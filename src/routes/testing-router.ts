@@ -1,8 +1,21 @@
 import { Request, Response, Router } from 'express'
+import { type VideoType } from '../db/db'
 
-export const testingRouter = Router()
+export const testingRouter = (db: VideoType[]) => {
+  const router = Router()
 
-testingRouter.delete('/all-data', (req: Request, res: Response) => {
-  let helloMessage = 'Hello Incubator!'
-  res.send(helloMessage)
-})
+  router.delete('/all-data', (req: Request, res: Response) => {
+    db = []
+    enum Resol {
+      P123,
+      P124,
+      P125,
+      P126,
+    }
+    for (let item in Resol) {
+    }
+
+    res.sendStatus(204)
+  })
+  return router
+}
