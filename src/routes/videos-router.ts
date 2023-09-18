@@ -43,7 +43,7 @@ export const videosRouter = (db: VideoType[]) => {
     const { title, author, availableResolutions } = req.body
 
     // validation
-    const errorsMessages = []
+    const errorsArray = []
     if (
       !title ||
       !title.trim() ||
@@ -57,11 +57,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('46===video', errorsMessages)
-
-      res.status(400).send(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     if (!author || typeof author !== 'string' || author.length > 20) {
@@ -70,10 +66,8 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('59===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
+      console.log('59===video', errorsArray)
     }
 
     let newAvailibleResolution = null
@@ -90,30 +84,34 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('79===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
+      console.log('79===video', errorsArray)
     }
 
-    const newDate = new Date()
-    const newNextDate = newDate
-    const newCreatedDate = newDate.toISOString()
-    const newPublishedDate = new Date(
-      newNextDate.setDate(newNextDate.getDate() + 1)
-    ).toISOString()
-    const newVideo: VideoType = {
-      id: +new Date(),
-      title,
-      author,
-      canBeDownloaded: false,
-      minAgeRestriction: null,
-      createdAt: newCreatedDate,
-      publicationDate: newPublishedDate,
-      availableResolutions: newAvailibleResolution,
+    if (!errorsArray.length) {
+      const newDate = new Date()
+      const newNextDate = newDate
+      const newCreatedDate = newDate.toISOString()
+      const newPublishedDate = new Date(
+        newNextDate.setDate(newNextDate.getDate() + 1)
+      ).toISOString()
+      const newVideo: VideoType = {
+        id: +new Date(),
+        title,
+        author,
+        canBeDownloaded: false,
+        minAgeRestriction: null,
+        createdAt: newCreatedDate,
+        publicationDate: newPublishedDate,
+        availableResolutions: newAvailibleResolution,
+      }
+      db.push(newVideo)
+      res.status(201).json(newVideo)
+    } else {
+      const result = { errorsMessages: errorsArray }
+      res.status(400).json(result)
+      return
     }
-    db.push(newVideo)
-    res.status(201).json(newVideo)
   })
 
   router.put('/:id', (req: Request, res: Response) => {
@@ -138,7 +136,7 @@ export const videosRouter = (db: VideoType[]) => {
     } = req.body
 
     // validation
-    const errorsMessages = []
+    const errorsArray = []
     if (
       !title ||
       !title.trim() ||
@@ -152,11 +150,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('46===video', errorsMessages)
-
-      res.status(400).send(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     if (!author || typeof author !== 'string' || author.length > 20) {
@@ -165,10 +159,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('157===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     let newAvailibleResolution = null
@@ -185,10 +176,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('177===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     if (canBeDownloaded && typeof canBeDownloaded !== 'boolean') {
@@ -197,10 +185,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('201===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     if (
@@ -215,10 +200,7 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('219===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
     if (
@@ -231,25 +213,28 @@ export const videosRouter = (db: VideoType[]) => {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
         field,
       }
-      errorsMessages.push(errorObject)
-      console.log('234===video', errorsMessages)
-      res.status(400).json(errorsMessages)
-      return
+      errorsArray.push(errorObject)
     }
 
-    const updatedVideo: VideoType = {
-      id: foundElement.id,
-      title,
-      author,
-      canBeDownloaded: canBeDownloaded ? canBeDownloaded : false,
-      minAgeRestriction: minAgeRestriction ? minAgeRestriction : null,
-      createdAt: foundElement?.createdAt,
-      publicationDate,
-      availableResolutions: newAvailibleResolution,
+    if (!errorsArray.length) {
+      const updatedVideo: VideoType = {
+        id: foundElement.id,
+        title,
+        author,
+        canBeDownloaded: canBeDownloaded ? canBeDownloaded : false,
+        minAgeRestriction: minAgeRestriction ? minAgeRestriction : null,
+        createdAt: foundElement?.createdAt,
+        publicationDate,
+        availableResolutions: newAvailibleResolution,
+      }
+      const index = db.indexOf(foundElement)
+      db[index] = updatedVideo
+      res.sendStatus(204)
+    } else {
+      const result = { errorsMessages: errorsArray }
+      res.status(400).send(result)
+      return
     }
-    const index = db.indexOf(foundElement)
-    db[index] = updatedVideo
-    res.sendStatus(204)
   })
 
   router.delete('/:id', (req: Request, res: Response) => {
