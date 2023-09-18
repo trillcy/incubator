@@ -6,20 +6,7 @@ const db_1 = require("../db/db");
 const videosRouter = (db) => {
     const router = (0, express_1.Router)();
     router.get('/', (req, res) => {
-        const result = db.map((el) => {
-            return {
-                id: el.id,
-                title: el.title,
-                author: el.author,
-                canBeDownloaded: el.canBeDownloaded,
-                minAgeRestriction: el.minAgeRestriction,
-                craetedAt: el.createdAt,
-                publicationDate: el.publicationDate,
-                availableResolutions: el.availableResolutions,
-            };
-        });
-        console.log('20===video', result);
-        res.status(200).json(result);
+        res.status(200).json(db);
     });
     router.get('/:id', (req, res) => {
         const resId = +req.params.id;
@@ -41,10 +28,11 @@ const videosRouter = (db) => {
         // validation
         const errorsArray = [];
         if (!title ||
+            title === null ||
             !title.trim() ||
             typeof title !== 'string' ||
             title.length > 40) {
-            console.log('42====');
+            console.log('42====', title);
             const field = 'title';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -52,7 +40,10 @@ const videosRouter = (db) => {
             };
             errorsArray.push(errorObject);
         }
-        if (!author || typeof author !== 'string' || author.length > 20) {
+        if (!author ||
+            author === null ||
+            typeof author !== 'string' ||
+            author.length > 20) {
             const field = 'author';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -62,23 +53,36 @@ const videosRouter = (db) => {
             console.log('59===video', errorsArray);
         }
         let newAvailibleResolution = null;
-        if (availableResolutions && Array.isArray(availableResolutions)) {
-            newAvailibleResolution = availableResolutions.filter((el) => {
-                if (db_1.resolutions.includes(el)) {
-                    return el;
+        if (availableResolutions !== null) {
+            if (!availableResolutions || !Array.isArray(availableResolutions)) {
+                const field = 'availableResolutions';
+                const errorObject = {
+                    message: `inputModel has incorrect values. Incorrect field: ${field}`,
+                    field,
+                };
+                errorsArray.push(errorObject);
+            }
+            else {
+                const checkedArray = availableResolutions.filter((el) => {
+                    if (db_1.resolutions.includes(el)) {
+                        return el;
+                    }
+                });
+                if (checkedArray.length !== availableResolutions.length) {
+                    const field = 'availableResolutions';
+                    const errorObject = {
+                        message: `inputModel has incorrect values. Incorrect field: ${field}`,
+                        field,
+                    };
+                    errorsArray.push(errorObject);
                 }
-            });
-        }
-        if (!newAvailibleResolution) {
-            const field = 'availableResolutions';
-            const errorObject = {
-                message: `inputModel has incorrect values. Incorrect field: ${field}`,
-                field,
-            };
-            errorsArray.push(errorObject);
-            console.log('79===video', errorsArray);
+                else {
+                    newAvailibleResolution = checkedArray;
+                }
+            }
         }
         if (!errorsArray.length) {
+            console.log('78====');
             const newDate = new Date();
             const newNextDate = newDate;
             const newCreatedDate = newDate.toISOString();
@@ -98,6 +102,7 @@ const videosRouter = (db) => {
         }
         else {
             const result = { errorsMessages: errorsArray };
+            console.log('112===', result);
             res.status(400).json(result);
             return;
         }
@@ -114,14 +119,16 @@ const videosRouter = (db) => {
             res.sendStatus(404);
             return;
         }
+        console.log('135====', foundElement);
         const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate, } = req.body;
         // validation
         const errorsArray = [];
         if (!title ||
+            title === null ||
             !title.trim() ||
             typeof title !== 'string' ||
             title.length > 40) {
-            console.log('42====');
+            console.log('42====', title);
             const field = 'title';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -129,31 +136,48 @@ const videosRouter = (db) => {
             };
             errorsArray.push(errorObject);
         }
-        if (!author || typeof author !== 'string' || author.length > 20) {
+        if (!author ||
+            author === null ||
+            typeof author !== 'string' ||
+            author.length > 20) {
             const field = 'author';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
                 field,
             };
             errorsArray.push(errorObject);
+            console.log('59===video', errorsArray);
         }
         let newAvailibleResolution = null;
-        if (availableResolutions && Array.isArray(availableResolutions)) {
-            newAvailibleResolution = availableResolutions.filter((el) => {
-                if (db_1.resolutions.includes(el)) {
-                    return el;
+        if (availableResolutions !== null) {
+            if (!availableResolutions || !Array.isArray(availableResolutions)) {
+                const field = 'availableResolutions';
+                const errorObject = {
+                    message: `inputModel has incorrect values. Incorrect field: ${field}`,
+                    field,
+                };
+                errorsArray.push(errorObject);
+            }
+            else {
+                const checkedArray = availableResolutions.filter((el) => {
+                    if (db_1.resolutions.includes(el)) {
+                        return el;
+                    }
+                });
+                if (checkedArray.length !== availableResolutions.length) {
+                    const field = 'availableResolutions';
+                    const errorObject = {
+                        message: `inputModel has incorrect values. Incorrect field: ${field}`,
+                        field,
+                    };
+                    errorsArray.push(errorObject);
                 }
-            });
+                else {
+                    newAvailibleResolution = checkedArray;
+                }
+            }
         }
-        if (!newAvailibleResolution) {
-            const field = 'availableResolutions';
-            const errorObject = {
-                message: `inputModel has incorrect values. Incorrect field: ${field}`,
-                field,
-            };
-            errorsArray.push(errorObject);
-        }
-        if (canBeDownloaded && typeof canBeDownloaded !== 'boolean') {
+        if (!canBeDownloaded || typeof canBeDownloaded !== 'boolean') {
             const field = 'canBeDownloaded';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -161,10 +185,10 @@ const videosRouter = (db) => {
             };
             errorsArray.push(errorObject);
         }
-        if (minAgeRestriction &&
-            typeof minAgeRestriction !== 'number' &&
-            !Number.isInteger(minAgeRestriction) &&
-            minAgeRestriction < 1 &&
+        if (!minAgeRestriction ||
+            typeof minAgeRestriction !== 'number' ||
+            !Number.isInteger(minAgeRestriction) ||
+            minAgeRestriction < 1 ||
             minAgeRestriction > 18) {
             const field = 'minAgeRestriction';
             const errorObject = {
@@ -183,6 +207,7 @@ const videosRouter = (db) => {
             };
             errorsArray.push(errorObject);
         }
+        console.log('244====', errorsArray);
         if (!errorsArray.length) {
             const updatedVideo = {
                 id: foundElement.id,
@@ -190,7 +215,7 @@ const videosRouter = (db) => {
                 author,
                 canBeDownloaded: canBeDownloaded ? canBeDownloaded : false,
                 minAgeRestriction: minAgeRestriction ? minAgeRestriction : null,
-                createdAt: foundElement === null || foundElement === void 0 ? void 0 : foundElement.createdAt,
+                createdAt: foundElement.createdAt,
                 publicationDate,
                 availableResolutions: newAvailibleResolution,
             };
@@ -200,7 +225,7 @@ const videosRouter = (db) => {
         }
         else {
             const result = { errorsMessages: errorsArray };
-            res.status(400).send(result);
+            res.status(400).json(result);
             return;
         }
     });

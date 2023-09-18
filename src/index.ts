@@ -2,11 +2,11 @@ import express, { Request, Response } from 'express'
 import { videosRouter } from './routes/videos-router'
 import { testingRouter } from './routes/testing-router'
 import { db } from './db/db'
-import { app } from './app'
+import { startApp } from './app'
 
 // export const app = express()
-const port = 3003
-
+const port = 3004
+const app = startApp()
 // app.use(express.json())
 // export const RouterPaths = {
 //   videos: '/videos',

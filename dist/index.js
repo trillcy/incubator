@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = require("./app");
 // export const app = express()
-const port = 3003;
+const port = 3004;
+const app = (0, app_1.startApp)();
 // app.use(express.json())
 // export const RouterPaths = {
 //   videos: '/videos',
@@ -10,6 +11,6 @@ const port = 3003;
 // }
 // app.use(RouterPaths.videos, videosRouter(db))
 // app.use(RouterPaths.testing, testingRouter(db))
-app_1.app.listen(port, () => {
+app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
