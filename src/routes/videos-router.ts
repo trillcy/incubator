@@ -37,8 +37,6 @@ export const videosRouter = (db: VideoType[]) => {
       typeof title !== 'string' ||
       title.length > 40
     ) {
-      console.log('42====', title)
-
       const field = 'title'
       const errorObject = {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -59,7 +57,6 @@ export const videosRouter = (db: VideoType[]) => {
         field,
       }
       errorsArray.push(errorObject)
-      console.log('59===video', errorsArray)
     }
 
     let newAvailibleResolution = null
@@ -91,8 +88,6 @@ export const videosRouter = (db: VideoType[]) => {
     }
 
     if (!errorsArray.length) {
-      console.log('78====')
-
       const newDate = new Date()
       const newNextDate = newDate
       const newCreatedDate = newDate.toISOString()
@@ -113,7 +108,6 @@ export const videosRouter = (db: VideoType[]) => {
       res.status(201).json(newVideo)
     } else {
       const result = { errorsMessages: errorsArray }
-      console.log('112===', result)
 
       res.status(400).json(result)
       return
@@ -132,7 +126,6 @@ export const videosRouter = (db: VideoType[]) => {
       res.sendStatus(404)
       return
     }
-    console.log('135====', foundElement)
 
     const {
       title,
@@ -152,8 +145,6 @@ export const videosRouter = (db: VideoType[]) => {
       typeof title !== 'string' ||
       title.length > 40
     ) {
-      console.log('42====', title)
-
       const field = 'title'
       const errorObject = {
         message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -174,7 +165,6 @@ export const videosRouter = (db: VideoType[]) => {
         field,
       }
       errorsArray.push(errorObject)
-      console.log('59===video', errorsArray)
     }
 
     let newAvailibleResolution = null
@@ -241,7 +231,6 @@ export const videosRouter = (db: VideoType[]) => {
       }
       errorsArray.push(errorObject)
     }
-    console.log('244====', errorsArray)
 
     if (!errorsArray.length) {
       const updatedVideo: VideoType = {

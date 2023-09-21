@@ -32,7 +32,6 @@ const videosRouter = (db) => {
             !title.trim() ||
             typeof title !== 'string' ||
             title.length > 40) {
-            console.log('42====', title);
             const field = 'title';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -50,7 +49,6 @@ const videosRouter = (db) => {
                 field,
             };
             errorsArray.push(errorObject);
-            console.log('59===video', errorsArray);
         }
         let newAvailibleResolution = null;
         if (availableResolutions !== null) {
@@ -82,7 +80,6 @@ const videosRouter = (db) => {
             }
         }
         if (!errorsArray.length) {
-            console.log('78====');
             const newDate = new Date();
             const newNextDate = newDate;
             const newCreatedDate = newDate.toISOString();
@@ -102,7 +99,6 @@ const videosRouter = (db) => {
         }
         else {
             const result = { errorsMessages: errorsArray };
-            console.log('112===', result);
             res.status(400).json(result);
             return;
         }
@@ -119,7 +115,6 @@ const videosRouter = (db) => {
             res.sendStatus(404);
             return;
         }
-        console.log('135====', foundElement);
         const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate, } = req.body;
         // validation
         const errorsArray = [];
@@ -128,7 +123,6 @@ const videosRouter = (db) => {
             !title.trim() ||
             typeof title !== 'string' ||
             title.length > 40) {
-            console.log('42====', title);
             const field = 'title';
             const errorObject = {
                 message: `inputModel has incorrect values. Incorrect field: ${field}`,
@@ -146,7 +140,6 @@ const videosRouter = (db) => {
                 field,
             };
             errorsArray.push(errorObject);
-            console.log('59===video', errorsArray);
         }
         let newAvailibleResolution = null;
         if (availableResolutions !== null) {
@@ -207,7 +200,6 @@ const videosRouter = (db) => {
             };
             errorsArray.push(errorObject);
         }
-        console.log('244====', errorsArray);
         if (!errorsArray.length) {
             const updatedVideo = {
                 id: foundElement.id,
