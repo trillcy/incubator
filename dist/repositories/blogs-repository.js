@@ -7,7 +7,7 @@ exports.blogsRepository = {
     findAll() {
         return blogsDb_1.blogsDb;
     },
-    findOne(id) {
+    findById(id) {
         const result = blogsDb_1.blogsDb.find((el) => el.id === id);
         return result;
     },

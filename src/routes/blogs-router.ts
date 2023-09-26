@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express'
-import { resolutions, type VideoType } from '../db/db'
-import { blogsRepository } from '../repositories/blogs-repository'
+import { blogsRepository } from '../repositories/blogs-db-repository'
 import {
   ValidationError,
   body,
   param,
   validationResult,
 } from 'express-validator'
+import { postsRepository } from '../repositories/posts-db-repository'
 
 type ErrorObject = { message: string; field: string }
 
@@ -28,6 +28,38 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 export const blogsRouter = () => {
   const router = Router()
 
+  // =============
+
+  const titleValidation = body('title')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 1, max: 30 })
+
+  const shortDescriptionValidation = body('shortDescription')
+    .isString()
+    .isLength({ min: 1, max: 100 })
+
+  const contentValidation = body('content')
+    .isString()
+    .trim()
+    .notEmpty()
+
+    .isLength({ min: 1, max: 1000 })
+
+  const blogIdValidation = param('id')
+    .isString()
+    .trim()
+    .notEmpty()
+    .exists({ checkFalsy: true })
+    .custom(async (value) => {
+      const blog = await blogsRepository.findById(value)
+      console.log('56====', blog)
+      if (!blog) throw new Error('incorrect blogId')
+      return true
+    })
+
+  // =============
   const idValidation = param('id')
     .isString()
     .trim()
@@ -58,8 +90,9 @@ export const blogsRouter = () => {
     nameValidation,
     descriptionValidation,
     websiteUrlValidation,
+    async (req: Request, res: Response) => {
+      console.log('61===blogs')
 
-    (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
         res.sendStatus(401)
@@ -71,29 +104,31 @@ export const blogsRouter = () => {
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        console.log('74===', errorsMessages)
 
         res.status(400).send({ errorsMessages })
       } else {
         const { name, description, websiteUrl } = req.body
-        const newBlog = blogsRepository.create(name, description, websiteUrl)
-        res.status(201).json(newBlog) //===.send()
+        const newBlog = await blogsRepository.create(
+          name,
+          description,
+          websiteUrl
+        )
+        res.status(201).json(newBlog)
+        //===.send()
       }
     }
   )
 
-  router.get('/', (req: Request, res: Response) => {
-    const result = blogsRepository.findAll()
-    console.log('10===blogs', result)
+  router.get('/', async (req: Request, res: Response) => {
+    const result = await blogsRepository.findAll()
 
     res.status(200).json(result)
   })
 
-  router.get('/:id', idValidation, (req: Request, res: Response) => {
+  router.get('/:id', idValidation, async (req: Request, res: Response) => {
     const resId = req.params.id
 
-    const result = blogsRepository.findOne(resId)
-    console.log('25===blogs', result)
+    const result = await blogsRepository.findById(resId)
     if (result) {
       res.status(200).json(result)
     } else {
@@ -107,7 +142,7 @@ export const blogsRouter = () => {
     nameValidation,
     descriptionValidation,
     websiteUrlValidation,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
         res.sendStatus(401)
@@ -116,19 +151,21 @@ export const blogsRouter = () => {
 
       const id = req.params.id
       const errors = validationResult(req)
-      console.log('48====', errors)
 
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        console.log('74===', errorsMessages)
 
         res.status(400).send({ errorsMessages })
       } else {
         const { name, description, websiteUrl } = req.body
 
-        const result = blogsRepository.update(id, name, description, websiteUrl)
-        console.log('140====', result)
+        const result = await blogsRepository.update(
+          id,
+          name,
+          description,
+          websiteUrl
+        )
 
         if (result) {
           res.sendStatus(204)
@@ -140,16 +177,14 @@ export const blogsRouter = () => {
     }
   )
 
-  router.delete('/:id', (req: Request, res: Response) => {
+  router.delete('/:id', async (req: Request, res: Response) => {
     const checkAuth = auth(req.headers.authorization)
     if (!checkAuth) {
       res.sendStatus(401)
       return
     }
     const id = req.params.id
-    console.log('281===', id)
-    const result = blogsRepository.delete(id)
-    console.log('283===', result)
+    const result = await blogsRepository.delete(id)
 
     if (result) {
       res.sendStatus(204)
@@ -160,3 +195,54 @@ export const blogsRouter = () => {
 
   return router
 }
+/*
+  router.post(
+    '/:id/posts',
+    titleValidation,
+    shortDescriptionValidation,
+    contentValidation,
+    blogIdValidation,
+    async (req: Request, res: Response) => {
+      const checkAuth = auth(req.headers.authorization)
+      if (!checkAuth) {
+        res.sendStatus(401)
+        return
+      }
+
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        res.status(400).send({ errorsMessages })
+      } else {
+        const { title, shortDescription, content } = req.body
+        const blogId = req.params.id
+        const newPost = await postsRepository.create(
+          title,
+          shortDescription,
+          content,
+          blogId
+        )
+        console.log('225=====', newPost)
+        // добавляем blogName
+        if (newPost) {
+          const blogModel = await blogsRepository.findById(blogId)
+          if (blogModel) {
+            const blogName = blogModel.name
+            console.log('231===posts', { ...newPost, blogName })
+
+            res.status(201).json({ ...newPost, blogName })
+          } else {
+            res.sendStatus(444)
+          }
+        } else {
+          res.sendStatus(404)
+        }
+      }
+
+      res.status(200).json(req.params.id)
+    }
+  )
+*/

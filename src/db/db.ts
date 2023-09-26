@@ -1,3 +1,8 @@
+import { log } from 'console'
+import { MongoClient } from 'mongodb'
+import { BlogType } from './blogsDb'
+import { PostType } from './postsDb'
+
 export type VideoType = {
   id: number
   title: string
@@ -30,4 +35,28 @@ export enum Resolution {
   P2160 = 'P2160',
 }
 
-export const db: VideoType[] = []
+export const videoDb: VideoType[] = []
+
+const mongoURI = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'
+
+const dbName = 'incubator'
+const client = new MongoClient(mongoURI)
+export const db = client.db(dbName)
+
+export const blogsCoollection = db.collection<BlogType>('blogs')
+export const postsCoollection = db.collection<PostType>('posts')
+
+export const connectDb = async () => {
+  try {
+    console.log('46----', mongoURI)
+
+    await client.connect()
+    console.log('49------123')
+
+    await db.command({ ping: 1 })
+    console.log('Connected successfully to server')
+  } catch (e) {
+    log({ e })
+    log('cant connect to db')
+  }
+}

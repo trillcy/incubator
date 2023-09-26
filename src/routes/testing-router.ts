@@ -1,21 +1,18 @@
 import { Request, Response, Router } from 'express'
-import { type VideoType } from '../db/db'
+import { postsRepository } from '../repositories/posts-db-repository'
+import { blogsRepository } from '../repositories/blogs-db-repository'
 
-export const testingRouter = (db: VideoType[]) => {
+export const testingRouter = () => {
   const router = Router()
 
-  router.delete('/all-data', (req: Request, res: Response) => {
-    db = []
-    enum Resol {
-      P123,
-      P124,
-      P125,
-      P126,
-    }
-    for (let item in Resol) {
-    }
+  router.delete('/all-data', async (req: Request, res: Response) => {
+    const resultPosts = await postsRepository.deleteAll()
+    const resultBlogs = await blogsRepository.deleteAll()
+    console.log('21===', resultPosts)
+    console.log('25===', resultBlogs)
 
     res.sendStatus(204)
   })
+
   return router
 }
