@@ -2,6 +2,7 @@ import {
   ValidationError,
   body,
   param,
+  query,
   validationResult,
 } from 'express-validator'
 import { blogsRepository } from '../repositories/blogs-db-repository'
@@ -23,7 +24,7 @@ export const validationMiidleware = {
     .notEmpty()
     .isLength({ min: 1, max: 1000 }),
 
-  blogIdValidation: body('id')
+  blogIdValidation: body('blogId')
     .isString()
     .trim()
     .notEmpty()

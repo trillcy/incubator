@@ -10,27 +10,80 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
-const postsDb_1 = require("../db/postsDb");
 const db_1 = require("../db/db");
+const blogs_db_repository_1 = require("./blogs-db-repository");
+const postsFields = [
+    'id',
+    'title',
+    'shortDescription',
+    'content',
+    'blogId',
+    'blogName',
+];
+const postsDirections = ['asc', 'desc'];
 exports.postsRepository = {
-    findAll() {
+    findAll(sortBy, sortDirection, pageNumber, pageSize, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('6++++');
-            const result = yield db_1.postsCoollection
-                .find({}, { projection: { _id: 0 } })
+            // -----
+            const sortField = sortBy && postsFields.includes(sortBy) ? sortBy : 'createdAt';
+            const sortString = sortDirection && postsDirections.includes(sortDirection)
+                ? sortDirection
+                : 'desc';
+            const sortValue = sortString === 'desc' ? -1 : 1;
+            const sortObject = {};
+            sortObject[sortField] = sortValue;
+            // ------
+            const numberOfPage = pageNumber && Number.isInteger(+pageNumber) ? +pageNumber : 1;
+            const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10;
+            const skipElements = (numberOfPage - 1) * size;
+            // -----
+            const searchObject = blogId ? { blogId: blogId } : {};
+            // ---------
+            const items = yield db_1.postsCollection
+                .find(searchObject, { projection: { _id: 0 } })
+                .sort(sortObject)
+                .skip(skipElements)
+                .limit(size)
                 .toArray();
-            console.log('9+++post-rep', result);
-            if (result) {
+            const totalCount = yield db_1.postsCollection.countDocuments(searchObject);
+            const pagesCount = Math.ceil(totalCount / size);
+            const resultArray = [];
+            if (items.length) {
+                for (let item of items) {
+                    const blogModel = yield blogs_db_repository_1.blogsRepository.findById(item.blogId);
+                    if (blogModel) {
+                        const object = {
+                            id: item.id,
+                            title: item.title,
+                            shortDescription: item.shortDescription,
+                            content: item.content,
+                            blogId: item.blogId,
+                            blogName: blogModel.name,
+                            createdAt: item.createdAt,
+                        };
+                        resultArray.push(object);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                const result = {
+                    pagesCount,
+                    page: numberOfPage,
+                    pageSize: size,
+                    totalCount,
+                    items: resultArray,
+                };
                 return result;
             }
             else {
-                return undefined;
+                return null;
             }
         });
     },
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCoollection.findOne({ id: id }, { projection: { _id: 0 } });
+            const result = yield db_1.postsCollection.findOne({ id: id }, { projection: { _id: 0 } });
             if (result) {
                 return result;
             }
@@ -41,20 +94,20 @@ exports.postsRepository = {
     },
     deleteAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCoollection.deleteMany({});
-            const totalCount = yield db_1.postsCoollection.countDocuments({});
+            const result = yield db_1.postsCollection.deleteMany({});
+            const totalCount = yield db_1.postsCollection.countDocuments({});
             return totalCount === 0;
         });
     },
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCoollection.deleteOne({ id: id });
+            const result = yield db_1.postsCollection.deleteOne({ id: id });
             return result.deletedCount === 1;
         });
     },
     update(id, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCoollection.updateOne({ id: id }, {
+            const result = yield db_1.postsCollection.updateOne({ id: id }, {
                 $set: {
                     title: title,
                     shortDescription: shortDescription,
@@ -70,29 +123,11 @@ exports.postsRepository = {
             }
         });
     },
-    create(title, shortDescription, content, blogId) {
+    create(newElement) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('60+++post-repo');
-            // const blog = await blogsCoollection.findOne(
-            //   { id: blogId },
-            //   { projection: { _id: 0 } }
-            // )
-            const date = new Date();
-            const id = `${postsDb_1.postsDb.length}-${date.toISOString()}`;
-            const newElement = {
-                id,
-                title,
-                shortDescription,
-                content,
-                blogId,
-                // blogName: blog!.name,
-                createdAt: date.toISOString(),
-            };
-            const result = yield db_1.db
-                .collection('posts')
-                .insertOne(Object.assign({}, newElement));
+            console.log('69++++posts.repo', newElement);
+            yield db_1.postsCollection.insertOne(Object.assign({}, newElement));
             return newElement;
-            // }
         });
     },
 };

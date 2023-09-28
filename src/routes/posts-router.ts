@@ -7,8 +7,13 @@ import {
   validationResult,
 } from 'express-validator'
 import { blogsRepository } from '../repositories/blogs-db-repository'
-import { PostType } from '../db/postsDb'
+import {
+  type PostType,
+  type ViewPostType,
+  type ResultPost,
+} from '../db/postsDb'
 import { validationMiidleware } from '../middlewares/validation'
+import { postsService } from '../domains/posts-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -29,7 +34,7 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 
 export const postsRouter = () => {
   const router = Router()
-
+  /*
   const idValidation = param('id')
     .isString()
     .trim()
@@ -64,70 +69,60 @@ export const postsRouter = () => {
       if (!blog) throw new Error('incorrect blogId')
       return true
     })
-
+*/
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }
 
   router.get('/', async (req: Request, res: Response) => {
-    const posts: PostType[] | undefined = await postsRepository.findAll()
-    // добавляем blogName
+    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
+      req.query
 
-    let resultArray: any = []
-    let isCompleat = true
-    console.log('61===posts', resultArray)
-    if (posts) {
-      for (let post of posts) {
-        const blogId = post.blogId
-        console.log('85====', blogId)
-
-        const blogModel = await blogsRepository.findById(blogId)
-        if (blogModel) {
-          const blogName = blogModel.name
-          console.log('72===posts', { ...post, blogName })
-
-          resultArray.push({ ...post, blogName })
-        } else {
-          console.log('92====posts')
-
-          isCompleat = false
-        }
-      }
-    }
-    if (isCompleat) {
-      res.status(200).json(resultArray)
-    } else {
-      res.sendStatus(445)
-    }
-  })
-
-  router.get('/:id', idValidation, async (req: Request, res: Response) => {
-    const resId = req.params.id
-
-    const post = await postsRepository.findById(resId)
-    console.log('95===posts', post)
-    // добавляем blogName
-    if (post) {
-      const blogId = post.blogId
-      const blogModel = await blogsRepository.findById(blogId)
-      if (blogModel) {
-        const blogName = blogModel.name
-        console.log('103===posts', { ...post, blogName })
-
-        res.status(200).json({ ...post, blogName })
-      } else {
-        res.sendStatus(443)
-      }
+    const result: ResultPost | null = await postsRepository.findAll(
+      // searchNameTerm?.toString(),
+      sortBy?.toString(),
+      sortDirection?.toString(),
+      pageNumber?.toString(),
+      pageSize?.toString()
+    )
+    if (result) {
+      res.status(200).json(result)
     } else {
       res.sendStatus(404)
     }
   })
+
+  router.get(
+    '/:id',
+    //validationMiidleware.idValidation,
+    async (req: Request, res: Response) => {
+      const postId = req.params.id
+
+      const post = await postsRepository.findById(postId)
+      console.log('95===posts', post)
+      // добавляем blogName
+      if (post) {
+        const blogId = post.blogId
+        const blogModel = await blogsRepository.findById(blogId)
+        if (blogModel) {
+          const blogName = blogModel.name
+          console.log('103===posts', { ...post, blogName })
+
+          res.status(200).json({ ...post, blogName })
+        } else {
+          res.sendStatus(443)
+        }
+      } else {
+        res.sendStatus(404)
+      }
+    }
+  )
   router.post(
     '/',
-    titleValidation,
-    shortDescriptionValidation,
-    contentValidation,
-    blogIdValidation,
+    validationMiidleware.titleValidation,
+    validationMiidleware.shortDescriptionValidation,
+    validationMiidleware.contentValidation,
+    validationMiidleware.blogIdValidation,
 
     async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
@@ -146,7 +141,7 @@ export const postsRouter = () => {
         res.status(400).send({ errorsMessages })
       } else {
         const { title, shortDescription, content, blogId } = req.body
-        const newPost = await postsRepository.create(
+        const newPost = await postsService.create(
           title,
           shortDescription,
           content,
@@ -155,17 +150,9 @@ export const postsRouter = () => {
         console.log('143=====', newPost)
         // добавляем blogName
         if (newPost) {
-          const blogModel = await blogsRepository.findById(blogId)
-          if (blogModel) {
-            const blogName = blogModel.name
-            console.log('153===posts', { ...newPost, blogName })
-
-            res.status(201).json({ ...newPost, blogName })
-          } else {
-            res.sendStatus(444)
-          }
+          res.status(201).json(newPost)
         } else {
-          res.sendStatus(404)
+          res.sendStatus(444)
         }
       }
     }
@@ -173,11 +160,11 @@ export const postsRouter = () => {
 
   router.put(
     '/:id',
-    idValidation,
-    titleValidation,
-    shortDescriptionValidation,
-    contentValidation,
-    blogIdValidation,
+    validationMiidleware.idValidation,
+    validationMiidleware.titleValidation,
+    validationMiidleware.shortDescriptionValidation,
+    validationMiidleware.contentValidation,
+    validationMiidleware.blogIdValidation,
     async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {

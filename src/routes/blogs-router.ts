@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response, Router, query } from 'express'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import {
   ValidationError,
@@ -7,6 +7,10 @@ import {
   validationResult,
 } from 'express-validator'
 import { postsRepository } from '../repositories/posts-db-repository'
+import { blogsService } from '../domains/blogs-services'
+import { validationMiidleware } from '../middlewares/validation'
+import { postsService } from '../domains/posts-services'
+import { ResultPost, ViewPostType } from '../db/postsDb'
 
 type ErrorObject = { message: string; field: string }
 
@@ -29,7 +33,7 @@ export const blogsRouter = () => {
   const router = Router()
 
   // =============
-
+  /*
   const titleValidation = body('title')
     .isString()
     .trim()
@@ -80,16 +84,16 @@ export const blogsRouter = () => {
     .isLength({ min: 1, max: 500 })
 
   const websiteUrlValidation = body('websiteUrl').isString().isURL()
-
+*/
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }
 
   router.post(
     '/',
-    nameValidation,
-    descriptionValidation,
-    websiteUrlValidation,
+    validationMiidleware.nameValidation,
+    validationMiidleware.descriptionValidation,
+    validationMiidleware.websiteUrlValidation,
     async (req: Request, res: Response) => {
       console.log('61===blogs')
 
@@ -108,11 +112,7 @@ export const blogsRouter = () => {
         res.status(400).send({ errorsMessages })
       } else {
         const { name, description, websiteUrl } = req.body
-        const newBlog = await blogsRepository.create(
-          name,
-          description,
-          websiteUrl
-        )
+        const newBlog = await blogsService.create(name, description, websiteUrl)
         res.status(201).json(newBlog)
         //===.send()
       }
@@ -120,28 +120,40 @@ export const blogsRouter = () => {
   )
 
   router.get('/', async (req: Request, res: Response) => {
-    const result = await blogsRepository.findAll()
+    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
+      req.query
+    const result: any = await blogsRepository.findAll(
+      searchNameTerm?.toString(),
+      sortBy?.toString(),
+      sortDirection?.toString(),
+      pageNumber?.toString(),
+      pageSize?.toString()
+    )
 
     res.status(200).json(result)
   })
 
-  router.get('/:id', idValidation, async (req: Request, res: Response) => {
-    const resId = req.params.id
+  router.get(
+    '/:id',
+    // validationMiidleware.idValidation,
+    async (req: Request, res: Response) => {
+      const resId = req.params.id
 
-    const result = await blogsRepository.findById(resId)
-    if (result) {
-      res.status(200).json(result)
-    } else {
-      res.sendStatus(404)
+      const result = await blogsRepository.findById(resId)
+      if (result) {
+        res.status(200).json(result)
+      } else {
+        res.sendStatus(404)
+      }
     }
-  })
+  )
 
   router.put(
     '/:id',
-    idValidation,
-    nameValidation,
-    descriptionValidation,
-    websiteUrlValidation,
+    validationMiidleware.idValidation,
+    validationMiidleware.nameValidation,
+    validationMiidleware.descriptionValidation,
+    validationMiidleware.websiteUrlValidation,
     async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
@@ -193,15 +205,11 @@ export const blogsRouter = () => {
     }
   })
 
-  return router
-}
-/*
   router.post(
-    '/:id/posts',
-    titleValidation,
-    shortDescriptionValidation,
-    contentValidation,
-    blogIdValidation,
+    '/:blogId/posts',
+    validationMiidleware.titleValidation,
+    validationMiidleware.shortDescriptionValidation,
+    validationMiidleware.contentValidation,
     async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
@@ -215,34 +223,54 @@ export const blogsRouter = () => {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
 
-        res.status(400).send({ errorsMessages })
+        return res.status(400).send({ errorsMessages })
       } else {
         const { title, shortDescription, content } = req.body
-        const blogId = req.params.id
-        const newPost = await postsRepository.create(
+        const blogId = req.params.blogId
+        if (!blogId) {
+          res.sendStatus(404)
+          return
+        }
+        const newPost: ViewPostType | null = await postsService.create(
           title,
           shortDescription,
           content,
           blogId
         )
-        console.log('225=====', newPost)
-        // добавляем blogName
-        if (newPost) {
-          const blogModel = await blogsRepository.findById(blogId)
-          if (blogModel) {
-            const blogName = blogModel.name
-            console.log('231===posts', { ...newPost, blogName })
+        console.log('236----', newPost)
 
-            res.status(201).json({ ...newPost, blogName })
-          } else {
-            res.sendStatus(444)
-          }
+        if (newPost) {
+          return res.status(201).json(newPost)
         } else {
-          res.sendStatus(404)
+          return res.sendStatus(404)
         }
       }
-
-      res.status(200).json(req.params.id)
     }
   )
-*/
+
+  router.get('/:blogId/posts', async (req: Request, res: Response) => {
+    const blogId = req.params.blogId
+    console.log('255---blog.route', blogId)
+
+    if (!blogId) {
+      res.sendStatus(404)
+      return
+    }
+    const { sortBy, sortDirection, pageNumber, pageSize } = req.query
+
+    const result = await postsRepository.findAll(
+      sortBy?.toString(),
+      sortDirection?.toString(),
+      pageNumber?.toString(),
+      pageSize?.toString(),
+      blogId
+    )
+    if (result) {
+      res.status(200).json(result)
+    } else {
+      res.sendStatus(404)
+    }
+  })
+
+  return router
+}

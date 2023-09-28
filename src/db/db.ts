@@ -43,8 +43,8 @@ const dbName = 'incubator'
 const client = new MongoClient(mongoURI)
 export const db = client.db(dbName)
 
-export const blogsCoollection = db.collection<BlogType>('blogs')
-export const postsCoollection = db.collection<PostType>('posts')
+export const blogsCollection = db.collection<BlogType>('blogs')
+export const postsCollection = db.collection<PostType>('posts')
 
 export const connectDb = async () => {
   try {

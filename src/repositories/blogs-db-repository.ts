@@ -1,33 +1,98 @@
 import { log } from 'console'
 import { blogsDb, type BlogType } from '../db/blogsDb'
-import { blogsCoollection } from '../db/db'
+import { blogsCollection } from '../db/db'
+
+const blogsFields = [
+  'id',
+  'name',
+  'description',
+  'websiteUrl',
+  'createdAt',
+  'isMembership',
+]
+
+const blogsDirections = ['asc', 'desc']
 
 export const blogsRepository = {
   async deleteAll(): Promise<boolean> {
-    await blogsCoollection.deleteMany({})
-    const totalCount = await blogsCoollection.countDocuments({})
+    await blogsCollection.deleteMany({})
+    const totalCount = await blogsCollection.countDocuments({})
     return totalCount === 0
   },
 
-  async findAll(): Promise<BlogType[] | undefined> {
-    const result = await blogsCoollection
-      .find({}, { projection: { _id: 0 } })
+  async findAll(
+    searchNameTerm: string | undefined,
+    sortBy: string | undefined,
+    sortDirection: string | undefined,
+    pageNumber: string | undefined,
+    pageSize: string | undefined
+  ): Promise<any> {
+    //Promise<BlogType[] | undefined> {
+    console.log(
+      '32+++++blog.repo',
+      searchNameTerm,
+      sortBy,
+      sortDirection,
+      pageNumber,
+      pageSize
+    )
+
+    const searchName = searchNameTerm ? searchNameTerm : ''
+    // -----
+    const sortField =
+      sortBy && blogsFields.includes(sortBy) ? sortBy : 'createdAt'
+    const sortString =
+      sortDirection && blogsDirections.includes(sortDirection)
+        ? sortDirection
+        : 'desc'
+    const sortValue = sortString === 'desc' ? -1 : 1
+    const sortObject: any = {}
+    sortObject[sortField] = sortValue
+    // ------
+    // TODO: проверить общее количество элементов в коллекции
+    // если меньше, то поставить соответствующий skipElements
+    // ------
+    const numberOfPage =
+      pageNumber && Number.isInteger(+pageNumber) ? +pageNumber : 1
+    const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10
+    const skipElements = (numberOfPage - 1) * size
+
+    const items = await blogsCollection
+      .find(
+        { name: { $regex: searchName, $options: 'i' } },
+        { projection: { _id: 0 } }
+      )
+      .sort(sortObject)
+      .skip(skipElements)
+      .limit(size)
       .toArray()
-    if (result) {
+    const totalCount = await blogsCollection.countDocuments({
+      name: { $regex: searchName, $options: 'i' },
+    })
+    const pagesCount = Math.ceil(totalCount / size)
+    if (items) {
+      console.log('66++++blog.repo', totalCount)
+
+      const result = {
+        pagesCount,
+        page: numberOfPage,
+        pageSize: size,
+        totalCount,
+        items,
+      }
       return result
     } else {
+      log('79+++++blog.repo')
       return undefined
     }
   },
 
   async findById(id: string): Promise<BlogType | null> {
-    return await blogsCoollection.findOne(
-      { id: id },
-      { projection: { _id: 0 } }
-    )
+    return await blogsCollection.findOne({ id: id }, { projection: { _id: 0 } })
   },
   async delete(id: string): Promise<boolean> {
-    const result = await blogsCoollection.deleteOne({ id: id })
+    const result = await blogsCollection.deleteOne({ id: id })
+
     return result.deletedCount === 1
   },
   async update(
@@ -36,7 +101,7 @@ export const blogsRepository = {
     description: string,
     websiteUrl: string
   ): Promise<boolean> {
-    const result = await blogsCoollection.updateOne(
+    const result = await blogsCollection.updateOne(
       { id: id },
       {
         $set: {
@@ -46,28 +111,15 @@ export const blogsRepository = {
         },
       }
     )
+
     if (result.matchedCount === 1) {
       return true
     } else {
       return false
     }
   },
-  async create(
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<BlogType | undefined> {
-    const date = new Date()
-    const id = `${blogsDb.length}-${date.toISOString()}`
-    const newElement = {
-      id: id,
-      name: name,
-      description: description,
-      websiteUrl: websiteUrl,
-      createdAt: date.toISOString(),
-      isMembership: false,
-    }
-    await blogsCoollection.insertOne({ ...newElement })
+  async create(newElement: BlogType): Promise<BlogType | undefined> {
+    await blogsCollection.insertOne({ ...newElement })
     return newElement
   },
 }

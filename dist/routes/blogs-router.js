@@ -13,6 +13,10 @@ exports.blogsRouter = void 0;
 const express_1 = require("express");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
 const express_validator_1 = require("express-validator");
+const posts_db_repository_1 = require("../repositories/posts-db-repository");
+const blogs_services_1 = require("../domains/blogs-services");
+const validation_1 = require("../middlewares/validation");
+const posts_services_1 = require("../domains/posts-services");
 const ErrorFormatter = (error) => {
     switch (error.type) {
         case 'field':
@@ -30,53 +34,62 @@ const ErrorFormatter = (error) => {
 const blogsRouter = () => {
     const router = (0, express_1.Router)();
     // =============
-    const titleValidation = (0, express_validator_1.body)('title')
-        .isString()
-        .trim()
-        .notEmpty()
-        .isLength({ min: 1, max: 30 });
-    const shortDescriptionValidation = (0, express_validator_1.body)('shortDescription')
-        .isString()
-        .isLength({ min: 1, max: 100 });
-    const contentValidation = (0, express_validator_1.body)('content')
-        .isString()
-        .trim()
-        .notEmpty()
-        .isLength({ min: 1, max: 1000 });
-    const blogIdValidation = (0, express_validator_1.param)('id')
-        .isString()
-        .trim()
-        .notEmpty()
-        .exists({ checkFalsy: true })
-        .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-        const blog = yield blogs_db_repository_1.blogsRepository.findById(value);
-        console.log('56====', blog);
-        if (!blog)
-            throw new Error('incorrect blogId');
-        return true;
-    }));
+    /*
+    const titleValidation = body('title')
+      .isString()
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1, max: 30 })
+  
+    const shortDescriptionValidation = body('shortDescription')
+      .isString()
+      .isLength({ min: 1, max: 100 })
+  
+    const contentValidation = body('content')
+      .isString()
+      .trim()
+      .notEmpty()
+  
+      .isLength({ min: 1, max: 1000 })
+  
+    const blogIdValidation = param('id')
+      .isString()
+      .trim()
+      .notEmpty()
+      .exists({ checkFalsy: true })
+      .custom(async (value) => {
+        const blog = await blogsRepository.findById(value)
+        console.log('56====', blog)
+        if (!blog) throw new Error('incorrect blogId')
+        return true
+      })
+  
     // =============
-    const idValidation = (0, express_validator_1.param)('id')
-        .isString()
-        .trim()
-        .notEmpty()
-        .exists({ checkFalsy: true });
-    const nameValidation = (0, express_validator_1.body)('name')
-        // .custom(({ req }) => {
-        //   return `Basic YWRtaW46cXdlcnR5` === req.headers.authorization
-        // })
-        .isString()
-        .trim()
-        .notEmpty()
-        .isLength({ min: 1, max: 15 });
-    const descriptionValidation = (0, express_validator_1.body)('description')
-        .isString()
-        .isLength({ min: 1, max: 500 });
-    const websiteUrlValidation = (0, express_validator_1.body)('websiteUrl').isString().isURL();
+    const idValidation = param('id')
+      .isString()
+      .trim()
+      .notEmpty()
+      .exists({ checkFalsy: true })
+  
+    const nameValidation = body('name')
+      // .custom(({ req }) => {
+      //   return `Basic YWRtaW46cXdlcnR5` === req.headers.authorization
+      // })
+      .isString()
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1, max: 15 })
+  
+    const descriptionValidation = body('description')
+      .isString()
+      .isLength({ min: 1, max: 500 })
+  
+    const websiteUrlValidation = body('websiteUrl').isString().isURL()
+  */
     const auth = (basicString) => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
-    router.post('/', nameValidation, descriptionValidation, websiteUrlValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.post('/', validation_1.validationMiidleware.nameValidation, validation_1.validationMiidleware.descriptionValidation, validation_1.validationMiidleware.websiteUrlValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('61===blogs');
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
@@ -91,16 +104,19 @@ const blogsRouter = () => {
         }
         else {
             const { name, description, websiteUrl } = req.body;
-            const newBlog = yield blogs_db_repository_1.blogsRepository.create(name, description, websiteUrl);
+            const newBlog = yield blogs_services_1.blogsService.create(name, description, websiteUrl);
             res.status(201).json(newBlog);
             //===.send()
         }
     }));
     router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield blogs_db_repository_1.blogsRepository.findAll();
+        const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = req.query;
+        const result = yield blogs_db_repository_1.blogsRepository.findAll(searchNameTerm === null || searchNameTerm === void 0 ? void 0 : searchNameTerm.toString(), sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
         res.status(200).json(result);
     }));
-    router.get('/:id', idValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.get('/:id', 
+    // validationMiidleware.idValidation,
+    (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const resId = req.params.id;
         const result = yield blogs_db_repository_1.blogsRepository.findById(resId);
         if (result) {
@@ -110,7 +126,7 @@ const blogsRouter = () => {
             res.sendStatus(404);
         }
     }));
-    router.put('/:id', idValidation, nameValidation, descriptionValidation, websiteUrlValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.put('/:id', validation_1.validationMiidleware.idValidation, validation_1.validationMiidleware.nameValidation, validation_1.validationMiidleware.descriptionValidation, validation_1.validationMiidleware.websiteUrlValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
             res.sendStatus(401);
@@ -150,57 +166,51 @@ const blogsRouter = () => {
             res.sendStatus(404);
         }
     }));
+    router.post('/:blogId/posts', validation_1.validationMiidleware.titleValidation, validation_1.validationMiidleware.shortDescriptionValidation, validation_1.validationMiidleware.contentValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const checkAuth = auth(req.headers.authorization);
+        if (!checkAuth) {
+            res.sendStatus(401);
+            return;
+        }
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const errorsArray = errors.array({ onlyFirstError: true });
+            const errorsMessages = errorsArray.map((e) => ErrorFormatter(e));
+            return res.status(400).send({ errorsMessages });
+        }
+        else {
+            const { title, shortDescription, content } = req.body;
+            const blogId = req.params.blogId;
+            if (!blogId) {
+                res.sendStatus(404);
+                return;
+            }
+            const newPost = yield posts_services_1.postsService.create(title, shortDescription, content, blogId);
+            console.log('236----', newPost);
+            if (newPost) {
+                return res.status(201).json(newPost);
+            }
+            else {
+                return res.sendStatus(404);
+            }
+        }
+    }));
+    router.get('/:blogId/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const blogId = req.params.blogId;
+        console.log('255---blog.route', blogId);
+        if (!blogId) {
+            res.sendStatus(404);
+            return;
+        }
+        const { sortBy, sortDirection, pageNumber, pageSize } = req.query;
+        const result = yield posts_db_repository_1.postsRepository.findAll(sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString(), blogId);
+        if (result) {
+            res.status(200).json(result);
+        }
+        else {
+            res.sendStatus(404);
+        }
+    }));
     return router;
 };
 exports.blogsRouter = blogsRouter;
-/*
-  router.post(
-    '/:id/posts',
-    titleValidation,
-    shortDescriptionValidation,
-    contentValidation,
-    blogIdValidation,
-    async (req: Request, res: Response) => {
-      const checkAuth = auth(req.headers.authorization)
-      if (!checkAuth) {
-        res.sendStatus(401)
-        return
-      }
-
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        const errorsArray = errors.array({ onlyFirstError: true })
-        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-
-        res.status(400).send({ errorsMessages })
-      } else {
-        const { title, shortDescription, content } = req.body
-        const blogId = req.params.id
-        const newPost = await postsRepository.create(
-          title,
-          shortDescription,
-          content,
-          blogId
-        )
-        console.log('225=====', newPost)
-        // добавляем blogName
-        if (newPost) {
-          const blogModel = await blogsRepository.findById(blogId)
-          if (blogModel) {
-            const blogName = blogModel.name
-            console.log('231===posts', { ...newPost, blogName })
-
-            res.status(201).json({ ...newPost, blogName })
-          } else {
-            res.sendStatus(444)
-          }
-        } else {
-          res.sendStatus(404)
-        }
-      }
-
-      res.status(200).json(req.params.id)
-    }
-  )
-*/

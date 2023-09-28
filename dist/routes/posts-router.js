@@ -14,6 +14,8 @@ const express_1 = require("express");
 const posts_db_repository_1 = require("../repositories/posts-db-repository");
 const express_validator_1 = require("express-validator");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
+const validation_1 = require("../middlewares/validation");
+const posts_services_1 = require("../domains/posts-services");
 const ErrorFormatter = (error) => {
     switch (error.type) {
         case 'field':
@@ -30,71 +32,62 @@ const ErrorFormatter = (error) => {
 };
 const postsRouter = () => {
     const router = (0, express_1.Router)();
-    const idValidation = (0, express_validator_1.param)('id')
-        .isString()
-        .trim()
-        .notEmpty()
-        .exists({ checkFalsy: true });
-    const titleValidation = (0, express_validator_1.body)('title')
-        .isString()
-        .trim()
-        .notEmpty()
-        .isLength({ min: 1, max: 30 });
-    const shortDescriptionValidation = (0, express_validator_1.body)('shortDescription')
-        .isString()
-        .isLength({ min: 1, max: 100 });
-    const contentValidation = (0, express_validator_1.body)('content')
-        .isString()
-        .trim()
-        .notEmpty()
-        .isLength({ min: 1, max: 1000 });
-    const blogIdValidation = (0, express_validator_1.body)('blogId')
-        .isString()
-        .trim()
-        .notEmpty()
-        .exists({ checkFalsy: true })
-        .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-        const blog = yield blogs_db_repository_1.blogsRepository.findById(value);
-        console.log('62====', blog);
-        if (!blog)
-            throw new Error('incorrect blogId');
-        return true;
-    }));
+    /*
+    const idValidation = param('id')
+      .isString()
+      .trim()
+      .notEmpty()
+      .exists({ checkFalsy: true })
+  
+    const titleValidation = body('title')
+      .isString()
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1, max: 30 })
+  
+    const shortDescriptionValidation = body('shortDescription')
+      .isString()
+      .isLength({ min: 1, max: 100 })
+  
+    const contentValidation = body('content')
+      .isString()
+      .trim()
+      .notEmpty()
+  
+      .isLength({ min: 1, max: 1000 })
+  
+    const blogIdValidation = body('blogId')
+      .isString()
+      .trim()
+      .notEmpty()
+      .exists({ checkFalsy: true })
+      .custom(async (value) => {
+        const blog = await blogsRepository.findById(value)
+        console.log('62====', blog)
+        if (!blog) throw new Error('incorrect blogId')
+        return true
+      })
+  */
     const auth = (basicString) => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
     router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const posts = yield posts_db_repository_1.postsRepository.findAll();
-        // добавляем blogName
-        let resultArray = [];
-        let isCompleat = true;
-        console.log('61===posts', resultArray);
-        if (posts) {
-            for (let post of posts) {
-                const blogId = post.blogId;
-                console.log('85====', blogId);
-                const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
-                if (blogModel) {
-                    const blogName = blogModel.name;
-                    console.log('72===posts', Object.assign(Object.assign({}, post), { blogName }));
-                    resultArray.push(Object.assign(Object.assign({}, post), { blogName }));
-                }
-                else {
-                    console.log('92====posts');
-                    isCompleat = false;
-                }
-            }
-        }
-        if (isCompleat) {
-            res.status(200).json(resultArray);
+        const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = req.query;
+        const result = yield posts_db_repository_1.postsRepository.findAll(
+        // searchNameTerm?.toString(),
+        sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
+        if (result) {
+            res.status(200).json(result);
         }
         else {
-            res.sendStatus(445);
+            res.sendStatus(404);
         }
     }));
-    router.get('/:id', idValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const resId = req.params.id;
-        const post = yield posts_db_repository_1.postsRepository.findById(resId);
+    router.get('/:id', 
+    //validationMiidleware.idValidation,
+    (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const postId = req.params.id;
+        const post = yield posts_db_repository_1.postsRepository.findById(postId);
         console.log('95===posts', post);
         // добавляем blogName
         if (post) {
@@ -113,7 +106,7 @@ const postsRouter = () => {
             res.sendStatus(404);
         }
     }));
-    router.post('/', titleValidation, shortDescriptionValidation, contentValidation, blogIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.post('/', validation_1.validationMiidleware.titleValidation, validation_1.validationMiidleware.shortDescriptionValidation, validation_1.validationMiidleware.contentValidation, validation_1.validationMiidleware.blogIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
             res.sendStatus(401);
@@ -128,26 +121,18 @@ const postsRouter = () => {
         }
         else {
             const { title, shortDescription, content, blogId } = req.body;
-            const newPost = yield posts_db_repository_1.postsRepository.create(title, shortDescription, content, blogId);
+            const newPost = yield posts_services_1.postsService.create(title, shortDescription, content, blogId);
             console.log('143=====', newPost);
             // добавляем blogName
             if (newPost) {
-                const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
-                if (blogModel) {
-                    const blogName = blogModel.name;
-                    console.log('153===posts', Object.assign(Object.assign({}, newPost), { blogName }));
-                    res.status(201).json(Object.assign(Object.assign({}, newPost), { blogName }));
-                }
-                else {
-                    res.sendStatus(444);
-                }
+                res.status(201).json(newPost);
             }
             else {
-                res.sendStatus(404);
+                res.sendStatus(444);
             }
         }
     }));
-    router.put('/:id', idValidation, titleValidation, shortDescriptionValidation, contentValidation, blogIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.put('/:id', validation_1.validationMiidleware.idValidation, validation_1.validationMiidleware.titleValidation, validation_1.validationMiidleware.shortDescriptionValidation, validation_1.validationMiidleware.contentValidation, validation_1.validationMiidleware.blogIdValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
             res.sendStatus(401);

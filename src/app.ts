@@ -3,6 +3,7 @@ import { videosRouter } from './routes/videos-router'
 import { testingRouter } from './routes/testing-router'
 import { blogsRouter } from './routes/blogs-router'
 import { postsRouter } from './routes/posts-router'
+import { usersRouter } from './routes/users-router'
 // import { videoDb } from './db/db'
 
 export const RouterPaths = {
@@ -10,6 +11,7 @@ export const RouterPaths = {
   testing: '/testing',
   blogs: '/blogs',
   posts: '/posts',
+  users: '/users',
 }
 
 export const app = express()
@@ -21,3 +23,4 @@ app.use(express.json())
 app.use(RouterPaths.testing, testingRouter())
 app.use(RouterPaths.blogs, blogsRouter())
 app.use(RouterPaths.posts, postsRouter())
+app.use(RouterPaths.users, usersRouter())

@@ -1,24 +1,96 @@
-import { postsDb, type PostType } from '../db/postsDb'
-import { blogsCoollection, db, postsCoollection } from '../db/db'
+import {
+  postsDb,
+  type PostType,
+  type ViewPostType,
+  type ResultPost,
+} from '../db/postsDb'
+import { BlogType } from '../db/blogsDb'
+import { postsCollection } from '../db/db'
+import { blogsRepository } from './blogs-db-repository'
+
+const postsFields = [
+  'id',
+  'title',
+  'shortDescription',
+  'content',
+  'blogId',
+  'blogName',
+]
+
+const postsDirections = ['asc', 'desc']
 
 export const postsRepository = {
-  async findAll(): Promise<PostType[] | undefined> {
-    console.log('6++++')
+  async findAll(
+    sortBy: string | undefined,
+    sortDirection: string | undefined,
+    pageNumber: string | undefined,
+    pageSize: string | undefined,
+    blogId?: string | undefined
+  ): Promise<ResultPost | null> {
+    // -----
+    const sortField =
+      sortBy && postsFields.includes(sortBy) ? sortBy : 'createdAt'
+    const sortString =
+      sortDirection && postsDirections.includes(sortDirection)
+        ? sortDirection
+        : 'desc'
+    const sortValue = sortString === 'desc' ? -1 : 1
+    const sortObject: any = {}
+    sortObject[sortField] = sortValue
+    // ------
+    const numberOfPage =
+      pageNumber && Number.isInteger(+pageNumber) ? +pageNumber : 1
+    const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10
+    const skipElements = (numberOfPage - 1) * size
+    // -----
 
-    const result = await postsCoollection
-      .find({}, { projection: { _id: 0 } })
+    const searchObject = blogId ? { blogId: blogId } : {}
+    // ---------
+    const items = await postsCollection
+      .find(searchObject, { projection: { _id: 0 } })
+      .sort(sortObject)
+      .skip(skipElements)
+      .limit(size)
       .toArray()
-    console.log('9+++post-rep', result)
 
-    if (result) {
+    const totalCount = await postsCollection.countDocuments(searchObject)
+    const pagesCount = Math.ceil(totalCount / size)
+    const resultArray = []
+    if (items.length) {
+      for (let item of items) {
+        const blogModel: BlogType | null = await blogsRepository.findById(
+          item.blogId
+        )
+        if (blogModel) {
+          const object: ViewPostType = {
+            id: item.id,
+            title: item.title,
+            shortDescription: item.shortDescription,
+            content: item.content,
+            blogId: item.blogId,
+            blogName: blogModel.name,
+            createdAt: item.createdAt,
+          }
+          resultArray.push(object)
+        } else {
+          return null
+        }
+      }
+      const result: ResultPost = {
+        pagesCount,
+        page: numberOfPage,
+        pageSize: size,
+        totalCount,
+        items: resultArray,
+      }
       return result
     } else {
-      return undefined
+      return null
     }
   },
 
   async findById(id: string): Promise<PostType | null> {
-    const result = await postsCoollection.findOne(
+    const result = await postsCollection.findOne(
       { id: id },
       { projection: { _id: 0 } }
     )
@@ -30,13 +102,13 @@ export const postsRepository = {
   },
 
   async deleteAll(): Promise<boolean> {
-    const result = await postsCoollection.deleteMany({})
-    const totalCount = await postsCoollection.countDocuments({})
+    const result = await postsCollection.deleteMany({})
+    const totalCount = await postsCollection.countDocuments({})
     return totalCount === 0
   },
 
   async delete(id: string): Promise<boolean> {
-    const result = await postsCoollection.deleteOne({ id: id })
+    const result = await postsCollection.deleteOne({ id: id })
     return result.deletedCount === 1
   },
 
@@ -47,7 +119,7 @@ export const postsRepository = {
     content: string,
     blogId: string
   ): Promise<boolean> {
-    const result = await postsCoollection.updateOne(
+    const result = await postsCollection.updateOne(
       { id: id },
       {
         $set: {
@@ -65,34 +137,10 @@ export const postsRepository = {
     }
   },
 
-  async create(
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<PostType | undefined> {
-    console.log('60+++post-repo')
-    // const blog = await blogsCoollection.findOne(
-    //   { id: blogId },
-    //   { projection: { _id: 0 } }
-    // )
+  async create(newElement: PostType): Promise<PostType> {
+    console.log('69++++posts.repo', newElement)
 
-    const date = new Date()
-    const id = `${postsDb.length}-${date.toISOString()}`
-    const newElement = {
-      id,
-      title,
-      shortDescription,
-      content,
-      blogId,
-      // blogName: blog!.name,
-      createdAt: date.toISOString(),
-    }
-    const result = await db
-      .collection<PostType>('posts')
-      .insertOne({ ...newElement })
-
+    await postsCollection.insertOne({ ...newElement })
     return newElement
-    // }
   },
 }

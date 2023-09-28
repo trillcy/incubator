@@ -26,7 +26,7 @@ exports.validationMiidleware = {
         .trim()
         .notEmpty()
         .isLength({ min: 1, max: 1000 }),
-    blogIdValidation: (0, express_validator_1.body)('id')
+    blogIdValidation: (0, express_validator_1.body)('blogId')
         .isString()
         .trim()
         .notEmpty()
