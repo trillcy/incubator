@@ -64,7 +64,6 @@ exports.postsService = {
                 blogName,
                 createdAt: date.toISOString(),
             };
-            console.log('60+++post.serv', newElement);
             const result = yield posts_db_repository_1.postsRepository.create(Object.assign({}, newElement));
             if (result) {
                 return newElement;

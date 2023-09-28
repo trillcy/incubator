@@ -4,7 +4,7 @@ import {
   type ViewPostType,
   type ResultPost,
 } from '../db/postsDb'
-import { BlogType } from '../db/blogsDb'
+import { BlogType } from '../db/types'
 import { postsCollection } from '../db/db'
 import { blogsRepository } from './blogs-db-repository'
 
@@ -138,8 +138,6 @@ export const postsRepository = {
   },
 
   async create(newElement: PostType): Promise<PostType> {
-    console.log('69++++posts.repo', newElement)
-
     await postsCollection.insertOne({ ...newElement })
     return newElement
   },

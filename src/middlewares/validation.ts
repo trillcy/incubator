@@ -6,6 +6,7 @@ import {
   validationResult,
 } from 'express-validator'
 import { blogsRepository } from '../repositories/blogs-db-repository'
+import { usersRepository } from '../repositories/users-db-repository'
 
 export const validationMiidleware = {
   titleValidation: body('title')
@@ -44,9 +45,6 @@ export const validationMiidleware = {
     .exists({ checkFalsy: true }),
 
   nameValidation: body('name')
-    // .custom(({ req }) => {
-    //   return `Basic YWRtaW46cXdlcnR5` === req.headers.authorization
-    // })
     .isString()
     .trim()
     .notEmpty()
@@ -57,8 +55,39 @@ export const validationMiidleware = {
     .isLength({ min: 1, max: 500 }),
 
   websiteUrlValidation: body('websiteUrl').isString().isURL(),
-
+  // =====
   auth: (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   },
+  // =====
+  // ^[a-zA-Z0-9_-]*$
+  loginValidation: body('login')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 3, max: 10 })
+    .custom(async (value) => {
+      const user = await usersRepository.findByLogin(value)
+      console.log('71====valid', user)
+      if (user) throw new Error('user exists')
+      return true
+    }),
+
+  passwordValidation: body('password')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 6, max: 20 }),
+
+  emailValidation: body('email')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isEmail()
+    .custom(async (value) => {
+      const user = await usersRepository.findByEmail(value)
+      console.log('89====valid', user)
+      if (user) throw new Error('user exists')
+      return true
+    }),
 }

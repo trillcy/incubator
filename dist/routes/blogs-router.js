@@ -59,7 +59,6 @@ const blogsRouter = () => {
       .exists({ checkFalsy: true })
       .custom(async (value) => {
         const blog = await blogsRepository.findById(value)
-        console.log('56====', blog)
         if (!blog) throw new Error('incorrect blogId')
         return true
       })
@@ -90,7 +89,6 @@ const blogsRouter = () => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
     router.post('/', validation_1.validationMiidleware.nameValidation, validation_1.validationMiidleware.descriptionValidation, validation_1.validationMiidleware.websiteUrlValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('61===blogs');
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
             res.sendStatus(401);
@@ -186,7 +184,6 @@ const blogsRouter = () => {
                 return;
             }
             const newPost = yield posts_services_1.postsService.create(title, shortDescription, content, blogId);
-            console.log('236----', newPost);
             if (newPost) {
                 return res.status(201).json(newPost);
             }
@@ -197,7 +194,6 @@ const blogsRouter = () => {
     }));
     router.get('/:blogId/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const blogId = req.params.blogId;
-        console.log('255---blog.route', blogId);
         if (!blogId) {
             res.sendStatus(404);
             return;

@@ -1,36 +1,37 @@
-import { log } from 'console'
-import { blogsDb, type BlogType } from '../db/blogsDb'
+import { UserDBType, type ViewUserType } from '../db/types'
 import { blogsRepository } from '../repositories/blogs-db-repository'
+import bcrypt from 'bcrypt'
+import { ObjectId } from 'mongodb'
+import { usersRepository } from '../repositories/users-db-repository'
 
-export const blogsService = {
-  async delete(id: string): Promise<boolean> {
-    return await blogsRepository.delete(id)
+export const usersService = {
+  async deleteUser(id: string): Promise<boolean> {
+    return await usersRepository.delete(id)
   },
-  async update(
-    id: string,
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<boolean> {
-    return await blogsRepository.update(id, name, description, websiteUrl)
-  },
-  async create(
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<BlogType | undefined> {
+  async createUser(
+    login: string,
+    email: string,
+    password: string
+  ): Promise<ViewUserType | null> {
+    const passwordSalt = await bcrypt.genSalt(10)
+    const passwordHash = await this._generateHash(password, passwordSalt)
     const date = new Date()
-    const id = `${blogsDb.length}-${date.toISOString()}`
-    const newElement = {
-      id: id,
-      name: name,
-      description: description,
-      websiteUrl: websiteUrl,
+    const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`
+    const newElement: UserDBType = {
+      // _id: new ObjectId(),
+      id,
+      login,
+      email,
+      passwordHash,
+      passwordSalt,
       createdAt: date.toISOString(),
-      isMembership: false,
     }
-    const result = await blogsRepository.create(newElement)
 
-    return newElement
+    const result = await usersRepository.create(newElement)
+
+    return result
+  },
+  async _generateHash(password: string, salt: string) {
+    return bcrypt.hash(password, salt)
   },
 }

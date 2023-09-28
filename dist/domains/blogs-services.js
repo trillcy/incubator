@@ -10,29 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
-const blogsDb_1 = require("../db/blogsDb");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
-blogs_db_repository_1.blogsRepository;
 exports.blogsService = {
-    deleteAll() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_db_repository_1.blogsRepository.deleteAll();
-        });
-    },
-    // async findAll(): Promise<BlogType[] | undefined> {
-    //   return await blogsRepository.findAll(
-    //     searchNameTerm,
-    //     sortBy,
-    //     sortDirection,
-    //     pageNumber,
-    //     pageSize
-    //   )
-    // },
-    findById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_db_repository_1.blogsRepository.findById(id);
-        });
-    },
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield blogs_db_repository_1.blogsRepository.delete(id);
@@ -46,7 +25,7 @@ exports.blogsService = {
     create(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const date = new Date();
-            const id = `${blogsDb_1.blogsDb.length}-${date.toISOString()}`;
+            const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const newElement = {
                 id: id,
                 name: name,

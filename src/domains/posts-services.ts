@@ -1,4 +1,3 @@
-import { log } from 'console'
 import {
   postsDb,
   type PostType,
@@ -80,7 +79,6 @@ export const postsService = {
       blogName,
       createdAt: date.toISOString(),
     }
-    console.log('60+++post.serv', newElement)
 
     const result = await postsRepository.create({ ...newElement })
     if (result) {

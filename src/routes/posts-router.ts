@@ -65,7 +65,6 @@ export const postsRouter = () => {
     .exists({ checkFalsy: true })
     .custom(async (value) => {
       const blog = await blogsRepository.findById(value)
-      console.log('62====', blog)
       if (!blog) throw new Error('incorrect blogId')
       return true
     })
@@ -99,14 +98,12 @@ export const postsRouter = () => {
       const postId = req.params.id
 
       const post = await postsRepository.findById(postId)
-      console.log('95===posts', post)
       // добавляем blogName
       if (post) {
         const blogId = post.blogId
         const blogModel = await blogsRepository.findById(blogId)
         if (blogModel) {
           const blogName = blogModel.name
-          console.log('103===posts', { ...post, blogName })
 
           res.status(200).json({ ...post, blogName })
         } else {
@@ -136,7 +133,6 @@ export const postsRouter = () => {
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        console.log('104===', errorsMessages)
 
         res.status(400).send({ errorsMessages })
       } else {
@@ -147,7 +143,6 @@ export const postsRouter = () => {
           content,
           blogId
         )
-        console.log('143=====', newPost)
         // добавляем blogName
         if (newPost) {
           res.status(201).json(newPost)
@@ -174,12 +169,10 @@ export const postsRouter = () => {
 
       const id = req.params.id
       const errors = validationResult(req)
-      console.log('147====posts', errors)
 
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        console.log('152===posts', errorsMessages)
 
         res.status(400).send({ errorsMessages })
       } else {
@@ -192,7 +185,6 @@ export const postsRouter = () => {
           content,
           blogId
         )
-        console.log('159====posts', result)
 
         if (result) {
           res.sendStatus(204)
@@ -206,7 +198,6 @@ export const postsRouter = () => {
 
   router.delete('/:id', async (req: Request, res: Response) => {
     const checkAuth = auth(req.headers.authorization)
-    console.log('226===post-auth', checkAuth)
 
     if (!checkAuth) {
       res.sendStatus(401)

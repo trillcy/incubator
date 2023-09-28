@@ -84,6 +84,7 @@ exports.blogsRepository = {
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.blogsCollection.deleteOne({ id: id });
+            console.log('95+++blog.delete', result);
             return result.deletedCount === 1;
         });
     },

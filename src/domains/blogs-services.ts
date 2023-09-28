@@ -1,5 +1,4 @@
-import { log } from 'console'
-import { blogsDb, type BlogType } from '../db/blogsDb'
+import { type BlogType } from '../db/types'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 
 export const blogsService = {
@@ -20,7 +19,7 @@ export const blogsService = {
     websiteUrl: string
   ): Promise<BlogType | undefined> {
     const date = new Date()
-    const id = `${blogsDb.length}-${date.toISOString()}`
+    const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`
     const newElement = {
       id: id,
       name: name,

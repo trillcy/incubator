@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectDb = exports.postsCollection = exports.blogsCollection = exports.db = exports.videoDb = exports.Resolution = exports.resolutions = void 0;
+exports.connectDb = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.db = exports.videoDb = exports.Resolution = exports.resolutions = void 0;
 const console_1 = require("console");
 const mongodb_1 = require("mongodb");
 exports.resolutions = [
@@ -40,6 +40,7 @@ const client = new mongodb_1.MongoClient(mongoURI);
 exports.db = client.db(dbName);
 exports.blogsCollection = exports.db.collection('blogs');
 exports.postsCollection = exports.db.collection('posts');
+exports.usersCollection = exports.db.collection('users');
 const connectDb = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('46----', mongoURI);

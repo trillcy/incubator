@@ -1,5 +1,5 @@
 import { log } from 'console'
-import { blogsDb, type BlogType } from '../db/blogsDb'
+import { type BlogType } from '../db/types'
 import { blogsCollection } from '../db/db'
 
 const blogsFields = [
@@ -92,6 +92,7 @@ export const blogsRepository = {
   },
   async delete(id: string): Promise<boolean> {
     const result = await blogsCollection.deleteOne({ id: id })
+    console.log('95+++blog.delete', result)
 
     return result.deletedCount === 1
   },

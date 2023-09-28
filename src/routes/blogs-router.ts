@@ -58,7 +58,6 @@ export const blogsRouter = () => {
     .exists({ checkFalsy: true })
     .custom(async (value) => {
       const blog = await blogsRepository.findById(value)
-      console.log('56====', blog)
       if (!blog) throw new Error('incorrect blogId')
       return true
     })
@@ -95,8 +94,6 @@ export const blogsRouter = () => {
     validationMiidleware.descriptionValidation,
     validationMiidleware.websiteUrlValidation,
     async (req: Request, res: Response) => {
-      console.log('61===blogs')
-
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
         res.sendStatus(401)
@@ -237,7 +234,6 @@ export const blogsRouter = () => {
           content,
           blogId
         )
-        console.log('236----', newPost)
 
         if (newPost) {
           return res.status(201).json(newPost)
@@ -250,7 +246,6 @@ export const blogsRouter = () => {
 
   router.get('/:blogId/posts', async (req: Request, res: Response) => {
     const blogId = req.params.blogId
-    console.log('255---blog.route', blogId)
 
     if (!blogId) {
       res.sendStatus(404)

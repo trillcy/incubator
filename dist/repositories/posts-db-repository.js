@@ -125,7 +125,6 @@ exports.postsRepository = {
     },
     create(newElement) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('69++++posts.repo', newElement);
             yield db_1.postsCollection.insertOne(Object.assign({}, newElement));
             return newElement;
         });

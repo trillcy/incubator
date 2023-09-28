@@ -11,6 +11,9 @@ import { blogsService } from '../domains/blogs-services'
 import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { ResultPost, ViewPostType } from '../db/postsDb'
+import { usersService } from '../domains/users-services'
+import { usersRepository } from '../repositories/users-db-repository'
+import { ResultUser, ViewUserType } from '../db/types'
 
 type ErrorObject = { message: string; field: string }
 
@@ -38,12 +41,10 @@ export const usersRouter = () => {
 
   router.post(
     '/',
-    validationMiidleware.nameValidation,
-    validationMiidleware.descriptionValidation,
-    validationMiidleware.websiteUrlValidation,
+    validationMiidleware.loginValidation,
+    validationMiidleware.passwordValidation,
+    validationMiidleware.emailValidation,
     async (req: Request, res: Response) => {
-      console.log('61===blogs')
-
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {
         res.sendStatus(401)
@@ -58,19 +59,26 @@ export const usersRouter = () => {
 
         res.status(400).send({ errorsMessages })
       } else {
-        const { name, description, websiteUrl } = req.body
-        const newBlog = await blogsService.create(name, description, websiteUrl)
-        res.status(201).json(newBlog)
-        //===.send()
+        const { login, password, email } = req.body
+        const newUser = await usersService.createUser(login, email, password)
+        res.status(201).json(newUser)
       }
     }
   )
 
   router.get('/', async (req: Request, res: Response) => {
-    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
-      req.query
-    const result: any = await blogsRepository.findAll(
-      searchNameTerm?.toString(),
+    const {
+      searchLoginTerm,
+      searchEmailTerm,
+      sortBy,
+      sortDirection,
+      pageNumber,
+      pageSize,
+    } = req.query
+
+    const result: ResultUser = await usersRepository.findAllUsers(
+      searchLoginTerm?.toString(),
+      searchEmailTerm?.toString(),
       sortBy?.toString(),
       sortDirection?.toString(),
       pageNumber?.toString(),
@@ -87,8 +95,8 @@ export const usersRouter = () => {
       return
     }
     const id = req.params.id
-    const result = await blogsRepository.delete(id)
-
+    // return deletedCount === 1 - достаточно?
+    const result = await usersRepository.delete(id)
     if (result) {
       res.sendStatus(204)
     } else {

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validationMiidleware = void 0;
 const express_validator_1 = require("express-validator");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
+const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.validationMiidleware = {
     titleValidation: (0, express_validator_1.body)('title')
         .isString()
@@ -45,9 +46,6 @@ exports.validationMiidleware = {
         .notEmpty()
         .exists({ checkFalsy: true }),
     nameValidation: (0, express_validator_1.body)('name')
-        // .custom(({ req }) => {
-        //   return `Basic YWRtaW46cXdlcnR5` === req.headers.authorization
-        // })
         .isString()
         .trim()
         .notEmpty()
@@ -56,7 +54,39 @@ exports.validationMiidleware = {
         .isString()
         .isLength({ min: 1, max: 500 }),
     websiteUrlValidation: (0, express_validator_1.body)('websiteUrl').isString().isURL(),
+    // =====
     auth: (basicString) => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     },
+    // =====
+    // ^[a-zA-Z0-9_-]*$
+    loginValidation: (0, express_validator_1.body)('login')
+        .isString()
+        .trim()
+        .notEmpty()
+        .isLength({ min: 3, max: 10 })
+        .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+        const user = yield users_db_repository_1.usersRepository.findByLogin(value);
+        console.log('71====valid', user);
+        if (user)
+            throw new Error('user exists');
+        return true;
+    })),
+    passwordValidation: (0, express_validator_1.body)('password')
+        .isString()
+        .trim()
+        .notEmpty()
+        .isLength({ min: 6, max: 20 }),
+    emailValidation: (0, express_validator_1.body)('email')
+        .isString()
+        .trim()
+        .notEmpty()
+        .isEmail()
+        .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+        const user = yield users_db_repository_1.usersRepository.findByEmail(value);
+        console.log('89====valid', user);
+        if (user)
+            throw new Error('user exists');
+        return true;
+    })),
 };

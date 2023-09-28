@@ -4,6 +4,7 @@ import { testingRouter } from './routes/testing-router'
 import { blogsRouter } from './routes/blogs-router'
 import { postsRouter } from './routes/posts-router'
 import { usersRouter } from './routes/users-router'
+import { authRouter } from './routes/auth-router'
 // import { videoDb } from './db/db'
 
 export const RouterPaths = {
@@ -12,6 +13,7 @@ export const RouterPaths = {
   blogs: '/blogs',
   posts: '/posts',
   users: '/users',
+  auth: '/auth',
 }
 
 export const app = express()
@@ -24,3 +26,4 @@ app.use(RouterPaths.testing, testingRouter())
 app.use(RouterPaths.blogs, blogsRouter())
 app.use(RouterPaths.posts, postsRouter())
 app.use(RouterPaths.users, usersRouter())
+app.use(RouterPaths.auth, authRouter())
