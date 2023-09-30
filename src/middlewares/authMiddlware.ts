@@ -1,0 +1,26 @@
+import { Request, Response, nextFunction } from 'express'
+import { jwtService } from '../applications/jwt-services'
+import { usersService } from '../domains/users-services'
+import { type ViewUserType } from '../types/types'
+
+export const authMiidleware = async (
+  req: Request,
+  res: Response,
+  next: nextFunction
+) => {
+  // проверка наличия заголовка
+  if (!req.headers.authorization) {
+    res.sendStatus(401)
+    return
+  }
+  // TODO: проверить наличие пользователя и валидность токена
+  const token = req.headers.authorization.split(' ')[1]
+  const userId = await jwtService.getUserIdByToken(token)
+
+  if (userId) {
+    // Если все норм, то получить user и вставить его в req
+    req.user = await usersService.findUserById(userId)
+    next()
+  }
+  res.send(401)
+}

@@ -1,6 +1,6 @@
 import { log } from 'console'
 import { MongoClient } from 'mongodb'
-import { BlogType, ViewUserType, type UserDBType } from './types'
+import { BlogType, ViewUserType, type UserDBType } from '../types/types'
 import { PostType } from './postsDb'
 
 export type VideoType = {

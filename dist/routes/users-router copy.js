@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersRouter = void 0;
 const express_1 = require("express");
-const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
 const express_validator_1 = require("express-validator");
 const validation_1 = require("../middlewares/validation");
 const users_services_1 = require("../domains/users-services");
+const users_db_repository_1 = require("../repositories/users-db-repository");
 const ErrorFormatter = (error) => {
     switch (error.type) {
         case 'field':
@@ -35,12 +35,11 @@ const usersRouter = () => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
     router.post('/', validation_1.validationMiidleware.loginValidation, validation_1.validationMiidleware.passwordValidation, validation_1.validationMiidleware.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('61===blogs');
-        // const checkAuth = auth(req.headers.authorization)
-        // if (!checkAuth) {
-        //   res.sendStatus(401)
-        //   return
-        // }
+        const checkAuth = auth(req.headers.authorization);
+        if (!checkAuth) {
+            res.sendStatus(401);
+            return;
+        }
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
@@ -49,14 +48,15 @@ const usersRouter = () => {
         }
         else {
             const { login, password, email } = req.body;
-            const newBlog = yield users_services_1.usersService.createUser(login, email, password);
-            res.status(201).json(newBlog);
-            //===.send()
+            // TODO: проверка на уникальность?
+            // -------
+            const newUser = yield users_services_1.usersService.createUser(login, email, password);
+            res.status(201).json(newUser);
         }
     }));
     router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = req.query;
-        const result = yield blogs_db_repository_1.blogsRepository.findAll(searchNameTerm === null || searchNameTerm === void 0 ? void 0 : searchNameTerm.toString(), sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
+        const { searchLoginTerm, searchEmailTerm, sortBy, sortDirection, pageNumber, pageSize, } = req.query;
+        const result = yield users_db_repository_1.usersRepository.findAllUsers(searchLoginTerm === null || searchLoginTerm === void 0 ? void 0 : searchLoginTerm.toString(), searchEmailTerm === null || searchEmailTerm === void 0 ? void 0 : searchEmailTerm.toString(), sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
         res.status(200).json(result);
     }));
     router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -66,7 +66,9 @@ const usersRouter = () => {
             return;
         }
         const id = req.params.id;
-        const result = yield blogs_db_repository_1.blogsRepository.delete(id);
+        console.log('101---id', id);
+        // return deletedCount === 1 - достаточно?
+        const result = yield users_services_1.usersService.deleteUser(id);
         if (result) {
             res.sendStatus(204);
         }

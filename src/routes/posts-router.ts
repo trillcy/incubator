@@ -14,6 +14,8 @@ import {
 } from '../db/postsDb'
 import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
+import { authMiidleware } from '../middlewares/authMiddlware'
+import { commentsService } from '../domains/comments-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -37,6 +39,35 @@ export const postsRouter = () => {
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }
+  router.post(
+    '/:postId/comments',
+    authMiidleware,
+    validationMiidleware.commentContentValidation,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        return res.status(400).send({ errorsMessages })
+      } else {
+        const { content } = req.body
+        const postId = req.params.postId
+        if (!postId) res.sendStatus(404)
+        const post = await postsRepository.findById(postId) // ищет НЕ ПО _id
+        if (!post) res.sendStatus(404)
+        const newComment: ViewCommentType | null =
+          await commentsService.createComment(content, post.id)
+
+        if (newComment) {
+          return res.status(201).json(newComment)
+        } else {
+          return res.sendStatus(404)
+        }
+      }
+    }
+  )
 
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =

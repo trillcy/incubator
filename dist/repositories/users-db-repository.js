@@ -22,6 +22,24 @@ const usersFields = [
 ];
 const usersDirections = ['asc', 'desc'];
 exports.usersRepository = {
+    findById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.usersCollection.findOne({ _id: id }
+            // { projection: { _id: 0 } }
+            );
+            if (result) {
+                return {
+                    id: result._id.toString(),
+                    login: result.login,
+                    email: result.email,
+                    createdAt: result.createdAt,
+                };
+            }
+            else {
+                return null;
+            }
+        });
+    },
     deleteAll() {
         return __awaiter(this, void 0, void 0, function* () {
             yield db_1.usersCollection.deleteMany({});
@@ -118,17 +136,9 @@ exports.usersRepository = {
     },
     findUserByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }, { projection: { _id: 0 } });
-            // if (result) {
-            //   return {
-            //     id: result._id,
-            //     login: result.login,
-            //     email: result.email,
-            //     createdAt: result.createdAt,
-            //   }
-            // } else {
-            //   return null
-            // }
+            const result = yield db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
+            // { projection: { _id: 0 } }
+            );
             return result;
         });
     },

@@ -4,7 +4,7 @@ import {
   type UserDBType,
   type ViewUserType,
   type ResultUser,
-} from '../db/types'
+} from '../types/types'
 import { blogsCollection, usersCollection } from '../db/db'
 
 const usersFields = [
@@ -19,6 +19,23 @@ const usersFields = [
 const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
+  async findById(id: ObjectId): Promise<ViewUserType | null> {
+    const result = await usersCollection.findOne(
+      { _id: id }
+      // { projection: { _id: 0 } }
+    )
+    if (result) {
+      return {
+        id: result._id.toString(),
+        login: result.login,
+        email: result.email,
+        createdAt: result.createdAt,
+      }
+    } else {
+      return null
+    }
+  },
+
   async deleteAll(): Promise<boolean> {
     await usersCollection.deleteMany({})
     const totalCount = await blogsCollection.countDocuments({})
@@ -121,19 +138,9 @@ export const usersRepository = {
     loginOrEmail: string
   ): Promise<UserDBType | null> {
     const result = await usersCollection.findOne(
-      { $or: [{ login: loginOrEmail }, { email: loginOrEmail }] },
-      { projection: { _id: 0 } }
+      { $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
+      // { projection: { _id: 0 } }
     )
-    // if (result) {
-    //   return {
-    //     id: result._id,
-    //     login: result.login,
-    //     email: result.email,
-    //     createdAt: result.createdAt,
-    //   }
-    // } else {
-    //   return null
-    // }
     return result
   },
   async delete(id: string): Promise<boolean | undefined> {

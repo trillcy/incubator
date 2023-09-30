@@ -27,6 +27,11 @@ exports.validationMiidleware = {
         .trim()
         .notEmpty()
         .isLength({ min: 1, max: 1000 }),
+    commentContentValidation: (0, express_validator_1.body)('content')
+        .isString()
+        .trim()
+        .notEmpty()
+        .isLength({ min: 20, max: 300 }),
     blogIdValidation: (0, express_validator_1.body)('blogId')
         .isString()
         .trim()
@@ -34,7 +39,6 @@ exports.validationMiidleware = {
         .exists({ checkFalsy: true })
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const blog = yield blogs_db_repository_1.blogsRepository.findById(value);
-        console.log('56====', blog);
         if (!blog)
             throw new Error('incorrect blogId');
         return true;
@@ -76,25 +80,19 @@ exports.validationMiidleware = {
         .isString()
         .trim()
         .notEmpty()
-        .escape()
         .isLength({ min: 6, max: 20 }),
     emailValidation: (0, express_validator_1.body)('email')
         .isString()
         .trim()
         .notEmpty()
         .isEmail()
-        .escape()
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield users_db_repository_1.usersRepository.findByEmail(value);
         if (user)
             throw new Error('user exists');
         return true;
     })),
-    loginOrEmailValidation: (0, express_validator_1.body)('loginOrEmail')
-        .isString()
-        .trim()
-        .notEmpty()
-        .escape(),
+    loginOrEmailValidation: (0, express_validator_1.body)('loginOrEmail').isString().trim().notEmpty(),
     // .custom(async (value) => {
     //   const user = await usersRepository.findUserByLoginOrEmail(value)
     //   console.log('98====valid', user)

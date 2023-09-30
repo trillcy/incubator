@@ -14,8 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const mongodb_1 = require("mongodb");
 const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.usersService = {
+    findUserById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield users_db_repository_1.usersRepository.findById(id);
+        });
+    },
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             // const transformId = id.
@@ -29,8 +35,7 @@ exports.usersService = {
             const date = new Date();
             const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const newElement = {
-                // _id: new ObjectId(),
-                // id,
+                _id: new mongodb_1.ObjectId(),
                 login,
                 email,
                 passwordHash,

@@ -13,7 +13,7 @@ import { postsService } from '../domains/posts-services'
 import { ResultPost, ViewPostType } from '../db/postsDb'
 import { usersService } from '../domains/users-services'
 import { usersRepository } from '../repositories/users-db-repository'
-import { ResultUser, ViewUserType } from '../db/types'
+import { ResultUser, ViewUserType } from '../types/types'
 
 type ErrorObject = { message: string; field: string }
 

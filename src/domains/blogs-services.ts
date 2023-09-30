@@ -1,4 +1,4 @@
-import { type BlogType } from '../db/types'
+import { type BlogType } from '../types/types'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 
 export const blogsService = {

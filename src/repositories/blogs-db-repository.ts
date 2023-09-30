@@ -1,4 +1,4 @@
-import { type BlogType } from '../db/types'
+import { type BlogType } from '../types/types'
 import { blogsCollection } from '../db/db'
 
 const blogsFields = [

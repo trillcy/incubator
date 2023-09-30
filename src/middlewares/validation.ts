@@ -25,6 +25,12 @@ export const validationMiidleware = {
     .notEmpty()
     .isLength({ min: 1, max: 1000 }),
 
+  commentContentValidation: body('content')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 20, max: 300 }),
+
   blogIdValidation: body('blogId')
     .isString()
     .trim()
@@ -32,7 +38,6 @@ export const validationMiidleware = {
     .exists({ checkFalsy: true })
     .custom(async (value) => {
       const blog = await blogsRepository.findById(value)
-      console.log('56====', blog)
       if (!blog) throw new Error('incorrect blogId')
       return true
     }),

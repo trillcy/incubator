@@ -23,11 +23,11 @@ exports.authService = {
             const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const user = yield users_db_repository_1.usersRepository.findUserByLoginOrEmail(loginOrEmail);
             if (!user)
-                return false;
+                return null;
             const passwordHash = yield bcrypt_1.default.hash(password, user.passwordSalt);
             if (user.passwordHash !== passwordHash)
-                return false;
-            return true;
+                return null;
+            return user;
         });
     },
 };

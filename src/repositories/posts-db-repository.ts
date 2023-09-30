@@ -4,7 +4,7 @@ import {
   type ViewPostType,
   type ResultPost,
 } from '../db/postsDb'
-import { BlogType } from '../db/types'
+import { BlogType } from '../types/types'
 import { postsCollection } from '../db/db'
 import { blogsRepository } from './blogs-db-repository'
 

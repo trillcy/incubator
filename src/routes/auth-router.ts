@@ -12,6 +12,7 @@ import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { ResultPost, ViewPostType } from '../db/postsDb'
 import { authService } from '../domains/auth-services'
+import { jwtService } from '../applications/jwt-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -35,10 +36,9 @@ export const authRouter = () => {
 
   router.post(
     '/login',
-    // validationMiidleware.loginOrEmailValidation,
+    validationMiidleware.loginOrEmailValidation,
+    validationMiidleware.passwordValidation,
     async (req: Request, res: Response) => {
-      console.log('40----auth.router', req.body)
-
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -49,13 +49,13 @@ export const authRouter = () => {
       }
       const { loginOrEmail, password } = req.body
 
-      const checkResult = await authService.checkCredential(
-        loginOrEmail,
-        password
-      )
+      const user = await authService.checkCredential(loginOrEmail, password)
 
-      if (checkResult) {
-        return res.sendStatus(204)
+      if (user) {
+        const token = await jwtService.createJWT(user)
+        console.log('55----auth.route', token)
+
+        return res.status(200).json(token)
       }
       return res.sendStatus(401)
     }

@@ -8,6 +8,12 @@ export type BlogType = {
   createdAt: string
   isMembership: boolean
 }
+export type ViewCommentType = {
+  id: string
+  content: string
+  commenntatorInfo: { userId: string; userLogin: string }
+  createdAt: string
+}
 export type ViewUserType = {
   id: string
   login: string
@@ -15,8 +21,7 @@ export type ViewUserType = {
   createdAt: string
 }
 export type UserDBType = {
-  // _id: ObjectId
-  // id: ObjectId
+  _id: ObjectId
   login: string
   email: string
   passwordHash: any
