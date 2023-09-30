@@ -11,9 +11,6 @@ export const testingRouter = () => {
     const resultBlogs = await blogsRepository.deleteAll()
     const resultUsers = await usersRepository.deleteAll()
     console.log('12===', resultPosts)
-    console.log('13===', resultBlogs)
-    console.log('14===', resultUsers)
-
     res.sendStatus(204)
   })
 

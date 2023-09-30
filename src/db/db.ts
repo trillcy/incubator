@@ -49,13 +49,10 @@ export const usersCollection = db.collection<UserDBType>('users')
 
 export const connectDb = async () => {
   try {
-    console.log('46----', mongoURI)
-
     await client.connect()
-    console.log('49------123')
 
     await db.command({ ping: 1 })
-    console.log('Connected successfully to server')
+    log('Connected successfully to server')
   } catch (e) {
     log({ e })
     log('cant connect to db')

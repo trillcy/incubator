@@ -11,7 +11,6 @@ export const authService = {
   ): Promise<boolean> {
     const date = new Date()
     console.log('123----')
-    console.log('321----')
 
     const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`
 

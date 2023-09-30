@@ -1,4 +1,3 @@
-import { log } from 'console'
 import { type BlogType } from '../db/types'
 import { blogsCollection } from '../db/db'
 
@@ -28,14 +27,6 @@ export const blogsRepository = {
     pageSize: string | undefined
   ): Promise<any> {
     //Promise<BlogType[] | undefined> {
-    console.log(
-      '32+++++blog.repo',
-      searchNameTerm,
-      sortBy,
-      sortDirection,
-      pageNumber,
-      pageSize
-    )
 
     const searchName = searchNameTerm ? searchNameTerm : ''
     // -----
@@ -71,8 +62,6 @@ export const blogsRepository = {
     })
     const pagesCount = Math.ceil(totalCount / size)
     if (items) {
-      console.log('66++++blog.repo', totalCount)
-
       const result = {
         pagesCount,
         page: numberOfPage,
@@ -82,7 +71,6 @@ export const blogsRepository = {
       }
       return result
     } else {
-      log('79+++++blog.repo')
       return undefined
     }
   },
@@ -92,7 +80,6 @@ export const blogsRepository = {
   },
   async delete(id: string): Promise<boolean> {
     const result = await blogsCollection.deleteOne({ id: id })
-    console.log('95+++blog.delete', result)
 
     return result.deletedCount === 1
   },

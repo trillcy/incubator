@@ -5,7 +5,8 @@ import { ObjectId } from 'mongodb'
 import { usersRepository } from '../repositories/users-db-repository'
 
 export const usersService = {
-  async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(id: string): Promise<boolean | undefined> {
+    // const transformId = id.
     return await usersRepository.delete(id)
   },
   async createUser(
@@ -19,7 +20,7 @@ export const usersService = {
     const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`
     const newElement: UserDBType = {
       // _id: new ObjectId(),
-      id,
+      // id,
       login,
       email,
       passwordHash,

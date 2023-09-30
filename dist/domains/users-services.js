@@ -18,6 +18,7 @@ const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.usersService = {
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            // const transformId = id.
             return yield users_db_repository_1.usersRepository.delete(id);
         });
     },
@@ -29,7 +30,7 @@ exports.usersService = {
             const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const newElement = {
                 // _id: new ObjectId(),
-                id,
+                // id,
                 login,
                 email,
                 passwordHash,

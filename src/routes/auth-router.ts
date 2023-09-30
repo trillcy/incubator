@@ -35,11 +35,9 @@ export const authRouter = () => {
 
   router.post(
     '/login',
-    validationMiidleware.loginValidation,
-    validationMiidleware.passwordValidation,
-    validationMiidleware.emailValidation,
+    // validationMiidleware.loginOrEmailValidation,
     async (req: Request, res: Response) => {
-      console.log('61---auth')
+      console.log('40----auth.router', req.body)
 
       const errors = validationResult(req)
 
@@ -50,6 +48,7 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { loginOrEmail, password } = req.body
+
       const checkResult = await authService.checkCredential(
         loginOrEmail,
         password

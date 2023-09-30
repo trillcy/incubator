@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+
 import {
   type UserDBType,
   type ViewUserType,
@@ -50,18 +52,26 @@ export const usersRepository = {
     const items = await usersCollection
       .find(
         {
-          login: { $regex: searchLogin, $options: 'i' },
-          email: { $regex: searchEmail, $options: 'i' },
-        },
-        { projection: { _id: 0 } }
+          $or: [
+            {
+              login: { $regex: searchLogin, $options: 'i' },
+            },
+            { email: { $regex: searchEmail, $options: 'i' } },
+          ],
+        }
+        // { projection: { _id: 0 } }
       )
       .sort(sortObject)
       .skip(skipElements)
       .limit(size)
       .toArray()
     const totalCount = await usersCollection.countDocuments({
-      login: { $regex: searchLogin, $options: 'i' },
-      email: { $regex: searchEmail, $options: 'i' },
+      $or: [
+        {
+          login: { $regex: searchLogin, $options: 'i' },
+        },
+        { email: { $regex: searchEmail, $options: 'i' } },
+      ],
     })
     const pagesCount = Math.ceil(totalCount / size)
     return {
@@ -70,7 +80,7 @@ export const usersRepository = {
       pageSize: size,
       totalCount,
       items: items.map((i) => ({
-        id: i.id,
+        id: i._id.toString(),
         login: i.login,
         email: i.email,
         createdAt: i.createdAt,
@@ -78,30 +88,64 @@ export const usersRepository = {
     }
   },
 
-  async findByLogin(login: string): Promise<UserDBType | null> {
-    return await usersCollection.findOne(
-      { login: login },
-      { projection: { _id: 0 } }
+  async findByLogin(login: string): Promise<ViewUserType | null> {
+    const result = await usersCollection.findOne(
+      { login: login }
+      // { projection: { _id: 0 } }
     )
+    if (result) {
+      return {
+        id: result._id.toString(),
+        login: result.login,
+        email: result.email,
+        createdAt: result.createdAt,
+      }
+    } else {
+      return null
+    }
   },
-  async findByEmail(email: string): Promise<UserDBType | null> {
-    return await usersCollection.findOne(
-      { email: email },
-      { projection: { _id: 0 } }
-    )
+  async findByEmail(email: string): Promise<ViewUserType | null> {
+    const result = await usersCollection.findOne({ email: email })
+    if (result) {
+      return {
+        id: result._id.toString(),
+        login: result.login,
+        email: result.email,
+        createdAt: result.createdAt,
+      }
+    } else {
+      return null
+    }
   },
   async findUserByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserDBType | null> {
-    return await usersCollection.findOne(
+    const result = await usersCollection.findOne(
       { $or: [{ login: loginOrEmail }, { email: loginOrEmail }] },
       { projection: { _id: 0 } }
     )
+    // if (result) {
+    //   return {
+    //     id: result._id,
+    //     login: result.login,
+    //     email: result.email,
+    //     createdAt: result.createdAt,
+    //   }
+    // } else {
+    //   return null
+    // }
+    return result
   },
-  async delete(id: string): Promise<boolean> {
-    const result = await usersCollection.deleteOne({ id })
+  async delete(id: string): Promise<boolean | undefined> {
+    try {
+      const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
+      console.log('141-----delete.user', result)
 
-    return result.deletedCount === 1
+      return result.deletedCount === 1
+    } catch (e) {
+      console.log('error delete', e)
+      return undefined
+    }
   },
 
   async create(newElement: UserDBType): Promise<ViewUserType | null> {

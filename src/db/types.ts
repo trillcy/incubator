@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+
 export type BlogType = {
   id: string
   name: string
@@ -13,7 +15,8 @@ export type ViewUserType = {
   createdAt: string
 }
 export type UserDBType = {
-  id: string
+  // _id: ObjectId
+  // id: ObjectId
   login: string
   email: string
   passwordHash: any

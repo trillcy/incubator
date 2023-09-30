@@ -66,9 +66,9 @@ export const validationMiidleware = {
     .trim()
     .notEmpty()
     .isLength({ min: 3, max: 10 })
+    .escape()
     .custom(async (value) => {
       const user = await usersRepository.findByLogin(value)
-      console.log('71====valid', user)
       if (user) throw new Error('user exists')
       return true
     }),
@@ -86,8 +86,15 @@ export const validationMiidleware = {
     .isEmail()
     .custom(async (value) => {
       const user = await usersRepository.findByEmail(value)
-      console.log('89====valid', user)
       if (user) throw new Error('user exists')
       return true
     }),
+
+  loginOrEmailValidation: body('loginOrEmail').isString().trim().notEmpty(),
+  // .custom(async (value) => {
+  //   const user = await usersRepository.findUserByLoginOrEmail(value)
+  //   console.log('98====valid', user)
+  //   if (!user) throw new Error('user doesnt exist. you should register')
+  //   return true
+  // }),
 }

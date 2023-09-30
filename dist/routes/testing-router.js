@@ -21,8 +21,6 @@ const testingRouter = () => {
         const resultBlogs = yield blogs_db_repository_1.blogsRepository.deleteAll();
         const resultUsers = yield users_db_repository_1.usersRepository.deleteAll();
         console.log('12===', resultPosts);
-        console.log('13===', resultBlogs);
-        console.log('14===', resultUsers);
         res.sendStatus(204);
     }));
     return router;

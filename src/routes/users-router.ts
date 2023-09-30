@@ -60,6 +60,9 @@ export const usersRouter = () => {
         res.status(400).send({ errorsMessages })
       } else {
         const { login, password, email } = req.body
+        // TODO: проверка на уникальность?
+
+        // -------
         const newUser = await usersService.createUser(login, email, password)
         res.status(201).json(newUser)
       }
@@ -95,8 +98,10 @@ export const usersRouter = () => {
       return
     }
     const id = req.params.id
+    console.log('101---id', id)
+
     // return deletedCount === 1 - достаточно?
-    const result = await usersRepository.delete(id)
+    const result = await usersService.deleteUser(id)
     if (result) {
       res.sendStatus(204)
     } else {

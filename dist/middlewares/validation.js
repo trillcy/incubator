@@ -65,9 +65,9 @@ exports.validationMiidleware = {
         .trim()
         .notEmpty()
         .isLength({ min: 3, max: 10 })
+        .escape()
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield users_db_repository_1.usersRepository.findByLogin(value);
-        console.log('71====valid', user);
         if (user)
             throw new Error('user exists');
         return true;
@@ -76,17 +76,29 @@ exports.validationMiidleware = {
         .isString()
         .trim()
         .notEmpty()
+        .escape()
         .isLength({ min: 6, max: 20 }),
     emailValidation: (0, express_validator_1.body)('email')
         .isString()
         .trim()
         .notEmpty()
         .isEmail()
+        .escape()
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield users_db_repository_1.usersRepository.findByEmail(value);
-        console.log('89====valid', user);
         if (user)
             throw new Error('user exists');
         return true;
     })),
+    loginOrEmailValidation: (0, express_validator_1.body)('loginOrEmail')
+        .isString()
+        .trim()
+        .notEmpty()
+        .escape(),
+    // .custom(async (value) => {
+    //   const user = await usersRepository.findUserByLoginOrEmail(value)
+    //   console.log('98====valid', user)
+    //   if (!user) throw new Error('user doesnt exist. you should register')
+    //   return true
+    // }),
 };

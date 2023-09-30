@@ -43,11 +43,9 @@ exports.postsCollection = exports.db.collection('posts');
 exports.usersCollection = exports.db.collection('users');
 const connectDb = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('46----', mongoURI);
         yield client.connect();
-        console.log('49------123');
         yield exports.db.command({ ping: 1 });
-        console.log('Connected successfully to server');
+        (0, console_1.log)('Connected successfully to server');
     }
     catch (e) {
         (0, console_1.log)({ e });

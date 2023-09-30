@@ -32,58 +32,6 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 export const blogsRouter = () => {
   const router = Router()
 
-  // =============
-  /*
-  const titleValidation = body('title')
-    .isString()
-    .trim()
-    .notEmpty()
-    .isLength({ min: 1, max: 30 })
-
-  const shortDescriptionValidation = body('shortDescription')
-    .isString()
-    .isLength({ min: 1, max: 100 })
-
-  const contentValidation = body('content')
-    .isString()
-    .trim()
-    .notEmpty()
-
-    .isLength({ min: 1, max: 1000 })
-
-  const blogIdValidation = param('id')
-    .isString()
-    .trim()
-    .notEmpty()
-    .exists({ checkFalsy: true })
-    .custom(async (value) => {
-      const blog = await blogsRepository.findById(value)
-      if (!blog) throw new Error('incorrect blogId')
-      return true
-    })
-
-  // =============
-  const idValidation = param('id')
-    .isString()
-    .trim()
-    .notEmpty()
-    .exists({ checkFalsy: true })
-
-  const nameValidation = body('name')
-    // .custom(({ req }) => {
-    //   return `Basic YWRtaW46cXdlcnR5` === req.headers.authorization
-    // })
-    .isString()
-    .trim()
-    .notEmpty()
-    .isLength({ min: 1, max: 15 })
-
-  const descriptionValidation = body('description')
-    .isString()
-    .isLength({ min: 1, max: 500 })
-
-  const websiteUrlValidation = body('websiteUrl').isString().isURL()
-*/
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }

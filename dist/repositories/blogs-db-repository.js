@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
-const console_1 = require("console");
 const db_1 = require("../db/db");
 const blogsFields = [
     'id',
@@ -32,7 +31,6 @@ exports.blogsRepository = {
     findAll(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize) {
         return __awaiter(this, void 0, void 0, function* () {
             //Promise<BlogType[] | undefined> {
-            console.log('32+++++blog.repo', searchNameTerm, sortBy, sortDirection, pageNumber, pageSize);
             const searchName = searchNameTerm ? searchNameTerm : '';
             // -----
             const sortField = sortBy && blogsFields.includes(sortBy) ? sortBy : 'createdAt';
@@ -60,7 +58,6 @@ exports.blogsRepository = {
             });
             const pagesCount = Math.ceil(totalCount / size);
             if (items) {
-                console.log('66++++blog.repo', totalCount);
                 const result = {
                     pagesCount,
                     page: numberOfPage,
@@ -71,7 +68,6 @@ exports.blogsRepository = {
                 return result;
             }
             else {
-                (0, console_1.log)('79+++++blog.repo');
                 return undefined;
             }
         });
@@ -84,7 +80,6 @@ exports.blogsRepository = {
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.blogsCollection.deleteOne({ id: id });
-            console.log('95+++blog.delete', result);
             return result.deletedCount === 1;
         });
     },

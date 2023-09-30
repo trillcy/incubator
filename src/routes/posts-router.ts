@@ -34,41 +34,6 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 
 export const postsRouter = () => {
   const router = Router()
-  /*
-  const idValidation = param('id')
-    .isString()
-    .trim()
-    .notEmpty()
-    .exists({ checkFalsy: true })
-
-  const titleValidation = body('title')
-    .isString()
-    .trim()
-    .notEmpty()
-    .isLength({ min: 1, max: 30 })
-
-  const shortDescriptionValidation = body('shortDescription')
-    .isString()
-    .isLength({ min: 1, max: 100 })
-
-  const contentValidation = body('content')
-    .isString()
-    .trim()
-    .notEmpty()
-
-    .isLength({ min: 1, max: 1000 })
-
-  const blogIdValidation = body('blogId')
-    .isString()
-    .trim()
-    .notEmpty()
-    .exists({ checkFalsy: true })
-    .custom(async (value) => {
-      const blog = await blogsRepository.findById(value)
-      if (!blog) throw new Error('incorrect blogId')
-      return true
-    })
-*/
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }

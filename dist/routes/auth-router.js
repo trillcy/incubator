@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
-const validation_1 = require("../middlewares/validation");
 const auth_services_1 = require("../domains/auth-services");
 const ErrorFormatter = (error) => {
     switch (error.type) {
@@ -30,8 +29,10 @@ const ErrorFormatter = (error) => {
 };
 const authRouter = () => {
     const router = (0, express_1.Router)();
-    router.post('/login', validation_1.validationMiidleware.loginValidation, validation_1.validationMiidleware.passwordValidation, validation_1.validationMiidleware.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('61---auth');
+    router.post('/login', 
+    // validationMiidleware.loginOrEmailValidation,
+    (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('40----auth.router', req.body);
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });

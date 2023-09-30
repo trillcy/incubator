@@ -20,7 +20,6 @@ exports.authService = {
         return __awaiter(this, void 0, void 0, function* () {
             const date = new Date();
             console.log('123----');
-            console.log('321----');
             const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const user = yield users_db_repository_1.usersRepository.findUserByLoginOrEmail(loginOrEmail);
             if (!user)

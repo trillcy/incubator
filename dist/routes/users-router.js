@@ -48,6 +48,8 @@ const usersRouter = () => {
         }
         else {
             const { login, password, email } = req.body;
+            // TODO: проверка на уникальность?
+            // -------
             const newUser = yield users_services_1.usersService.createUser(login, email, password);
             res.status(201).json(newUser);
         }
@@ -64,8 +66,9 @@ const usersRouter = () => {
             return;
         }
         const id = req.params.id;
+        console.log('101---id', id);
         // return deletedCount === 1 - достаточно?
-        const result = yield users_db_repository_1.usersRepository.delete(id);
+        const result = yield users_services_1.usersService.deleteUser(id);
         if (result) {
             res.sendStatus(204);
         }
