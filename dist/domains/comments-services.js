@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentsService = void 0;
-const postsDb_1 = require("../db/postsDb");
 const posts_db_repository_1 = require("../repositories/posts-db-repository");
-const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
+const mongodb_1 = require("mongodb");
+const comments_db_repository_1 = require("../repositories/comments-db-repository");
 exports.commentsService = {
     /*
     async findAll(
@@ -30,62 +30,44 @@ exports.commentsService = {
         pageSize
       )
     },
-  
-    async findById(id: string): Promise<PostType | null> {
-      return await postsRepository.findById(id)
-    },
-  
-    async deleteAll(): Promise<boolean> {
-      return await postsRepository.deleteAll()
-    },
-  
-    async delete(id: string): Promise<boolean> {
-      return await postsRepository.delete(id)
-    },
-  
-    async update(
-      id: string,
-      title: string,
-      shortDescription: string,
-      content: string,
-      blogId: string
-    ): Promise<boolean> {
-      const blogModel = await blogsRepository.findById(blogId)
-      if (!blogModel) {
-        return false
-      }
-  
-      return await postsRepository.update(
-        id,
-        title,
-        shortDescription,
-        content,
-        blogId
-      )
-    },
   */
-    createComment(content, postId) {
+    findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
-            if (!blogModel)
-                return null;
-            const blogName = blogModel.name;
-            "createdAt";
-            "2023-09-30T11:12:46.504Z";
-            const date = new Date();
-            const id = `${postsDb_1.postsDb.length}-${date.toISOString()}`;
+            return yield comments_db_repository_1.commentsRepository.findById(id);
+        });
+    },
+    deleteAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield posts_db_repository_1.postsRepository.deleteAll();
+        });
+    },
+    deleteComment(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield comments_db_repository_1.commentsRepository.delete(id);
+        });
+    },
+    updateComment(id, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield comments_db_repository_1.commentsRepository.update(id, content);
+        });
+    },
+    createComment(content, postId, user) {
+        return __awaiter(this, void 0, void 0, function* () {
             const newElement = {
-                id,
-                title,
-                shortDescription,
+                _id: new mongodb_1.ObjectId(),
                 content,
-                blogId,
-                blogName,
-                createdAt: date.toISOString(),
+                commentatorInfo: { userId: user.id, userLogin: user.login },
+                createdAt: new Date().toISOString(),
+                postId,
             };
-            const result = yield posts_db_repository_1.postsRepository.create(Object.assign({}, newElement));
+            const result = yield comments_db_repository_1.commentsRepository.createComment(Object.assign({}, newElement));
             if (result) {
-                return newElement;
+                return {
+                    id: result._id.toString(),
+                    content: result.content,
+                    commentatorInfo: result.commentatorInfo,
+                    createdAt: result.createdAt,
+                };
             }
             else {
                 return null;

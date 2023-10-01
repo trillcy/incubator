@@ -7,6 +7,7 @@ import {
 import { BlogType } from '../types/types'
 import { postsCollection } from '../db/db'
 import { blogsRepository } from './blogs-db-repository'
+import { ObjectId } from 'mongodb'
 
 const postsFields = [
   'id',
@@ -90,12 +91,26 @@ export const postsRepository = {
   },
 
   async findById(id: string): Promise<PostType | null> {
+    // const result = await postsCollection.findOne(
+    //   { id: id },
+    //   { projection: { _id: 0 } }
+    // )
     const result = await postsCollection.findOne(
-      { id: id },
-      { projection: { _id: 0 } }
+      { _id: new ObjectId(id) }
+      // { projection: { _id: 0 } }
     )
     if (result) {
-      return result
+      // return result
+      // ====
+      return {
+        id: result._id.toString(),
+        title: result.title,
+        shortDescription: result.shortDescription,
+        content: result.content,
+        blogId: result.blogId,
+        createdAt: result.createdAt,
+      }
+      // =====
     } else {
       return null
     }

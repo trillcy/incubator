@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentsRouter = void 0;
 const express_1 = require("express");
-const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
 const express_validator_1 = require("express-validator");
 const validation_1 = require("../middlewares/validation");
-const users_services_1 = require("../domains/users-services");
 const authMiddlware_1 = require("../middlewares/authMiddlware");
+const comments_services_1 = require("../domains/comments-services");
+const comments_db_repository_1 = require("../repositories/comments-db-repository");
 const ErrorFormatter = (error) => {
     switch (error.type) {
         case 'field':
@@ -32,15 +32,7 @@ const ErrorFormatter = (error) => {
 };
 const commentsRouter = () => {
     const router = (0, express_1.Router)();
-    const auth = (basicString) => {
-        return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
-    };
     router.put('/:id', authMiddlware_1.authMiidleware, validation_1.validationMiidleware.commentContentValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const checkAuth = auth(req.headers.authorization);
-        if (!checkAuth) {
-            res.sendStatus(401);
-            return;
-        }
         const id = req.params.id;
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
@@ -49,39 +41,72 @@ const commentsRouter = () => {
             res.status(400).send({ errorsMessages });
         }
         else {
-            const { name, description, websiteUrl } = req.body;
-            const result = yield blogs_db_repository_1.blogsRepository.update(id, name, description, websiteUrl);
-            if (result) {
-                res.sendStatus(204);
-                return;
+            const commentId = req.params.id;
+            const owner = yield comments_services_1.commentsService.findById(commentId);
+            if (owner) {
+                if (owner.commentatorInfo.userId !== req.user.id) {
+                    res.sendStatus(403);
+                }
+                const { content } = req.body;
+                const result = yield comments_services_1.commentsService.updateComment(id, content);
+                if (result) {
+                    res.sendStatus(204);
+                    return;
+                }
+                else {
+                    res.sendStatus(404);
+                }
             }
             else {
                 res.sendStatus(404);
             }
         }
     }));
-    router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const checkAuth = auth(req.headers.authorization);
-        if (!checkAuth) {
-            res.sendStatus(401);
-            return;
-        }
-        const id = req.params.id;
-        console.log('101---id', id);
-        // return deletedCount === 1 - достаточно?
-        const result = yield users_services_1.usersService.deleteUser(id);
-        if (result) {
-            res.sendStatus(204);
+    router.delete('/:id', authMiddlware_1.authMiidleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const commentId = req.params.id;
+        const owner = yield comments_services_1.commentsService.findById(commentId);
+        if (owner) {
+            if (owner.commentatorInfo.userId !== req.user.id) {
+                res.sendStatus(403);
+            }
+            const result = yield comments_services_1.commentsService.deleteComment(commentId);
+            if (result) {
+                res.sendStatus(204);
+            }
+            else {
+                res.sendStatus(404);
+            }
         }
         else {
             res.sendStatus(404);
         }
     }));
-    router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = req.query;
-        const result = yield blogs_db_repository_1.blogsRepository.findAll(searchNameTerm === null || searchNameTerm === void 0 ? void 0 : searchNameTerm.toString(), sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
-        res.status(200).json(result);
+    router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const commentId = req.params.id;
+        const comment = yield comments_db_repository_1.commentsRepository.findById(commentId);
+        // добавляем blogName
+        if (comment) {
+            res.status(200).json(comment);
+        }
+        else {
+            res.sendStatus(404);
+        }
     }));
+    /*
+    router.get('/', async (req: Request, res: Response) => {
+      const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
+        req.query
+      const result: any = await blogsRepository.findAll(
+        searchNameTerm?.toString(),
+        sortBy?.toString(),
+        sortDirection?.toString(),
+        pageNumber?.toString(),
+        pageSize?.toString()
+      )
+  
+      res.status(200).json(result)
+    })
+  */
     return router;
 };
 exports.commentsRouter = commentsRouter;

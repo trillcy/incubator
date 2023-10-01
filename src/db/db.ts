@@ -1,6 +1,11 @@
 import { log } from 'console'
 import { MongoClient } from 'mongodb'
-import { BlogType, ViewUserType, type UserDBType } from '../types/types'
+import {
+  BlogType,
+  ViewUserType,
+  type UserDBType,
+  type CommentDBType,
+} from '../types/types'
 import { PostType } from './postsDb'
 
 export type VideoType = {
@@ -46,6 +51,7 @@ export const db = client.db(dbName)
 export const blogsCollection = db.collection<BlogType>('blogs')
 export const postsCollection = db.collection<PostType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
+export const commentsCollection = db.collection<CommentDBType>('comments')
 
 export const connectDb = async () => {
   try {

@@ -37,8 +37,10 @@ export const usersRepository = {
   },
 
   async deleteAll(): Promise<boolean> {
+    console.log('40+++users.repo.deleteAll')
+
     await usersCollection.deleteMany({})
-    const totalCount = await blogsCollection.countDocuments({})
+    const totalCount = await usersCollection.countDocuments({})
     return totalCount === 0
   },
   async findAllUsers(

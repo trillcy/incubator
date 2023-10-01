@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express'
 import { postsRepository } from '../repositories/posts-db-repository'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
+import { commentsRepository } from '../repositories/comments-db-repository'
 
 export const testingRouter = () => {
   const router = Router()
@@ -10,7 +11,7 @@ export const testingRouter = () => {
     const resultPosts = await postsRepository.deleteAll()
     const resultBlogs = await blogsRepository.deleteAll()
     const resultUsers = await usersRepository.deleteAll()
-    console.log('12===', resultPosts)
+    const resultComments = await commentsRepository.deleteAll()
     res.sendStatus(204)
   })
 

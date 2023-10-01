@@ -11,9 +11,24 @@ export type BlogType = {
 export type ViewCommentType = {
   id: string
   content: string
-  commenntatorInfo: { userId: string; userLogin: string }
+  commentatorInfo: { userId: string; userLogin: string }
   createdAt: string
 }
+export type CommentDBType = {
+  _id: ObjectId
+  content: string
+  commentatorInfo: { userId: string; userLogin: string }
+  createdAt: string
+  postId: string
+}
+export type ResultComment = {
+  pagesCount: number
+  page: number
+  pageSize: number
+  totalCount: number
+  items: ViewCommentType[]
+}
+
 export type ViewUserType = {
   id: string
   login: string

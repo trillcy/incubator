@@ -12,10 +12,13 @@ import {
   type ViewPostType,
   type ResultPost,
 } from '../db/postsDb'
+import { type ResultComment } from '../types/types'
+import { type ViewCommentType } from '../types/types'
 import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { authMiidleware } from '../middlewares/authMiddlware'
 import { commentsService } from '../domains/comments-services'
+import { commentsRepository } from '../repositories/comments-db-repository'
 
 type ErrorObject = { message: string; field: string }
 
@@ -44,6 +47,8 @@ export const postsRouter = () => {
     authMiidleware,
     validationMiidleware.commentContentValidation,
     async (req: Request, res: Response) => {
+      console.log('48----post.route', req.user)
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -52,13 +57,25 @@ export const postsRouter = () => {
 
         return res.status(400).send({ errorsMessages })
       } else {
+        console.log('56----post.router', req.user)
+        // TODO: как сравнить userId или userLogin - где взять???
+
         const { content } = req.body
+
         const postId = req.params.postId
-        if (!postId) res.sendStatus(404)
-        const post = await postsRepository.findById(postId) // ищет НЕ ПО _id
-        if (!post) res.sendStatus(404)
+        if (!postId) {
+          res.sendStatus(404)
+          return
+        }
+        const post = await postsRepository.findById(postId)
+        if (!post) {
+          res.sendStatus(404)
+          return
+        }
+        console.log('66----post.router', post.id, req.user)
+
         const newComment: ViewCommentType | null =
-          await commentsService.createComment(content, post.id)
+          await commentsService.createComment(content, post.id, req.user!)
 
         if (newComment) {
           return res.status(201).json(newComment)
@@ -68,6 +85,29 @@ export const postsRouter = () => {
       }
     }
   )
+
+  router.get('/:postId/comments', async (req: Request, res: Response) => {
+    const { sortBy, sortDirection, pageNumber, pageSize } = req.query
+    const postId = req.params.postId
+    if (!postId) {
+      res.sendStatus(404)
+      return
+    }
+    const post = await postsRepository.findById(postId)
+    if (!post) {
+      res.sendStatus(404)
+      return
+    }
+
+    const result: ResultComment = await commentsRepository.findAllComments(
+      sortBy?.toString(),
+      sortDirection?.toString(),
+      pageNumber?.toString(),
+      pageSize?.toString(),
+      postId?.toString()
+    )
+    res.status(200).json(result)
+  })
 
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =

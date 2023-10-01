@@ -14,13 +14,14 @@ const express_1 = require("express");
 const posts_db_repository_1 = require("../repositories/posts-db-repository");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
 const users_db_repository_1 = require("../repositories/users-db-repository");
+const comments_db_repository_1 = require("../repositories/comments-db-repository");
 const testingRouter = () => {
     const router = (0, express_1.Router)();
     router.delete('/all-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const resultPosts = yield posts_db_repository_1.postsRepository.deleteAll();
         const resultBlogs = yield blogs_db_repository_1.blogsRepository.deleteAll();
         const resultUsers = yield users_db_repository_1.usersRepository.deleteAll();
-        console.log('12===', resultPosts);
+        const resultComments = yield comments_db_repository_1.commentsRepository.deleteAll();
         res.sendStatus(204);
     }));
     return router;

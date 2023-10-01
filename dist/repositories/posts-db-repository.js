@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
 const db_1 = require("../db/db");
 const blogs_db_repository_1 = require("./blogs-db-repository");
+const mongodb_1 = require("mongodb");
 const postsFields = [
     'id',
     'title',
@@ -83,9 +84,25 @@ exports.postsRepository = {
     },
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCollection.findOne({ id: id }, { projection: { _id: 0 } });
+            // const result = await postsCollection.findOne(
+            //   { id: id },
+            //   { projection: { _id: 0 } }
+            // )
+            const result = yield db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) }
+            // { projection: { _id: 0 } }
+            );
             if (result) {
-                return result;
+                // return result
+                // ====
+                return {
+                    id: result._id.toString(),
+                    title: result.title,
+                    shortDescription: result.shortDescription,
+                    content: result.content,
+                    blogId: result.blogId,
+                    createdAt: result.createdAt,
+                };
+                // =====
             }
             else {
                 return null;

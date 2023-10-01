@@ -18,7 +18,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.jwtService = {
     createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.SECRET_KEY, {
+            const token = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.SECRET_KEY || '123', {
                 expiresIn: '1h',
             });
             return token;
@@ -27,7 +27,7 @@ exports.jwtService = {
     getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+                const result = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY || '123');
                 return new mongodb_1.ObjectId(result.userId);
             }
             catch (e) {

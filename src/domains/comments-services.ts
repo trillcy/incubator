@@ -7,7 +7,13 @@ import {
 import { blogsCollection, db, postsCollection } from '../db/db'
 import { postsRepository } from '../repositories/posts-db-repository'
 import { blogsRepository } from '../repositories/blogs-db-repository'
-import { type ViewCommentType } from '../types/types'
+import {
+  type ViewCommentType,
+  ViewUserType,
+  CommentDBType,
+} from '../types/types'
+import { ObjectId } from 'mongodb'
+import { commentsRepository } from '../repositories/comments-db-repository'
 
 export const commentsService = {
   /*
@@ -26,63 +32,44 @@ export const commentsService = {
       pageSize
     )
   },
-
-  async findById(id: string): Promise<PostType | null> {
-    return await postsRepository.findById(id)
+*/
+  async findById(id: string): Promise<ViewCommentType | null> {
+    return await commentsRepository.findById(id)
   },
 
   async deleteAll(): Promise<boolean> {
     return await postsRepository.deleteAll()
   },
 
-  async delete(id: string): Promise<boolean> {
-    return await postsRepository.delete(id)
+  async deleteComment(id: string): Promise<boolean> {
+    return await commentsRepository.delete(id)
   },
 
-  async update(
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<boolean> {
-    const blogModel = await blogsRepository.findById(blogId)
-    if (!blogModel) {
-      return false
-    }
-
-    return await postsRepository.update(
-      id,
-      title,
-      shortDescription,
-      content,
-      blogId
-    )
+  async updateComment(id: string, content: string): Promise<boolean> {
+    return await commentsRepository.update(id, content)
   },
-*/
+
   async createComment(
     content: string,
-    postId: string
+    postId: string,
+    user: ViewUserType
   ): Promise<ViewCommentType | null> {
-    const blogModel = await blogsRepository.findById(blogId)
-    if (!blogModel) return null
-    const blogName = blogModel.name
-    "createdAt": "2023-09-30T11:12:46.504Z"
-    const date = new Date()
-    const id = `${postsDb.length}-${date.toISOString()}`
-    const newElement = {
-      id,
-      title,
-      shortDescription,
+    const newElement: CommentDBType = {
+      _id: new ObjectId(),
       content,
-      blogId,
-      blogName,
-      createdAt: date.toISOString(),
+      commentatorInfo: { userId: user.id, userLogin: user.login },
+      createdAt: new Date().toISOString(),
+      postId,
     }
 
-    const result = await postsRepository.create({ ...newElement })
+    const result = await commentsRepository.createComment({ ...newElement })
     if (result) {
-      return newElement
+      return {
+        id: result._id.toString(),
+        content: result.content,
+        commentatorInfo: result.commentatorInfo,
+        createdAt: result.createdAt,
+      }
     } else {
       return null
     }

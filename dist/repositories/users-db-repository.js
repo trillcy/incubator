@@ -42,8 +42,9 @@ exports.usersRepository = {
     },
     deleteAll() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('40+++users.repo.deleteAll');
             yield db_1.usersCollection.deleteMany({});
-            const totalCount = yield db_1.blogsCollection.countDocuments({});
+            const totalCount = yield db_1.usersCollection.countDocuments({});
             return totalCount === 0;
         });
     },

@@ -15,6 +15,7 @@ const express_validator_1 = require("express-validator");
 const validation_1 = require("../middlewares/validation");
 const auth_services_1 = require("../domains/auth-services");
 const jwt_services_1 = require("../applications/jwt-services");
+const authMiddlware_1 = require("../middlewares/authMiddlware");
 const ErrorFormatter = (error) => {
     switch (error.type) {
         case 'field':
@@ -31,6 +32,26 @@ const ErrorFormatter = (error) => {
 };
 const authRouter = () => {
     const router = (0, express_1.Router)();
+    // -----
+    router.get('/me', authMiddlware_1.authMiidleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        // const errors = validationResult(req)
+        // if (!errors.isEmpty()) {
+        //   const errorsArray = errors.array({ onlyFirstError: true })
+        //   const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+        //   return res.status(400).send({ errorsMessages })
+        // }
+        const { user } = req;
+        if (user) {
+            const userOut = {
+                userId: user.id,
+                login: user.login,
+                email: user.email,
+            };
+            res.status(200).json(userOut);
+            return;
+        }
+        return res.sendStatus(401);
+    }));
     router.post('/login', validation_1.validationMiidleware.loginOrEmailValidation, validation_1.validationMiidleware.passwordValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
@@ -42,7 +63,7 @@ const authRouter = () => {
         const user = yield auth_services_1.authService.checkCredential(loginOrEmail, password);
         if (user) {
             const token = yield jwt_services_1.jwtService.createJWT(user);
-            console.log('55----auth.route', token);
+            console.log('94----auth.route', token);
             return res.status(200).json(token);
         }
         return res.sendStatus(401);
