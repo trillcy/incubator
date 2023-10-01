@@ -64,23 +64,12 @@ exports.commentsService = {
       )
     },
   */
-    create(content) {
+    createComment(content, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
             if (!blogModel)
                 return null;
             const blogName = blogModel.name;
-            "id";
-            "string",
-                "content";
-            "string",
-                "commentatorInfo";
-            {
-                "userId";
-                "string",
-                    "userLogin";
-                "string";
-            }
             "createdAt";
             "2023-09-30T11:12:46.504Z";
             const date = new Date();
