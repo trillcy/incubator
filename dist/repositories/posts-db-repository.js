@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
 const db_1 = require("../db/db");
-const blogs_db_repository_1 = require("./blogs-db-repository");
 const mongodb_1 = require("mongodb");
 const postsFields = [
     'id',
@@ -41,45 +40,44 @@ exports.postsRepository = {
             const searchObject = blogId ? { blogId: blogId } : {};
             // ---------
             const items = yield db_1.postsCollection
-                .find(searchObject, { projection: { _id: 0 } })
+                .find(searchObject) //, { projection: { _id: 0 } })
                 .sort(sortObject)
                 .skip(skipElements)
                 .limit(size)
                 .toArray();
             const totalCount = yield db_1.postsCollection.countDocuments(searchObject);
             const pagesCount = Math.ceil(totalCount / size);
-            const resultArray = [];
-            if (items.length) {
-                for (let item of items) {
-                    const blogModel = yield blogs_db_repository_1.blogsRepository.findById(item.blogId);
-                    if (blogModel) {
-                        const object = {
-                            id: item.id,
-                            title: item.title,
-                            shortDescription: item.shortDescription,
-                            content: item.content,
-                            blogId: item.blogId,
-                            blogName: blogModel.name,
-                            createdAt: item.createdAt,
-                        };
-                        resultArray.push(object);
-                    }
-                    else {
-                        return null;
-                    }
-                }
-                const result = {
-                    pagesCount,
-                    page: numberOfPage,
-                    pageSize: size,
-                    totalCount,
-                    items: resultArray,
+            // const resultArray = []
+            // if (items.length) {
+            //   for (let item of items) {
+            // const blogModel: ViewBlogType | null = await blogsRepository.findById(
+            //   item.blogId
+            // )
+            // if (blogModel) {
+            const object = items.map((item) => {
+                return {
+                    id: item._id.toString(),
+                    title: item.title,
+                    shortDescription: item.shortDescription,
+                    content: item.content,
+                    blogId: item.blogId,
+                    blogName: item.blogName,
+                    createdAt: item.createdAt,
                 };
-                return result;
-            }
-            else {
-                return null;
-            }
+            });
+            // resultArray.push(object)
+            // } else {
+            //   return null
+            // }
+            // }
+            const result = {
+                pagesCount,
+                page: numberOfPage,
+                pageSize: size,
+                totalCount,
+                items: object,
+            };
+            return result;
         });
     },
     findById(id) {
@@ -118,13 +116,13 @@ exports.postsRepository = {
     },
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCollection.deleteOne({ id: id });
+            const result = yield db_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return result.deletedCount === 1;
         });
     },
     update(id, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCollection.updateOne({ id: id }, {
+            const result = yield db_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
                     title: title,
                     shortDescription: shortDescription,
@@ -142,8 +140,21 @@ exports.postsRepository = {
     },
     create(newElement) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.postsCollection.insertOne(Object.assign({}, newElement));
-            return newElement;
+            const result = yield db_1.postsCollection.insertOne(Object.assign({}, newElement));
+            if (result.acknowledged) {
+                return {
+                    id: result.insertedId.toString(),
+                    title: newElement.title,
+                    shortDescription: newElement.shortDescription,
+                    content: newElement.content,
+                    blogId: newElement.blogId,
+                    blogName: newElement.blogName,
+                    createdAt: newElement.createdAt,
+                };
+            }
+            else {
+                return null;
+            }
         });
     },
 };

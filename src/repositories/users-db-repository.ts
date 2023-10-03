@@ -37,8 +37,6 @@ export const usersRepository = {
   },
 
   async deleteAll(): Promise<boolean> {
-    console.log('40+++users.repo.deleteAll')
-
     await usersCollection.deleteMany({})
     const totalCount = await usersCollection.countDocuments({})
     return totalCount === 0
@@ -143,16 +141,16 @@ export const usersRepository = {
       { $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
       // { projection: { _id: 0 } }
     )
+    console.log('144++++user.repo', result)
+
     return result
   },
   async delete(id: string): Promise<boolean | undefined> {
     try {
       const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
-      console.log('141-----delete.user', result)
 
       return result.deletedCount === 1
     } catch (e) {
-      console.log('error delete', e)
       return undefined
     }
   },

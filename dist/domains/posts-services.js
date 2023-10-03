@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsService = void 0;
-const postsDb_1 = require("../db/postsDb");
 const posts_db_repository_1 = require("../repositories/posts-db-repository");
 const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
+const mongodb_1 = require("mongodb");
 exports.postsService = {
     findAll(
     // searchNameTerm: string | undefined,
@@ -54,9 +54,8 @@ exports.postsService = {
                 return null;
             const blogName = blogModel.name;
             const date = new Date();
-            const id = `${postsDb_1.postsDb.length}-${date.toISOString()}`;
             const newElement = {
-                id,
+                _id: new mongodb_1.ObjectId(),
                 title,
                 shortDescription,
                 content,
@@ -65,12 +64,7 @@ exports.postsService = {
                 createdAt: date.toISOString(),
             };
             const result = yield posts_db_repository_1.postsRepository.create(Object.assign({}, newElement));
-            if (result) {
-                return newElement;
-            }
-            else {
-                return null;
-            }
+            return result;
         });
     },
 };

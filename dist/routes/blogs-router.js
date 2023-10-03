@@ -60,9 +60,7 @@ const blogsRouter = () => {
         const result = yield blogs_db_repository_1.blogsRepository.findAll(searchNameTerm === null || searchNameTerm === void 0 ? void 0 : searchNameTerm.toString(), sortBy === null || sortBy === void 0 ? void 0 : sortBy.toString(), sortDirection === null || sortDirection === void 0 ? void 0 : sortDirection.toString(), pageNumber === null || pageNumber === void 0 ? void 0 : pageNumber.toString(), pageSize === null || pageSize === void 0 ? void 0 : pageSize.toString());
         res.status(200).json(result);
     }));
-    router.get('/:id', 
-    // validationMiidleware.idValidation,
-    (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const resId = req.params.id;
         const result = yield blogs_db_repository_1.blogsRepository.findById(resId);
         if (result) {
@@ -131,6 +129,11 @@ const blogsRouter = () => {
                 res.sendStatus(404);
                 return;
             }
+            const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
+            if (!blogModel) {
+                res.sendStatus(404);
+                return;
+            }
             const newPost = yield posts_services_1.postsService.create(title, shortDescription, content, blogId);
             if (newPost) {
                 return res.status(201).json(newPost);
@@ -143,6 +146,11 @@ const blogsRouter = () => {
     router.get('/:blogId/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const blogId = req.params.blogId;
         if (!blogId) {
+            res.sendStatus(404);
+            return;
+        }
+        const blogModel = yield blogs_db_repository_1.blogsRepository.findById(blogId);
+        if (!blogModel) {
             res.sendStatus(404);
             return;
         }

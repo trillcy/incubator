@@ -1,5 +1,6 @@
-import { type BlogType } from '../types/types'
+import { type ViewBlogType, BlogDBType, ResultBlog } from '../types/types'
 import { blogsCollection } from '../db/db'
+import { ObjectId } from 'mongodb'
 
 const blogsFields = [
   'id',
@@ -25,8 +26,8 @@ export const blogsRepository = {
     sortDirection: string | undefined,
     pageNumber: string | undefined,
     pageSize: string | undefined
-  ): Promise<any> {
-    //Promise<BlogType[] | undefined> {
+  ): Promise<ResultBlog> {
+    // Promise<BlogType[] | undefined> {
 
     const searchName = searchNameTerm ? searchNameTerm : ''
     // -----
@@ -49,10 +50,7 @@ export const blogsRepository = {
     const skipElements = (numberOfPage - 1) * size
 
     const items = await blogsCollection
-      .find(
-        { name: { $regex: searchName, $options: 'i' } },
-        { projection: { _id: 0 } }
-      )
+      .find({ name: { $regex: searchName, $options: 'i' } })
       .sort(sortObject)
       .skip(skipElements)
       .limit(size)
@@ -61,25 +59,44 @@ export const blogsRepository = {
       name: { $regex: searchName, $options: 'i' },
     })
     const pagesCount = Math.ceil(totalCount / size)
-    if (items) {
-      const result = {
-        pagesCount,
-        page: numberOfPage,
-        pageSize: size,
-        totalCount,
-        items,
+    const resultArray = []
+
+    const result = items.map((el) => {
+      return {
+        id: el._id.toString(),
+        name: el.name,
+        description: el.description,
+        websiteUrl: el.websiteUrl,
+        createdAt: el.createdAt,
+        isMembership: el.isMembership,
       }
-      return result
-    } else {
-      return undefined
+    })
+    return {
+      pagesCount,
+      page: numberOfPage,
+      pageSize: size,
+      totalCount,
+      items: result,
     }
   },
 
-  async findById(id: string): Promise<BlogType | null> {
-    return await blogsCollection.findOne({ id: id }, { projection: { _id: 0 } })
+  async findById(id: string): Promise<ViewBlogType | null> {
+    const result = await blogsCollection.findOne({ _id: new ObjectId(id) })
+    if (result) {
+      return {
+        id: result._id.toString(),
+        name: result.name,
+        description: result.description,
+        websiteUrl: result.websiteUrl,
+        createdAt: result.createdAt,
+        isMembership: result.isMembership,
+      }
+    } else {
+      return null
+    }
   },
   async delete(id: string): Promise<boolean> {
-    const result = await blogsCollection.deleteOne({ id: id })
+    const result = await blogsCollection.deleteOne({ _id: new ObjectId(id) })
 
     return result.deletedCount === 1
   },
@@ -90,7 +107,7 @@ export const blogsRepository = {
     websiteUrl: string
   ): Promise<boolean> {
     const result = await blogsCollection.updateOne(
-      { id: id },
+      { _id: new ObjectId(id) },
       {
         $set: {
           name: name,
@@ -106,8 +123,19 @@ export const blogsRepository = {
       return false
     }
   },
-  async create(newElement: BlogType): Promise<BlogType | undefined> {
-    await blogsCollection.insertOne({ ...newElement })
-    return newElement
+  async create(newElement: BlogDBType): Promise<ViewBlogType | null> {
+    const result = await blogsCollection.insertOne({ ...newElement })
+    if (result.acknowledged) {
+      return {
+        id: result.insertedId.toString(),
+        name: newElement.name,
+        description: newElement.description,
+        websiteUrl: newElement.websiteUrl,
+        createdAt: newElement.createdAt,
+        isMembership: newElement.isMembership,
+      }
+    } else {
+      return null
+    }
   },
 }

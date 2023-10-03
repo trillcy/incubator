@@ -98,7 +98,6 @@ export const usersRouter = () => {
       return
     }
     const id = req.params.id
-    console.log('101---id', id)
 
     // return deletedCount === 1 - достаточно?
     const result = await usersService.deleteUser(id)

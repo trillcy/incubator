@@ -1,12 +1,11 @@
 import { log } from 'console'
 import { MongoClient } from 'mongodb'
 import {
-  BlogType,
-  ViewUserType,
   type UserDBType,
   type CommentDBType,
+  type PostDBType,
+  type BlogDBType,
 } from '../types/types'
-import { PostType } from './postsDb'
 
 export type VideoType = {
   id: number
@@ -48,8 +47,8 @@ const dbName = 'incubator'
 const client = new MongoClient(mongoURI)
 export const db = client.db(dbName)
 
-export const blogsCollection = db.collection<BlogType>('blogs')
-export const postsCollection = db.collection<PostType>('posts')
+export const blogsCollection = db.collection<BlogDBType>('blogs')
+export const postsCollection = db.collection<PostDBType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
 

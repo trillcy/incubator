@@ -66,7 +66,6 @@ const usersRouter = () => {
             return;
         }
         const id = req.params.id;
-        console.log('101---id', id);
         // return deletedCount === 1 - достаточно?
         const result = yield users_services_1.usersService.deleteUser(id);
         if (result) {

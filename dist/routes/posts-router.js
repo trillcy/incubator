@@ -39,7 +39,6 @@ const postsRouter = () => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
     router.post('/:postId/comments', authMiddlware_1.authMiidleware, validation_1.validationMiidleware.commentContentValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('48----post.route', req.user);
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
@@ -47,7 +46,6 @@ const postsRouter = () => {
             return res.status(400).send({ errorsMessages });
         }
         else {
-            console.log('56----post.router', req.user);
             // TODO: как сравнить userId или userLogin - где взять???
             const { content } = req.body;
             const postId = req.params.postId;
@@ -60,7 +58,6 @@ const postsRouter = () => {
                 res.sendStatus(404);
                 return;
             }
-            console.log('66----post.router', post.id, req.user);
             const newComment = yield comments_services_1.commentsService.createComment(content, post.id, req.user);
             if (newComment) {
                 return res.status(201).json(newComment);
@@ -157,7 +154,7 @@ const postsRouter = () => {
         }
         else {
             const { title, shortDescription, content, blogId } = req.body;
-            const result = yield posts_db_repository_1.postsRepository.update(id, title, shortDescription, content, blogId);
+            const result = yield posts_services_1.postsService.update(id, title, shortDescription, content, blogId);
             if (result) {
                 res.sendStatus(204);
                 return;

@@ -47,8 +47,6 @@ export const postsRouter = () => {
     authMiidleware,
     validationMiidleware.commentContentValidation,
     async (req: Request, res: Response) => {
-      console.log('48----post.route', req.user)
-
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -57,7 +55,6 @@ export const postsRouter = () => {
 
         return res.status(400).send({ errorsMessages })
       } else {
-        console.log('56----post.router', req.user)
         // TODO: как сравнить userId или userLogin - где взять???
 
         const { content } = req.body
@@ -72,7 +69,6 @@ export const postsRouter = () => {
           res.sendStatus(404)
           return
         }
-        console.log('66----post.router', post.id, req.user)
 
         const newComment: ViewCommentType | null =
           await commentsService.createComment(content, post.id, req.user!)
@@ -214,7 +210,7 @@ export const postsRouter = () => {
       } else {
         const { title, shortDescription, content, blogId } = req.body
 
-        const result = await postsRepository.update(
+        const result = await postsService.update(
           id,
           title,
           shortDescription,

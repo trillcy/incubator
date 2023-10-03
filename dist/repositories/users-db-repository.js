@@ -42,7 +42,6 @@ exports.usersRepository = {
     },
     deleteAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('40+++users.repo.deleteAll');
             yield db_1.usersCollection.deleteMany({});
             const totalCount = yield db_1.usersCollection.countDocuments({});
             return totalCount === 0;
@@ -140,6 +139,7 @@ exports.usersRepository = {
             const result = yield db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
             // { projection: { _id: 0 } }
             );
+            console.log('144++++user.repo', result);
             return result;
         });
     },
@@ -147,11 +147,9 @@ exports.usersRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = yield db_1.usersCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
-                console.log('141-----delete.user', result);
                 return result.deletedCount === 1;
             }
             catch (e) {
-                console.log('error delete', e);
                 return undefined;
             }
         });

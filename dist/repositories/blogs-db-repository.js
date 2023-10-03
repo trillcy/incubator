@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
 const db_1 = require("../db/db");
+const mongodb_1 = require("mongodb");
 const blogsFields = [
     'id',
     'name',
@@ -30,7 +31,7 @@ exports.blogsRepository = {
     },
     findAll(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize) {
         return __awaiter(this, void 0, void 0, function* () {
-            //Promise<BlogType[] | undefined> {
+            // Promise<BlogType[] | undefined> {
             const searchName = searchNameTerm ? searchNameTerm : '';
             // -----
             const sortField = sortBy && blogsFields.includes(sortBy) ? sortBy : 'createdAt';
@@ -48,7 +49,7 @@ exports.blogsRepository = {
             const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10;
             const skipElements = (numberOfPage - 1) * size;
             const items = yield db_1.blogsCollection
-                .find({ name: { $regex: searchName, $options: 'i' } }, { projection: { _id: 0 } })
+                .find({ name: { $regex: searchName, $options: 'i' } })
                 .sort(sortObject)
                 .skip(skipElements)
                 .limit(size)
@@ -57,35 +58,53 @@ exports.blogsRepository = {
                 name: { $regex: searchName, $options: 'i' },
             });
             const pagesCount = Math.ceil(totalCount / size);
-            if (items) {
-                const result = {
-                    pagesCount,
-                    page: numberOfPage,
-                    pageSize: size,
-                    totalCount,
-                    items,
+            const resultArray = [];
+            const result = items.map((el) => {
+                return {
+                    id: el._id.toString(),
+                    name: el.name,
+                    description: el.description,
+                    websiteUrl: el.websiteUrl,
+                    createdAt: el.createdAt,
+                    isMembership: el.isMembership,
                 };
-                return result;
-            }
-            else {
-                return undefined;
-            }
+            });
+            return {
+                pagesCount,
+                page: numberOfPage,
+                pageSize: size,
+                totalCount,
+                items: result,
+            };
         });
     },
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield db_1.blogsCollection.findOne({ id: id }, { projection: { _id: 0 } });
+            const result = yield db_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            if (result) {
+                return {
+                    id: result._id.toString(),
+                    name: result.name,
+                    description: result.description,
+                    websiteUrl: result.websiteUrl,
+                    createdAt: result.createdAt,
+                    isMembership: result.isMembership,
+                };
+            }
+            else {
+                return null;
+            }
         });
     },
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.blogsCollection.deleteOne({ id: id });
+            const result = yield db_1.blogsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return result.deletedCount === 1;
         });
     },
     update(id, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.blogsCollection.updateOne({ id: id }, {
+            const result = yield db_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
                     name: name,
                     description: description,
@@ -102,8 +121,20 @@ exports.blogsRepository = {
     },
     create(newElement) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.blogsCollection.insertOne(Object.assign({}, newElement));
-            return newElement;
+            const result = yield db_1.blogsCollection.insertOne(Object.assign({}, newElement));
+            if (result.acknowledged) {
+                return {
+                    id: result.insertedId.toString(),
+                    name: newElement.name,
+                    description: newElement.description,
+                    websiteUrl: newElement.websiteUrl,
+                    createdAt: newElement.createdAt,
+                    isMembership: newElement.isMembership,
+                };
+            }
+            else {
+                return null;
+            }
         });
     },
 };

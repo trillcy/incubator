@@ -7,6 +7,7 @@ import {
 import { blogsCollection, db, postsCollection } from '../db/db'
 import { postsRepository } from '../repositories/posts-db-repository'
 import { blogsRepository } from '../repositories/blogs-db-repository'
+import { ObjectId } from 'mongodb'
 
 export const postsService = {
   async findAll(
@@ -69,9 +70,8 @@ export const postsService = {
     const blogName = blogModel.name
 
     const date = new Date()
-    const id = `${postsDb.length}-${date.toISOString()}`
     const newElement = {
-      id,
+      _id: new ObjectId(),
       title,
       shortDescription,
       content,
@@ -81,10 +81,6 @@ export const postsService = {
     }
 
     const result = await postsRepository.create({ ...newElement })
-    if (result) {
-      return newElement
-    } else {
-      return null
-    }
+    return result
   },
 }

@@ -53,6 +53,12 @@ const authRouter = () => {
         return res.sendStatus(401);
     }));
     router.post('/login', validation_1.validationMiidleware.loginOrEmailValidation, validation_1.validationMiidleware.passwordValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        // .custom(async (value) => {
+        //   const user = await usersRepository.findUserByLoginOrEmail(value)
+        //   console.log('98====valid', user)
+        //   if (!user) throw new Error('user doesnt exist. you should register')
+        //   return true
+        // }),
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
@@ -63,8 +69,7 @@ const authRouter = () => {
         const user = yield auth_services_1.authService.checkCredential(loginOrEmail, password);
         if (user) {
             const token = yield jwt_services_1.jwtService.createJWT(user);
-            console.log('94----auth.route', token);
-            return res.status(200).json(token);
+            return res.status(200).json({ accessToken: token });
         }
         return res.sendStatus(401);
     }));

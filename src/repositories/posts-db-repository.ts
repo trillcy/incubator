@@ -1,10 +1,5 @@
-import {
-  postsDb,
-  type PostType,
-  type ViewPostType,
-  type ResultPost,
-} from '../db/postsDb'
-import { BlogType } from '../types/types'
+import { postsDb, type PostType, type ResultPost } from '../db/postsDb'
+import { type ViewBlogType, PostDBType, ViewPostType } from '../types/types'
 import { postsCollection } from '../db/db'
 import { blogsRepository } from './blogs-db-repository'
 import { ObjectId } from 'mongodb'
@@ -27,7 +22,7 @@ export const postsRepository = {
     pageNumber: string | undefined,
     pageSize: string | undefined,
     blogId?: string | undefined
-  ): Promise<ResultPost | null> {
+  ): Promise<ResultPost> {
     // -----
     const sortField =
       sortBy && postsFields.includes(sortBy) ? sortBy : 'createdAt'
@@ -48,7 +43,7 @@ export const postsRepository = {
     const searchObject = blogId ? { blogId: blogId } : {}
     // ---------
     const items = await postsCollection
-      .find(searchObject, { projection: { _id: 0 } })
+      .find(searchObject) //, { projection: { _id: 0 } })
       .sort(sortObject)
       .skip(skipElements)
       .limit(size)
@@ -56,38 +51,37 @@ export const postsRepository = {
 
     const totalCount = await postsCollection.countDocuments(searchObject)
     const pagesCount = Math.ceil(totalCount / size)
-    const resultArray = []
-    if (items.length) {
-      for (let item of items) {
-        const blogModel: BlogType | null = await blogsRepository.findById(
-          item.blogId
-        )
-        if (blogModel) {
-          const object: ViewPostType = {
-            id: item.id,
-            title: item.title,
-            shortDescription: item.shortDescription,
-            content: item.content,
-            blogId: item.blogId,
-            blogName: blogModel.name,
-            createdAt: item.createdAt,
-          }
-          resultArray.push(object)
-        } else {
-          return null
-        }
+    // const resultArray = []
+    // if (items.length) {
+    //   for (let item of items) {
+    // const blogModel: ViewBlogType | null = await blogsRepository.findById(
+    //   item.blogId
+    // )
+    // if (blogModel) {
+    const object: ViewPostType[] = items.map((item) => {
+      return {
+        id: item._id.toString(),
+        title: item.title,
+        shortDescription: item.shortDescription,
+        content: item.content,
+        blogId: item.blogId,
+        blogName: item.blogName,
+        createdAt: item.createdAt,
       }
-      const result: ResultPost = {
-        pagesCount,
-        page: numberOfPage,
-        pageSize: size,
-        totalCount,
-        items: resultArray,
-      }
-      return result
-    } else {
-      return null
+    })
+    // resultArray.push(object)
+    // } else {
+    //   return null
+    // }
+    // }
+    const result: ResultPost = {
+      pagesCount,
+      page: numberOfPage,
+      pageSize: size,
+      totalCount,
+      items: object,
     }
+    return result
   },
 
   async findById(id: string): Promise<PostType | null> {
@@ -123,7 +117,7 @@ export const postsRepository = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const result = await postsCollection.deleteOne({ id: id })
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) })
     return result.deletedCount === 1
   },
 
@@ -135,7 +129,7 @@ export const postsRepository = {
     blogId: string
   ): Promise<boolean> {
     const result = await postsCollection.updateOne(
-      { id: id },
+      { _id: new ObjectId(id) },
       {
         $set: {
           title: title,
@@ -152,8 +146,20 @@ export const postsRepository = {
     }
   },
 
-  async create(newElement: PostType): Promise<PostType> {
-    await postsCollection.insertOne({ ...newElement })
-    return newElement
+  async create(newElement: PostDBType): Promise<ViewPostType | null> {
+    const result = await postsCollection.insertOne({ ...newElement })
+    if (result.acknowledged) {
+      return {
+        id: result.insertedId.toString(),
+        title: newElement.title,
+        shortDescription: newElement.shortDescription,
+        content: newElement.content,
+        blogId: newElement.blogId,
+        blogName: newElement.blogName,
+        createdAt: newElement.createdAt,
+      }
+    } else {
+      return null
+    }
   },
 }

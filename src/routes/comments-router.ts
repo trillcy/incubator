@@ -43,7 +43,6 @@ export const commentsRouter = () => {
     authMiidleware,
     validationMiidleware.commentContentValidation,
     async (req: Request, res: Response) => {
-      const id = req.params.id
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -53,25 +52,24 @@ export const commentsRouter = () => {
         res.status(400).send({ errorsMessages })
       } else {
         const commentId = req.params.id
+
         const owner = await commentsService.findById(commentId)
+        console.log('58----comments.route', owner)
+        console.log('59----comments.route', req.user!)
+
         if (owner) {
-          if (owner.commentatorInfo.userId !== req.user!.id) {
-            res.sendStatus(403)
+          if (owner.commentatorInfo.userId !== req.user!.id.toString()) {
+            return res.sendStatus(403)
           }
-
           const { content } = req.body
-
-          const result = await commentsService.updateComment(id, content)
-
+          const result = await commentsService.updateComment(commentId, content)
           if (result) {
-            res.sendStatus(204)
-            return
+            return res.sendStatus(204)
           } else {
-            res.sendStatus(404)
+            return res.sendStatus(404)
           }
-        } else {
-          res.sendStatus(404)
         }
+        return res.sendStatus(404)
       }
     }
   )
@@ -79,19 +77,27 @@ export const commentsRouter = () => {
   router.delete('/:id', authMiidleware, async (req: Request, res: Response) => {
     const commentId = req.params.id
     const owner = await commentsService.findById(commentId)
+    console.log('82----comments.route', owner)
+    console.log('83----comments.route', req.user!.id.toString())
+    console.log('84----comments.route', req.user!)
+
     if (owner) {
-      if (owner.commentatorInfo.userId !== req.user!.id) {
-        res.sendStatus(403)
+      if (owner.commentatorInfo.userId !== req.user!.id.toString()) {
+        console.log('86----comments.route', req.user!.id.toString())
+        return res.sendStatus(403)
       }
+      console.log('92---comments.router')
+
       const result = await commentsService.deleteComment(commentId)
       if (result) {
-        res.sendStatus(204)
+        return res.sendStatus(204)
       } else {
-        res.sendStatus(404)
+        return res.sendStatus(404)
       }
-    } else {
-      res.sendStatus(404)
     }
+    console.log('99---comments.router')
+
+    return res.sendStatus(404)
   })
   router.get('/:id', async (req: Request, res: Response) => {
     const commentId = req.params.id

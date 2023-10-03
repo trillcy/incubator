@@ -93,10 +93,4 @@ exports.validationMiidleware = {
         return true;
     })),
     loginOrEmailValidation: (0, express_validator_1.body)('loginOrEmail').isString().trim().notEmpty(),
-    // .custom(async (value) => {
-    //   const user = await usersRepository.findUserByLoginOrEmail(value)
-    //   console.log('98====valid', user)
-    //   if (!user) throw new Error('user doesnt exist. you should register')
-    //   return true
-    // }),
 };

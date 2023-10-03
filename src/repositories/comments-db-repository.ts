@@ -5,7 +5,7 @@ import {
   type ResultPost,
 } from '../db/postsDb'
 import { ViewCommentType, type ResultComment } from '../types/types'
-import { type BlogType, CommentDBType } from '../types/types'
+import { type ViewBlogType, CommentDBType } from '../types/types'
 import { commentsCollection, postsCollection } from '../db/db'
 import { blogsRepository } from './blogs-db-repository'
 import { ObjectId } from 'mongodb'
@@ -106,18 +106,22 @@ export const commentsRepository = {
 
   async delete(id: string): Promise<boolean> {
     const result = await commentsCollection.deleteOne({ _id: new ObjectId(id) })
+    console.log('109++++comments.repo', id)
+    console.log('110++++comments.repo', result)
+
     return result.deletedCount === 1
   },
 
   async update(id: string, content: string): Promise<boolean> {
     const result = await commentsCollection.updateOne(
-      { id: new ObjectId(id) },
+      { _id: new ObjectId(id) },
       {
         $set: {
           content: content,
         },
       }
     )
+
     if (result.matchedCount === 1) {
       return true
     } else {

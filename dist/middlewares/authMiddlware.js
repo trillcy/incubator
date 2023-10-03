@@ -22,10 +22,8 @@ const authMiidleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     const token = req.headers.authorization.split(' ')[1];
     const userId = yield jwt_services_1.jwtService.getUserIdByToken(token);
     if (userId) {
-        console.log('19++++authMiddlewre', userId);
         // Если все норм, то получить user и вставить его в req
         req.user = yield users_services_1.usersService.findUserById(userId);
-        console.log('23++++authMiddlewre', userId, req.user);
         next();
         return;
     }

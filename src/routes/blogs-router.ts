@@ -11,7 +11,7 @@ import { blogsService } from '../domains/blogs-services'
 import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { ResultPost, ViewPostType } from '../db/postsDb'
-
+import { ViewBlogType, type ResultBlog } from '../types/types'
 type ErrorObject = { message: string; field: string }
 
 const ErrorFormatter = (error: ValidationError): ErrorObject => {
@@ -67,7 +67,8 @@ export const blogsRouter = () => {
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
       req.query
-    const result: any = await blogsRepository.findAll(
+
+    const result: ResultBlog = await blogsRepository.findAll(
       searchNameTerm?.toString(),
       sortBy?.toString(),
       sortDirection?.toString(),
@@ -78,20 +79,16 @@ export const blogsRouter = () => {
     res.status(200).json(result)
   })
 
-  router.get(
-    '/:id',
-    // validationMiidleware.idValidation,
-    async (req: Request, res: Response) => {
-      const resId = req.params.id
+  router.get('/:id', async (req: Request, res: Response) => {
+    const resId = req.params.id
 
-      const result = await blogsRepository.findById(resId)
-      if (result) {
-        res.status(200).json(result)
-      } else {
-        res.sendStatus(404)
-      }
+    const result: ViewBlogType | null = await blogsRepository.findById(resId)
+    if (result) {
+      res.status(200).json(result)
+    } else {
+      res.sendStatus(404)
     }
-  )
+  })
 
   router.put(
     '/:id',
@@ -172,7 +169,13 @@ export const blogsRouter = () => {
       } else {
         const { title, shortDescription, content } = req.body
         const blogId = req.params.blogId
+
         if (!blogId) {
+          res.sendStatus(404)
+          return
+        }
+        const blogModel = await blogsRepository.findById(blogId)
+        if (!blogModel) {
           res.sendStatus(404)
           return
         }
@@ -199,6 +202,12 @@ export const blogsRouter = () => {
       res.sendStatus(404)
       return
     }
+    const blogModel = await blogsRepository.findById(blogId)
+    if (!blogModel) {
+      res.sendStatus(404)
+      return
+    }
+
     const { sortBy, sortDirection, pageNumber, pageSize } = req.query
 
     const result = await postsRepository.findAll(

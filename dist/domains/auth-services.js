@@ -18,10 +18,9 @@ const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.authService = {
     checkCredential(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const date = new Date();
-            console.log('123----');
-            const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
+            console.log('12===auth.serv', loginOrEmail, password);
             const user = yield users_db_repository_1.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+            console.log('16===auth.serv', user);
             if (!user)
                 return null;
             const passwordHash = yield bcrypt_1.default.hash(password, user.passwordSalt);

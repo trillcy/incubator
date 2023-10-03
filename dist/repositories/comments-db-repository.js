@@ -100,12 +100,14 @@ exports.commentsRepository = {
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.commentsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            console.log('109++++comments.repo', id);
+            console.log('110++++comments.repo', result);
             return result.deletedCount === 1;
         });
     },
     update(id, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.commentsCollection.updateOne({ id: new mongodb_1.ObjectId(id) }, {
+            const result = yield db_1.commentsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
                     content: content,
                 },

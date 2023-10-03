@@ -33,7 +33,6 @@ const ErrorFormatter = (error) => {
 const commentsRouter = () => {
     const router = (0, express_1.Router)();
     router.put('/:id', authMiddlware_1.authMiidleware, validation_1.validationMiidleware.commentContentValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const id = req.params.id;
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
@@ -43,43 +42,46 @@ const commentsRouter = () => {
         else {
             const commentId = req.params.id;
             const owner = yield comments_services_1.commentsService.findById(commentId);
+            console.log('58----comments.route', owner);
+            console.log('59----comments.route', req.user);
             if (owner) {
-                if (owner.commentatorInfo.userId !== req.user.id) {
-                    res.sendStatus(403);
+                if (owner.commentatorInfo.userId !== req.user.id.toString()) {
+                    return res.sendStatus(403);
                 }
                 const { content } = req.body;
-                const result = yield comments_services_1.commentsService.updateComment(id, content);
+                const result = yield comments_services_1.commentsService.updateComment(commentId, content);
                 if (result) {
-                    res.sendStatus(204);
-                    return;
+                    return res.sendStatus(204);
                 }
                 else {
-                    res.sendStatus(404);
+                    return res.sendStatus(404);
                 }
             }
-            else {
-                res.sendStatus(404);
-            }
+            return res.sendStatus(404);
         }
     }));
     router.delete('/:id', authMiddlware_1.authMiidleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const commentId = req.params.id;
         const owner = yield comments_services_1.commentsService.findById(commentId);
+        console.log('82----comments.route', owner);
+        console.log('83----comments.route', req.user.id.toString());
+        console.log('84----comments.route', req.user);
         if (owner) {
-            if (owner.commentatorInfo.userId !== req.user.id) {
-                res.sendStatus(403);
+            if (owner.commentatorInfo.userId !== req.user.id.toString()) {
+                console.log('86----comments.route', req.user.id.toString());
+                return res.sendStatus(403);
             }
+            console.log('92---comments.router');
             const result = yield comments_services_1.commentsService.deleteComment(commentId);
             if (result) {
-                res.sendStatus(204);
+                return res.sendStatus(204);
             }
             else {
-                res.sendStatus(404);
+                return res.sendStatus(404);
             }
         }
-        else {
-            res.sendStatus(404);
-        }
+        console.log('99---comments.router');
+        return res.sendStatus(404);
     }));
     router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const commentId = req.params.id;

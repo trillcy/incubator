@@ -64,6 +64,13 @@ export const authRouter = () => {
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
     async (req: Request, res: Response) => {
+      // .custom(async (value) => {
+      //   const user = await usersRepository.findUserByLoginOrEmail(value)
+      //   console.log('98====valid', user)
+      //   if (!user) throw new Error('user doesnt exist. you should register')
+      //   return true
+      // }),
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -78,9 +85,7 @@ export const authRouter = () => {
 
       if (user) {
         const token = await jwtService.createJWT(user)
-        console.log('94----auth.route', token)
-
-        return res.status(200).json(token)
+        return res.status(200).json({ accessToken: token })
       }
       return res.sendStatus(401)
     }
