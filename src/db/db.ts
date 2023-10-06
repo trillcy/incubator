@@ -44,7 +44,7 @@ export enum Resolution {
 
 export const videoDb: VideoType[] = []
 
-const mongoURI = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'
+const mongoURI = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017'
 
 const dbName = 'incubator'
 const client = new MongoClient(mongoURI)
