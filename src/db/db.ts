@@ -1,3 +1,6 @@
+import { config } from 'dotenv'
+config()
+
 import { log } from 'console'
 import { MongoClient } from 'mongodb'
 import {
