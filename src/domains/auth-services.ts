@@ -14,6 +14,22 @@ import { add } from 'date-fns'
 import { emailManager } from '../managers/emails-managers'
 
 export const authService = {
+  async deleteRefreshToken(
+    userId: string,
+    refreshToken: string
+  ): Promise<boolean> {
+    const user = await usersRepository.findById(new ObjectId(userId))
+    if (!user) {
+      return false
+    }
+    const deletedTokens = user.deletedTokens
+    deletedTokens.push(refreshToken)
+    const newElement = {
+      deletedTokens,
+    }
+    return await usersRepository.updateUser(new ObjectId(user.id), newElement)
+  },
+
   async confirmationCode(code: string): Promise<boolean> {
     // находим пользователя по code
     const user = await usersRepository.findByCode(code)
@@ -120,6 +136,7 @@ export const authService = {
         expirationDate: add(date, { hours: 1, minutes: 3 }),
         isConfirmed: false,
       },
+      deletedTokens: [],
     }
 
     const user: ViewUserType | null = await usersRepository.create(newElement)

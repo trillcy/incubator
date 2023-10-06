@@ -66,3 +66,8 @@ export const connectDb = async () => {
     log('cant connect to db')
   }
 }
+
+export const keys = {
+  access: process.env.ACCESS_TOKEN_KEY,
+  refresh: process.env.REFRESH_TOKEN_KEY,
+}

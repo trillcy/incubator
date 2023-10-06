@@ -81,6 +81,7 @@ export type ViewCompleteUserType = {
     expirationDate: Date | null
     isConfirmed: boolean
   }
+  deletedTokens: string[]
 }
 export type UserDBType = {
   _id: ObjectId
@@ -95,6 +96,7 @@ export type UserDBType = {
     expirationDate: Date | null
     isConfirmed: boolean
   }
+  deletedTokens: string[]
 }
 export type ViewEmailUserType = {
   id: string

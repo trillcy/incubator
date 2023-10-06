@@ -1,12 +1,14 @@
 import {
   ValidationError,
   body,
+  cookie,
   param,
   query,
   validationResult,
 } from 'express-validator'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
+import { jwtService } from '../applications/jwt-services'
 
 export const validationMiidleware = {
   titleValidation: body('title')

@@ -4,21 +4,21 @@ import { usersService } from '../domains/users-services'
 import { type ViewUserType } from '../types/types'
 import { usersRepository } from '../repositories/users-db-repository'
 
-export const authMiidleware = async (
+export const tokenMiidleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // проверка наличия заголовка
-  if (!req.headers.authorization) {
+  // проверка наличия куков
+  if (!req.cookies.refreshToken) {
     res.sendStatus(401)
     return
   }
   // TODO: проверить наличие пользователя и валидность токена
-  const token = req.headers.authorization.split(' ')[1]
+  const token = req.cookies.refreshToken
   const userId = await jwtService.getUserIdByToken(
     token,
-    process.env.SECRET_KEY_1 || '123'
+    process.env.SECRET_KEY_2 || '123'
   )
   if (userId) {
     // Если все норм, то получить user и вставить его в req

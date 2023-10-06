@@ -43,13 +43,14 @@ export const usersRepository = {
           expirationDate: result.emailConfirmation.expirationDate,
           isConfirmed: result.emailConfirmation.isConfirmed,
         },
+        deletedTokens: result.deletedTokens,
       }
     } else {
       return null
     }
   },
 
-  async findById(id: ObjectId): Promise<ViewUserType | null> {
+  async findById(id: ObjectId): Promise<ViewCompleteUserType | null> {
     const result = await usersCollection.findOne(
       { _id: id }
       // { projection: { _id: 0 } }
@@ -57,9 +58,20 @@ export const usersRepository = {
     if (result) {
       return {
         id: result._id.toString(),
-        login: result.accountData.userName.login,
-        email: result.accountData.userName.email,
-        createdAt: result.accountData.createdAt.toISOString(),
+        accountData: {
+          userName: {
+            login: result.accountData.userName.login,
+            email: result.accountData.userName.email,
+          },
+          passwordHash: result.accountData.passwordHash,
+          createdAt: result.accountData.createdAt,
+        },
+        emailConfirmation: {
+          confirmationCode: result.emailConfirmation.confirmationCode,
+          expirationDate: result.emailConfirmation.expirationDate,
+          isConfirmed: result.emailConfirmation.isConfirmed,
+        },
+        deletedTokens: result.deletedTokens,
       }
     } else {
       return null
