@@ -33,16 +33,22 @@ exports.usersService = {
             const passwordSalt = yield bcrypt_1.default.genSalt(10);
             const passwordHash = yield this._generateHash(password, passwordSalt);
             const date = new Date();
-            const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`;
             const newElement = {
                 _id: new mongodb_1.ObjectId(),
-                login,
-                email,
-                passwordHash,
-                passwordSalt,
-                createdAt: date.toISOString(),
+                accountData: {
+                    userName: { login, email },
+                    passwordHash,
+                    passwordSalt,
+                    createdAt: date,
+                },
+                emailConfirmation: {
+                    confirmationCode: null,
+                    expirationDate: null,
+                    isConfirmed: false,
+                },
             };
-            const result = yield users_db_repository_1.usersRepository.create(newElement);
+            console.log('37===users', newElement);
+            const result = yield users_db_repository_1.usersRepository.create(Object.assign({}, newElement));
             return result;
         });
     },

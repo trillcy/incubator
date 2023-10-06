@@ -1,5 +1,11 @@
 import { ObjectId } from 'mongodb'
 
+export type EmailBody = {
+  email: string
+  message: string
+  subject: string
+}
+
 export type PostDBType = {
   _id: ObjectId
   title: string
@@ -63,12 +69,49 @@ export type ResultComment = {
   items: ViewCommentType[]
 }
 
+export type ViewCompleteUserType = {
+  id: string
+  accountData: {
+    userName: { login: string; email: string }
+    passwordHash: string
+    createdAt: Date
+  }
+  emailConfirmation: {
+    confirmationCode: string | null
+    expirationDate: Date | null
+    isConfirmed: boolean
+  }
+}
+export type UserDBType = {
+  _id: ObjectId
+  accountData: {
+    userName: { login: string; email: string }
+    passwordHash: any
+    passwordSalt: string
+    createdAt: Date
+  }
+  emailConfirmation: {
+    confirmationCode: string | null
+    expirationDate: Date | null
+    isConfirmed: boolean
+  }
+}
+export type ViewEmailUserType = {
+  id: string
+  login: string
+  email: string
+  createdAt: string
+  confirmationCode: string | null
+  expirationDate: Date | null
+  isConfirmed: boolean
+}
 export type ViewUserType = {
   id: string
   login: string
   email: string
   createdAt: string
 }
+/*
 export type UserDBType = {
   _id: ObjectId
   login: string
@@ -77,6 +120,7 @@ export type UserDBType = {
   passwordSalt: string
   createdAt: string
 }
+*/
 export type ResultUser = {
   pagesCount: number
   page: number

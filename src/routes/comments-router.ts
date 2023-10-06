@@ -49,10 +49,9 @@ export const commentsRouter = () => {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
 
-        res.status(400).send({ errorsMessages })
+        return res.status(400).send({ errorsMessages })
       } else {
         const commentId = req.params.id
-
         const owner = await commentsService.findById(commentId)
         console.log('58----comments.route', owner)
         console.log('59----comments.route', req.user!)

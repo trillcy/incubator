@@ -32,14 +32,9 @@ const ErrorFormatter = (error) => {
 };
 const authRouter = () => {
     const router = (0, express_1.Router)();
-    // -----
+    // пинимает токен в заголовке
+    // возвращает {userId, login, email}
     router.get('/me', authMiddlware_1.authMiidleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        // const errors = validationResult(req)
-        // if (!errors.isEmpty()) {
-        //   const errorsArray = errors.array({ onlyFirstError: true })
-        //   const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        //   return res.status(400).send({ errorsMessages })
-        // }
         const { user } = req;
         if (user) {
             const userOut = {
@@ -52,13 +47,9 @@ const authRouter = () => {
         }
         return res.sendStatus(401);
     }));
+    // проверяет есть ли такой пользователь в БД
+    // возвращает JWT token
     router.post('/login', validation_1.validationMiidleware.loginOrEmailValidation, validation_1.validationMiidleware.passwordValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        // .custom(async (value) => {
-        //   const user = await usersRepository.findUserByLoginOrEmail(value)
-        //   console.log('98====valid', user)
-        //   if (!user) throw new Error('user doesnt exist. you should register')
-        //   return true
-        // }),
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
@@ -72,6 +63,70 @@ const authRouter = () => {
             return res.status(200).json({ accessToken: token });
         }
         return res.sendStatus(401);
+    }));
+    // регистрация пользователя
+    // в middleware проверяем, что такого login и email нет
+    // сохраняет user
+    // отправляет письмо с подтверждением регистрации
+    // возвращает только код 204
+    router.post('/registration', validation_1.validationMiidleware.newLoginValidation, validation_1.validationMiidleware.newEmailValidation, validation_1.validationMiidleware.passwordValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const errorsArray = errors.array({ onlyFirstError: true });
+            const errorsMessages = errorsArray.map((e) => ErrorFormatter(e));
+            return res.status(400).send({ errorsMessages });
+        }
+        const { login, email, password } = req.body;
+        console.log('93----', login, email, password);
+        const emailSuccess = yield auth_services_1.authService.registration(login, email, password);
+        console.log('100----', emailSuccess);
+        if (emailSuccess) {
+            return res.sendStatus(204);
+        }
+        else {
+            return res.sendStatus(444);
+        }
+    }));
+    // в middleware проверяем наличие такого email ???
+    // отправляет письмо с подтверждением регистрации
+    // возвращает только код 204
+    router.post('/registration-email-resending', validation_1.validationMiidleware.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const errorsArray = errors.array({ onlyFirstError: true });
+            const errorsMessages = errorsArray.map((e) => ErrorFormatter(e));
+            return res.status(400).send({ errorsMessages });
+        }
+        const { email } = req.body;
+        console.log('128---auth', email);
+        const emailSuccess = yield auth_services_1.authService.emailResending(email);
+        console.log('129---auth', emailSuccess);
+        if (emailSuccess) {
+            return res.sendStatus(204);
+        }
+        else {
+            return res.sendStatus(444);
+        }
+    }));
+    // в middleware проверяем строку присланного кода - обычная строка ??? trim можно применять ???
+    // проверяем код с записанным
+    // возвращает только код 204
+    router.post('/registration-confirmation', validation_1.validationMiidleware.codeValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const errorsArray = errors.array({ onlyFirstError: true });
+            const errorsMessages = errorsArray.map((e) => ErrorFormatter(e));
+            return res.status(400).send({ errorsMessages });
+        }
+        const { code } = req.body;
+        console.log('156----auth', code);
+        const user = yield auth_services_1.authService.confirmationCode(code);
+        if (user) {
+            return res.sendStatus(204);
+        }
+        else {
+            return res.sendStatus(400);
+        }
     }));
     return router;
 };

@@ -22,6 +22,35 @@ const usersFields = [
 ];
 const usersDirections = ['asc', 'desc'];
 exports.usersRepository = {
+    findByCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.usersCollection.findOne({
+                'emailConfirmation.confirmationCode': code,
+            });
+            console.log('28+++users', result);
+            if (result) {
+                return {
+                    id: result._id.toString(),
+                    accountData: {
+                        userName: {
+                            login: result.accountData.userName.login,
+                            email: result.accountData.userName.email,
+                        },
+                        passwordHash: result.accountData.passwordHash,
+                        createdAt: result.accountData.createdAt,
+                    },
+                    emailConfirmation: {
+                        confirmationCode: result.emailConfirmation.confirmationCode,
+                        expirationDate: result.emailConfirmation.expirationDate,
+                        isConfirmed: result.emailConfirmation.isConfirmed,
+                    },
+                };
+            }
+            else {
+                return null;
+            }
+        });
+    },
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.usersCollection.findOne({ _id: id }
@@ -30,9 +59,9 @@ exports.usersRepository = {
             if (result) {
                 return {
                     id: result._id.toString(),
-                    login: result.login,
-                    email: result.email,
-                    createdAt: result.createdAt,
+                    login: result.accountData.userName.login,
+                    email: result.accountData.userName.email,
+                    createdAt: result.accountData.createdAt.toISOString(),
                 };
             }
             else {
@@ -93,24 +122,24 @@ exports.usersRepository = {
                 totalCount,
                 items: items.map((i) => ({
                     id: i._id.toString(),
-                    login: i.login,
-                    email: i.email,
-                    createdAt: i.createdAt,
+                    login: i.accountData.userName.login,
+                    email: i.accountData.userName.email,
+                    createdAt: i.accountData.createdAt.toISOString(),
                 })),
             };
         });
     },
     findByLogin(login) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.usersCollection.findOne({ login: login }
+            const result = yield db_1.usersCollection.findOne({ 'accountData.userName.login': login }
             // { projection: { _id: 0 } }
             );
             if (result) {
                 return {
                     id: result._id.toString(),
-                    login: result.login,
-                    email: result.email,
-                    createdAt: result.createdAt,
+                    login: result.accountData.userName.login,
+                    email: result.accountData.userName.email,
+                    createdAt: result.accountData.createdAt.toISOString(),
                 };
             }
             else {
@@ -120,13 +149,18 @@ exports.usersRepository = {
     },
     findByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.usersCollection.findOne({ email: email });
+            const result = yield db_1.usersCollection.findOne({
+                'accountData.userName.email': email,
+            });
             if (result) {
                 return {
                     id: result._id.toString(),
-                    login: result.login,
-                    email: result.email,
-                    createdAt: result.createdAt,
+                    login: result.accountData.userName.login,
+                    email: result.accountData.userName.email,
+                    createdAt: result.accountData.createdAt.toISOString(),
+                    confirmationCode: result.emailConfirmation.confirmationCode,
+                    expirationDate: result.emailConfirmation.expirationDate,
+                    isConfirmed: result.emailConfirmation.isConfirmed,
                 };
             }
             else {
@@ -136,10 +170,12 @@ exports.usersRepository = {
     },
     findUserByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
-            // { projection: { _id: 0 } }
-            );
-            console.log('144++++user.repo', result);
+            const result = yield db_1.usersCollection.findOne({
+                $or: [
+                    { 'accountData.userName.login': loginOrEmail },
+                    { 'accountData.userName.email': loginOrEmail },
+                ],
+            });
             return result;
         });
     },
@@ -150,7 +186,7 @@ exports.usersRepository = {
                 return result.deletedCount === 1;
             }
             catch (e) {
-                return undefined;
+                return null;
             }
         });
     },
@@ -160,14 +196,20 @@ exports.usersRepository = {
             if (created.acknowledged) {
                 return {
                     id: created.insertedId.toString(),
-                    login: newElement.login,
-                    email: newElement.email,
-                    createdAt: newElement.createdAt,
+                    login: newElement.accountData.userName.login,
+                    email: newElement.accountData.userName.email,
+                    createdAt: newElement.accountData.createdAt.toISOString(),
                 };
             }
             else {
                 return null;
             }
+        });
+    },
+    updateUser(id, newElement) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updated = yield db_1.usersCollection.updateOne({ _id: id }, { $set: newElement });
+            return updated.acknowledged;
         });
     },
 };

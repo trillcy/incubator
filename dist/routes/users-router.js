@@ -34,7 +34,7 @@ const usersRouter = () => {
     const auth = (basicString) => {
         return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false;
     };
-    router.post('/', validation_1.validationMiidleware.loginValidation, validation_1.validationMiidleware.passwordValidation, validation_1.validationMiidleware.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    router.post('/', validation_1.validationMiidleware.newLoginValidation, validation_1.validationMiidleware.passwordValidation, validation_1.validationMiidleware.newEmailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const checkAuth = auth(req.headers.authorization);
         if (!checkAuth) {
             res.sendStatus(401);

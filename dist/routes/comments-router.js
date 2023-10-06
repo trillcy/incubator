@@ -37,7 +37,7 @@ const commentsRouter = () => {
         if (!errors.isEmpty()) {
             const errorsArray = errors.array({ onlyFirstError: true });
             const errorsMessages = errorsArray.map((e) => ErrorFormatter(e));
-            res.status(400).send({ errorsMessages });
+            return res.status(400).send({ errorsMessages });
         }
         else {
             const commentId = req.params.id;

@@ -41,9 +41,9 @@ export const usersRouter = () => {
 
   router.post(
     '/',
-    validationMiidleware.loginValidation,
+    validationMiidleware.newLoginValidation,
     validationMiidleware.passwordValidation,
-    validationMiidleware.emailValidation,
+    validationMiidleware.newEmailValidation,
     async (req: Request, res: Response) => {
       const checkAuth = auth(req.headers.authorization)
       if (!checkAuth) {

@@ -64,7 +64,7 @@ exports.validationMiidleware = {
     },
     // =====
     // ^[a-zA-Z0-9_-]*$
-    loginValidation: (0, express_validator_1.body)('login')
+    newLoginValidation: (0, express_validator_1.body)('login')
         .isString()
         .trim()
         .notEmpty()
@@ -81,7 +81,7 @@ exports.validationMiidleware = {
         .trim()
         .notEmpty()
         .isLength({ min: 6, max: 20 }),
-    emailValidation: (0, express_validator_1.body)('email')
+    newEmailValidation: (0, express_validator_1.body)('email')
         .isString()
         .trim()
         .notEmpty()
@@ -92,5 +92,12 @@ exports.validationMiidleware = {
             throw new Error('user exists');
         return true;
     })),
+    emailValidation: (0, express_validator_1.body)('email').isString().trim().notEmpty().isEmail(),
+    // .custom(async (value) => {
+    //   const user = await usersRepository.findByEmail(value)
+    //   if (user) throw new Error('user exists')
+    //   return true
+    // }),
     loginOrEmailValidation: (0, express_validator_1.body)('loginOrEmail').isString().trim().notEmpty(),
+    codeValidation: (0, express_validator_1.body)('code').isString().trim().notEmpty(),
 };

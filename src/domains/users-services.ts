@@ -1,4 +1,4 @@
-import { UserDBType, type ViewUserType } from '../types/types'
+import { type UserDBType, type ViewUserType } from '../types/types'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import bcrypt from 'bcrypt'
 import { ObjectId } from 'mongodb'
@@ -8,7 +8,7 @@ export const usersService = {
   async findUserById(id: ObjectId) {
     return await usersRepository.findById(id)
   },
-  async deleteUser(id: string): Promise<boolean | undefined> {
+  async deleteUser(id: string): Promise<boolean | null> {
     // const transformId = id.
     return await usersRepository.delete(id)
   },
@@ -20,17 +20,23 @@ export const usersService = {
     const passwordSalt = await bcrypt.genSalt(10)
     const passwordHash = await this._generateHash(password, passwordSalt)
     const date = new Date()
-    const id = `${Math.floor(Math.random() * 30)}-${date.toISOString()}`
     const newElement: UserDBType = {
       _id: new ObjectId(),
-      login,
-      email,
-      passwordHash,
-      passwordSalt,
-      createdAt: date.toISOString(),
+      accountData: {
+        userName: { login, email },
+        passwordHash,
+        passwordSalt,
+        createdAt: date,
+      },
+      emailConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
+        isConfirmed: false,
+      },
     }
+    console.log('37===users', newElement)
 
-    const result = await usersRepository.create(newElement)
+    const result = await usersRepository.create({ ...newElement })
 
     return result
   },

@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb'
 import {
   type UserDBType,
   type ViewUserType,
+  type ViewEmailUserType,
+  type ViewCompleteUserType,
   type ResultUser,
 } from '../types/types'
 import { blogsCollection, usersCollection } from '../db/db'
@@ -19,6 +21,34 @@ const usersFields = [
 const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
+  async findByCode(code: string): Promise<ViewCompleteUserType | null> {
+    const result = await usersCollection.findOne({
+      'emailConfirmation.confirmationCode': code,
+    })
+    console.log('28+++users', result)
+
+    if (result) {
+      return {
+        id: result._id.toString(),
+        accountData: {
+          userName: {
+            login: result.accountData.userName.login,
+            email: result.accountData.userName.email,
+          },
+          passwordHash: result.accountData.passwordHash,
+          createdAt: result.accountData.createdAt,
+        },
+        emailConfirmation: {
+          confirmationCode: result.emailConfirmation.confirmationCode,
+          expirationDate: result.emailConfirmation.expirationDate,
+          isConfirmed: result.emailConfirmation.isConfirmed,
+        },
+      }
+    } else {
+      return null
+    }
+  },
+
   async findById(id: ObjectId): Promise<ViewUserType | null> {
     const result = await usersCollection.findOne(
       { _id: id }
@@ -27,9 +57,9 @@ export const usersRepository = {
     if (result) {
       return {
         id: result._id.toString(),
-        login: result.login,
-        email: result.email,
-        createdAt: result.createdAt,
+        login: result.accountData.userName.login,
+        email: result.accountData.userName.email,
+        createdAt: result.accountData.createdAt.toISOString(),
       }
     } else {
       return null
@@ -98,37 +128,42 @@ export const usersRepository = {
       totalCount,
       items: items.map((i) => ({
         id: i._id.toString(),
-        login: i.login,
-        email: i.email,
-        createdAt: i.createdAt,
+        login: i.accountData.userName.login,
+        email: i.accountData.userName.email,
+        createdAt: i.accountData.createdAt.toISOString(),
       })),
     }
   },
 
   async findByLogin(login: string): Promise<ViewUserType | null> {
     const result = await usersCollection.findOne(
-      { login: login }
+      { 'accountData.userName.login': login }
       // { projection: { _id: 0 } }
     )
     if (result) {
       return {
         id: result._id.toString(),
-        login: result.login,
-        email: result.email,
-        createdAt: result.createdAt,
+        login: result.accountData.userName.login,
+        email: result.accountData.userName.email,
+        createdAt: result.accountData.createdAt.toISOString(),
       }
     } else {
       return null
     }
   },
-  async findByEmail(email: string): Promise<ViewUserType | null> {
-    const result = await usersCollection.findOne({ email: email })
+  async findByEmail(email: string): Promise<ViewEmailUserType | null> {
+    const result = await usersCollection.findOne({
+      'accountData.userName.email': email,
+    })
     if (result) {
       return {
         id: result._id.toString(),
-        login: result.login,
-        email: result.email,
-        createdAt: result.createdAt,
+        login: result.accountData.userName.login,
+        email: result.accountData.userName.email,
+        createdAt: result.accountData.createdAt.toISOString(),
+        confirmationCode: result.emailConfirmation.confirmationCode,
+        expirationDate: result.emailConfirmation.expirationDate,
+        isConfirmed: result.emailConfirmation.isConfirmed,
       }
     } else {
       return null
@@ -137,35 +172,44 @@ export const usersRepository = {
   async findUserByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserDBType | null> {
-    const result = await usersCollection.findOne(
-      { $or: [{ login: loginOrEmail }, { email: loginOrEmail }] }
-      // { projection: { _id: 0 } }
-    )
-    console.log('144++++user.repo', result)
+    const result = await usersCollection.findOne({
+      $or: [
+        { 'accountData.userName.login': loginOrEmail },
+        { 'accountData.userName.email': loginOrEmail },
+      ],
+    })
 
     return result
   },
-  async delete(id: string): Promise<boolean | undefined> {
+  async delete(id: string): Promise<boolean | null> {
     try {
       const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
 
       return result.deletedCount === 1
     } catch (e) {
-      return undefined
+      return null
     }
   },
 
   async create(newElement: UserDBType): Promise<ViewUserType | null> {
     const created = await usersCollection.insertOne({ ...newElement })
+
     if (created.acknowledged) {
       return {
         id: created.insertedId.toString(),
-        login: newElement.login,
-        email: newElement.email,
-        createdAt: newElement.createdAt,
+        login: newElement.accountData.userName.login,
+        email: newElement.accountData.userName.email,
+        createdAt: newElement.accountData.createdAt.toISOString(),
       }
     } else {
       return null
     }
+  },
+  async updateUser(id: ObjectId, newElement: any): Promise<boolean> {
+    const updated = await usersCollection.updateOne(
+      { _id: id },
+      { $set: newElement }
+    )
+    return updated.acknowledged
   },
 }
