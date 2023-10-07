@@ -3,6 +3,7 @@ import { jwtService } from '../applications/jwt-services'
 import { usersService } from '../domains/users-services'
 import { type ViewUserType } from '../types/types'
 import { usersRepository } from '../repositories/users-db-repository'
+import { keys } from '../db/db'
 
 export const authMiidleware = async (
   req: Request,
@@ -16,10 +17,7 @@ export const authMiidleware = async (
   }
   // TODO: проверить наличие пользователя и валидность токена
   const token = req.headers.authorization.split(' ')[1]
-  const userId = await jwtService.getUserIdByToken(
-    token,
-    process.env.SECRET_KEY_1 || '123'
-  )
+  const userId = await jwtService.getUserIdByToken(token, keys.access)
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)
