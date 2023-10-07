@@ -19,11 +19,16 @@ export const tokenMiidleware = async (
   const token = req.cookies.refreshToken
   const userId = await jwtService.getUserIdByToken(token, keys.refresh)
   console.log('24+++token', userId)
-
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)
+
     if (user) {
+      // проверить есть ли токен в blackList
+      const isWrong = user.deletedTokens.includes(token)
+      if (isWrong) {
+        return res.sendStatus(401)
+      }
       req.user = {
         id: user.id,
         login: user.accountData.userName.login,
@@ -34,5 +39,5 @@ export const tokenMiidleware = async (
       return
     }
   }
-  res.sendStatus(401)
+  return res.sendStatus(401)
 }
