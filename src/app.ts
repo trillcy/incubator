@@ -6,6 +6,8 @@ import { postsRouter } from './routes/posts-router'
 import { usersRouter } from './routes/users-router'
 import { authRouter } from './routes/auth-router'
 import { commentsRouter } from './routes/comments-router'
+import cors from 'cors'
+import cookieParser from 'cookie-parser'
 // import { videoDb } from './db/db'
 
 export const RouterPaths = {
@@ -22,6 +24,8 @@ export const app = express()
 // const port = 3004
 
 app.use(express.json())
+app.use(cors())
+app.use(cookieParser())
 
 // app.use(RouterPaths.videos, videosRouter(videoDb))
 app.use(RouterPaths.testing, testingRouter())
