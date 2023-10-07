@@ -78,6 +78,7 @@ export const usersRouter = () => {
       pageNumber,
       pageSize,
     } = req.query
+    console.log('81---users')
 
     const result: ResultUser = await usersRepository.findAllUsers(
       searchLoginTerm?.toString(),

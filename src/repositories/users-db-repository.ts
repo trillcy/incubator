@@ -113,9 +113,17 @@ export const usersRepository = {
         {
           $or: [
             {
-              login: { $regex: searchLogin, $options: 'i' },
+              'accountData.userName.login': {
+                $regex: searchLogin,
+                $options: 'i',
+              },
             },
-            { email: { $regex: searchEmail, $options: 'i' } },
+            {
+              'accountData.userName.email': {
+                $regex: searchEmail,
+                $options: 'i',
+              },
+            },
           ],
         }
         // { projection: { _id: 0 } }
@@ -124,12 +132,17 @@ export const usersRepository = {
       .skip(skipElements)
       .limit(size)
       .toArray()
+    console.log('127+++usrs', searchLogin, searchEmail)
+    console.log('128+++usrs', items)
+
     const totalCount = await usersCollection.countDocuments({
       $or: [
         {
-          login: { $regex: searchLogin, $options: 'i' },
+          'accountData.userName.login': { $regex: searchLogin, $options: 'i' },
         },
-        { email: { $regex: searchEmail, $options: 'i' } },
+        {
+          'accountData.userName.email': { $regex: searchEmail, $options: 'i' },
+        },
       ],
     })
     const pagesCount = Math.ceil(totalCount / size)
