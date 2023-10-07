@@ -89,6 +89,8 @@ export const authService = {
     loginOrEmail: string,
     password: string
   ): Promise<UserDBType | null> {
+    console.log('83---auth', loginOrEmail)
+
     const user: UserDBType | null =
       await usersRepository.findUserByLoginOrEmail(loginOrEmail)
 

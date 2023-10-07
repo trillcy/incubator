@@ -94,6 +94,7 @@ export const authRouter = () => {
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+        console.log('97---auth', errorsMessages)
 
         return res.status(400).send({ errorsMessages })
       }
@@ -112,6 +113,8 @@ export const authRouter = () => {
           keys.refresh,
           '20000'
         )
+        console.log('115----auth', accessToken, refreshToken)
+
         res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
           secure: true,

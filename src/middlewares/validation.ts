@@ -109,13 +109,29 @@ export const validationMiidleware = {
       return true
     }),
 
-  loginOrEmailValidation: body('loginOrEmail').isString().trim().notEmpty(),
+  loginOrEmailValidation: body('loginOrEmail')
+    .isString()
+    .trim()
+    .notEmpty()
+    .custom(async (value) => {
+      const user = await usersRepository.findUserByLoginOrEmail(value)
+      console.log('118++++valid', user)
+
+      if (!user) {
+        throw new Error('user doesnt exist')
+      } else {
+        // if (user.emailConfirmation.isConfirmed) throw new Error('code exists')
+        return true
+      }
+    }),
+
   codeValidation: body('code')
     .isString()
     .trim()
     .notEmpty()
     .custom(async (value) => {
       const user = await usersRepository.findByCode(value)
+
       if (!user) throw new Error('user doesnt exist')
       if (user.emailConfirmation.isConfirmed) throw new Error('code exists')
       return true
