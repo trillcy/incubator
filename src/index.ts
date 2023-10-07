@@ -3,6 +3,7 @@ dotenv.config()
 
 import { app } from './app'
 import { connectDb } from './db/db'
+import { log } from 'console'
 
 // export const app = express()
 // const port = 3004
