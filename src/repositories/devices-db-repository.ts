@@ -32,25 +32,14 @@ export const devicesRepository = {
     return await devicesCollection.findOne({ deviceId })
   },
 
-  async findById(id: string): Promise<PostType | null> {
-    // const result = await postsCollection.findOne(
-    //   { id: id },
-    //   { projection: { _id: 0 } }
-    // )
-    const result = await postsCollection.findOne(
-      { _id: new ObjectId(id) }
-      // { projection: { _id: 0 } }
-    )
+  async findById(id: string): Promise<ViewDeviceType | null> {
+    const result = await devicesCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
-      // return result
-      // ====
       return {
-        id: result._id.toString(),
+        ip: result.ip,
         title: result.title,
-        shortDescription: result.shortDescription,
-        content: result.content,
-        blogId: result.blogId,
-        createdAt: result.createdAt,
+        deviceId: result.deviceId,
+        lastActiveDate: result.lastActiveDate.toISOString(),
       }
       // =====
     } else {
