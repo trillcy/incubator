@@ -9,12 +9,23 @@ import { ObjectId } from 'mongodb'
 export const devicesService = {
   async deleteDevice(deviceId: string): Promise<boolean | null> {
     // const transformId = id.
-    return await devicesRepository.deleteDevice(deviceId)
+    return await devicesRepository.deleteOneDevice(deviceId)
   },
 
-  async deleteDevicesWithoutCurrent(deviceId: string): Promise<boolean | null> {
+  async deleteUserDevices(
+    userId: string,
+    deviceId: string
+  ): Promise<boolean | null> {
     // const transformId = id.
-    return await devicesRepository.deleteWithoutCurrent(deviceId)
+    return await devicesRepository.deleteUserDevice(userId, deviceId)
+  },
+
+  async deleteDevicesWithoutCurrent(
+    userId: string,
+    deviceId: string
+  ): Promise<boolean | null> {
+    // const transformId = id.
+    return await devicesRepository.deleteWithoutCurrent(userId, deviceId)
   },
 
   async createDevice(

@@ -60,13 +60,15 @@ export const securityRouter = () => {
     // validationMiidleware.deviceValidation,
     async (req: Request, res: Response) => {
       const currentDeviceId = req.deviceId
-      if (currentDeviceId) {
-        const deletedDevices = await devicesService.deleteDevicesWithoutCurrent(
+      const userId = req.user?.id
+      if (userId && currentDeviceId) {
+        const deletedDevices = await devicesService.deleteUserDevices(
+          userId,
           currentDeviceId
         )
         return res.sendStatus(204)
       }
-      return res.sendStatus(401)
+      return res.sendStatus(444)
     }
   )
   // удаляет все сессии пользователя кроме текущей
@@ -75,10 +77,15 @@ export const securityRouter = () => {
     tokenMiddleware,
     async (req: Request, res: Response) => {
       const currentDeviceId = req.deviceId
-      const deletedDevices = await devicesService.deleteDevicesWithoutCurrent(
-        currentDeviceId
-      )
-      return res.sendStatus(204)
+      const userId = req.user?.id
+      if (userId && currentDeviceId) {
+        const deletedDevices = await devicesService.deleteDevicesWithoutCurrent(
+          userId,
+          currentDeviceId
+        )
+        return res.sendStatus(204)
+      }
+      return res.sendStatus(401)
     }
   )
   return router

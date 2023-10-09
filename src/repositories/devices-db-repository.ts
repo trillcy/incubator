@@ -64,16 +64,24 @@ export const devicesRepository = {
     return totalCount === 0
   },
 
-  async deleteWithoutCurrent(currentDeviceId: string): Promise<boolean> {
+  async deleteWithoutCurrent(
+    userId: string,
+    currentDeviceId: string
+  ): Promise<boolean> {
     const result = await devicesCollection.deleteMany({
+      userId,
       deviceId: { $nin: [currentDeviceId] },
     })
     console.log('114----', result)
 
-    return true
+    return result.acknowledged
   },
 
-  async deleteDevice(deviceId: string): Promise<boolean> {
+  async deleteUserDevice(userId: string, deviceId: string): Promise<boolean> {
+    const result = await devicesCollection.deleteMany({ userId, deviceId })
+    return result.acknowledged
+  },
+  async deleteOneDevice(deviceId: string): Promise<boolean> {
     const result = await devicesCollection.deleteMany({ deviceId })
     return result.acknowledged
   },

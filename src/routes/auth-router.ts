@@ -88,8 +88,7 @@ export const authRouter = () => {
     '/login',
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
-    // validationMiidleware.deviceValidation,
-    effortsMiddleware,
+    // effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
