@@ -74,22 +74,18 @@ export const devicesRepository = {
     const result = await devicesCollection.deleteMany({ deviceId })
     return result.acknowledged
   },
-  /*
+
   async update(
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
+    deviceId: string,
+    ip: string,
+    lastActiveDate: Date
   ): Promise<boolean> {
     const result = await postsCollection.updateOne(
-      { _id: new ObjectId(id) },
+      { deviceId },
       {
         $set: {
-          title: title,
-          shortDescription: shortDescription,
-          content: content,
-          blogId: blogId,
+          ip: ip,
+          lastActiveDate: lastActiveDate,
         },
       }
     )
@@ -99,7 +95,7 @@ export const devicesRepository = {
       return false
     }
   },
-*/
+
   async createDevice(newElement: DeviceDBType): Promise<ViewDeviceType | null> {
     const result = await devicesCollection.insertOne({ ...newElement })
     console.log('169++++sess', result)

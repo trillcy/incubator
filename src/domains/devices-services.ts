@@ -28,6 +28,13 @@ export const devicesService = {
     return await devicesRepository.deleteWithoutCurrent(userId, deviceId)
   },
 
+  async updateDevice(
+    deviceId: string,
+    ip: string,
+    lastActiveDate: Date
+  ): Promise<boolean> {
+    return await devicesRepository.update(deviceId, ip, lastActiveDate)
+  },
   async createDevice(
     ip: string,
     title: string,

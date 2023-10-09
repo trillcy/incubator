@@ -61,24 +61,43 @@ export const authRouter = () => {
       const deviceId = req.deviceId
       console.log('57---auth', user)
 
-      if (user) {
+      const title = req.headers['user-agent']?.toString() ?? 'Anonymous'
+      const ip = req.ip
+
+      if (user && title && ip && deviceId) {
+        console.log('133----auth')
+        // выдаем access и refresh токены
+        const accessData = { userId: user.id }
         const accessToken = await jwtService.createJWT(
-          user.id,
+          accessData,
           keys.access,
-          '10000000'
+          '10min'
         )
+        const refreshData = { userId: user.id, deviceId }
 
         const refreshToken = await jwtService.createJWT(
-          { userId: user.id, deviceId },
+          refreshData,
           keys.refresh,
-          '2000000000'
+          '20min'
         )
 
-        res.cookie('refreshToken', refreshToken, {
-          httpOnly: true,
-          secure: true,
-        })
-        return res.status(200).json({ accessToken: accessToken })
+        const payloadObject = await jwtService.decodeJWT(refreshToken)
+        const lastActiveDate = new Date(payloadObject.iat + 10000)
+        const expiredDate = payloadObject.exp
+
+        const device = await devicesService.updateDevice(
+          deviceId,
+          ip,
+          lastActiveDate
+        )
+        if (!device) return res.sendStatus(444)
+        return res
+          .cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+          })
+          .status(200)
+          .json({ accessToken: accessToken })
       }
       return res.sendStatus(401)
     }
