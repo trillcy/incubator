@@ -51,10 +51,14 @@ export const usersRepository = {
   },
 
   async findById(id: ObjectId): Promise<ViewCompleteUserType | null> {
+    console.log('54+++user.repo', '6524116dddb2a93277071c27', id)
+
     const result = await usersCollection.findOne(
-      { _id: id }
+      { _id: new ObjectId(id) }
       // { projection: { _id: 0 } }
     )
+    console.log('60+++user.repo', result)
+
     if (result) {
       return {
         id: result._id.toString(),

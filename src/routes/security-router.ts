@@ -40,6 +40,7 @@ export const securityRouter = () => {
     tokenMiddleware,
     async (req: Request, res: Response) => {
       const user = req.user
+      console.log('43----sec.route', user)
 
       if (user) {
         const devices = await devicesRepository.findAll(user.id)

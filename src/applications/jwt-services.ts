@@ -28,6 +28,7 @@ export const jwtService = {
 
       return result
     } catch (e) {
+      console.log('error in verify token:', e)
       return null
     }
   },

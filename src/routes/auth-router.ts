@@ -65,13 +65,13 @@ export const authRouter = () => {
         const accessToken = await jwtService.createJWT(
           user.id,
           keys.access,
-          '10000'
+          '10000000'
         )
 
         const refreshToken = await jwtService.createJWT(
           { userId: user.id, deviceId },
           keys.refresh,
-          '20000'
+          '2000000000'
         )
 
         res.cookie('refreshToken', refreshToken, {
@@ -119,14 +119,14 @@ export const authRouter = () => {
           const accessToken = await jwtService.createJWT(
             accessData,
             keys.access,
-            '10000'
+            '10min'
           )
           const refreshData = { userId: user._id, deviceId }
 
           const refreshToken = await jwtService.createJWT(
             refreshData,
             keys.refresh,
-            '20000'
+            '20min'
           )
           console.log('115----auth', accessToken, refreshToken)
 

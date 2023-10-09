@@ -20,19 +20,15 @@ export const tokenMiddleware = async (
   console.log('20+++token', token)
 
   const payloadObject = await jwtService.getUserIdByToken(token, keys.refresh)
-  const userId = payloadObject.user.id
+  if (!payloadObject) return res.sendStatus(401)
+  const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
   console.log('24+++token', userId)
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)
-
+    console.log('32+++token', user)
     if (user && deviceId) {
-      // проверить есть ли токен в blackList
-      const isWrong = user.deletedTokens.includes(token)
-      if (isWrong) {
-        return res.sendStatus(401)
-      }
       req.user = {
         id: user.id,
         login: user.accountData.userName.login,
