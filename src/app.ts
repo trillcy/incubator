@@ -37,3 +37,6 @@ app.use(RouterPaths.users, usersRouter())
 app.use(RouterPaths.auth, authRouter())
 app.use(RouterPaths.comments, commentsRouter())
 app.use(RouterPaths.security, securityRouter())
+
+// для того, чтобы работал корректный ip адрес в заголовках
+app.set('trust proxy', true)

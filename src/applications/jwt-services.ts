@@ -3,11 +3,19 @@ import { UserDBType } from '../types/types'
 import jwt from 'jsonwebtoken'
 
 export const jwtService = {
-  async createJWT(userId: string, key: any, expiresIn: string) {
-    const token: string = jwt.sign({ userId: new ObjectId(userId) }, key, {
+  async decodeJWT(token: string) {
+    const payloadData: any = jwt.decode(token)
+    console.log('10+++jwt', payloadData)
+
+    return payloadData
+  },
+  async createJWT(payloadData: any, key: any, expiresIn: string) {
+    const token: string = jwt.sign(payloadData, key, {
       expiresIn,
     })
     console.log('10+++jwt', jwt.verify(token, key))
+
+    const payload = jwt.decode(token, key)
 
     return token
   },
@@ -18,7 +26,7 @@ export const jwtService = {
       const result: any = jwt.verify(token, key)
       console.log('17++++jwt', result)
 
-      return new ObjectId(result.userId)
+      return result
     } catch (e) {
       return null
     }

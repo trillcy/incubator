@@ -1,27 +1,18 @@
 import { ObjectId } from 'mongodb'
 
-export type ResultSession = {
-  pagesCount: number
-  page: number
-  pageSize: number
-  totalCount: number
-  items: ViewSessionType[]
-}
-
-export type ViewSessionType = {
-  IP: string
-  URL: string
+export type ViewDeviceType = {
+  ip: string
+  title: string
   deviceId: string
-  expireDate: Date
-  userId: string
+  lastActiveDate: string
 }
 
-export type SessionDBType = {
+export type DeviceDBType = {
   _id: ObjectId
-  IP: string
-  URL: string
+  ip: string
+  title: string
   deviceId: string
-  expireDate: Date
+  lastActiveDate: Date
   userId: string
 }
 

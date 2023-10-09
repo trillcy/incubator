@@ -17,7 +17,8 @@ export const authMiidleware = async (
   }
   // TODO: проверить наличие пользователя и валидность токена
   const token = req.headers.authorization.split(' ')[1]
-  const userId = await jwtService.getUserIdByToken(token, keys.access)
+  const payloadObject = await jwtService.getUserIdByToken(token, keys.access)
+  const userId = payloadObject.user.id
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)

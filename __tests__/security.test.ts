@@ -12,11 +12,11 @@ describe(RouterPaths.posts, () => {
   afterAll((done) => {
     done()
   })
-  /*
+
   it('check get -> correct getAll', async () => {
-    await request(app).get(RouterPaths.posts).expect(200)
+    await request(app).get(RouterPaths.security).expect(200)
   })
-*/
+  /*
   it('create user; create correctpost1,2 -> 1, correct get all', async () => {
     // создаем корректный BLOG - 2 шт
     const testObj = {
@@ -44,6 +44,7 @@ describe(RouterPaths.posts, () => {
     // const refreshToken = expectObject_2
     console.log('44+++posts') //, refreshToken)
   })
+*/
 
   /*
   it('create authorisation post -> incorrect name', async () => {

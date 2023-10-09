@@ -3,7 +3,7 @@ declare global {
   namespace Express {
     export interface Request {
       user: ViewUserType | null
-      count: number
+      deviceId: string
     }
   }
 }

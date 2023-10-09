@@ -10,7 +10,7 @@ import {
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
 import { jwtService } from '../applications/jwt-services'
-import { sessionsRepository } from '../repositories/sessions-db-repository'
+import { devicesRepository } from '../repositories/devices-db-repository'
 
 export const validationMiidleware = {
   titleValidation: body('title')
@@ -139,7 +139,7 @@ export const validationMiidleware = {
       return true
     }),
 
-  deviceValidation: header('User-Agent').isString().trim().notEmpty(),
+  // deviceValidation: header('User-Agent').isString().trim().notEmpty(),
   // .custom(async (value) => {
   //   const session = await sessionsRepository.findByDevice(value)
 

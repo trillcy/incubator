@@ -11,7 +11,8 @@ import { authMiidleware } from '../middlewares/authMiddlware'
 import { usersRepository } from '../repositories/users-db-repository'
 import { type ViewEmailUserType } from '../types/types'
 import { tokenMiddleware } from '../middlewares/tokenMiddlware'
-import { sessionsService } from '../domains/sessions-services'
+import { devicesService } from '../domains/devices-services'
+import { effortsMiddleware } from '../middlewares/effortsMiddlware'
 
 type ErrorObject = { message: string; field: string }
 
@@ -56,20 +57,18 @@ export const authRouter = () => {
     tokenMiddleware,
     async (req: Request, res: Response) => {
       const user = req.user
+      const deviceId = req.deviceId
       console.log('57---auth', user)
 
       if (user) {
-        const deletedToken = await authService.deleteRefreshToken(
-          user.id,
-          req.cookies.refreshToken
-        )
         const accessToken = await jwtService.createJWT(
           user.id,
           keys.access,
           '10000'
         )
+
         const refreshToken = await jwtService.createJWT(
-          user.id,
+          { userId: user.id, deviceId },
           keys.refresh,
           '20000'
         )
@@ -89,7 +88,8 @@ export const authRouter = () => {
     '/login',
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
-    validationMiidleware.deviceValidation,
+    // validationMiidleware.deviceValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
@@ -101,53 +101,47 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { loginOrEmail, password } = req.body
-      // проверяем что пользователь с таким login || email существует
+      // проверяем что пользователь с таким login || email существует в БД
       // проверяем что пароль правильный
       const user = await authService.checkCredential(loginOrEmail, password)
 
       if (user) {
-        // выдаем access и refresh токены
-        const accessToken = await jwtService.createJWT(
-          user._id.toString(),
-          keys.access,
-          '10000'
-        )
-        const refreshToken = await jwtService.createJWT(
-          user._id.toString(),
-          keys.refresh,
-          '20000'
-        )
-        console.log('115----auth', accessToken, refreshToken)
-        // записываем session
-        // ??? надо ли проверять что сессия для данного девайс существует ???
-        // ??? и если да то удалять ее ???
-        const newDate = new Date()
-        // ExpireTime = newDate
-        const URL = req.baseUrl
-        const IP = req.headers['x-forwarded-for']?.toString() || null
-        const deviceId = `1-${req.headers['user-agent']?.toString()}` || null
-        const expireDate = newDate
-        console.log(
-          '130---',
-          req.headers,
-          URL,
-          req.headers['x-forwarded-for'],
-          req.headers['user-agent'],
-          IP,
-          deviceId,
-          expireDate
-        )
+        // записываем devices
+        const title = req.baseUrl
+        const ip = req.headers['x-forwarded-for']?.toString() || null
+        const deviceId = req.headers['user-agent']?.toString() || null
+        console.log('115-----', title, ip, deviceId)
 
-        if (URL && IP && deviceId) {
+        if (title && ip && deviceId) {
           console.log('133----auth')
+          // выдаем access и refresh токены
+          const accessData = { userId: user._id }
+          const accessToken = await jwtService.createJWT(
+            accessData,
+            keys.access,
+            '10000'
+          )
+          const refreshData = { userId: user._id, deviceId }
 
-          const session = await sessionsService.createSession(
-            IP,
-            URL,
+          const refreshToken = await jwtService.createJWT(
+            refreshData,
+            keys.refresh,
+            '20000'
+          )
+          console.log('115----auth', accessToken, refreshToken)
+
+          const payloadObject = await jwtService.decodeJWT(refreshToken)
+          const lastActiveDate = new Date(payloadObject.iat)
+          const expiredDate = payloadObject.exp
+
+          const device = await devicesService.createDevice(
+            ip,
+            title,
             deviceId,
-            expireDate,
+            lastActiveDate,
             user._id.toString()
           )
+
           res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
@@ -166,14 +160,14 @@ export const authRouter = () => {
     '/logout',
     tokenMiddleware,
     async (req: Request, res: Response) => {
-      if (!req.user) {
+      if (!req.deviceId) {
         return res.sendStatus(444)
       }
-
-      const deletedToken = await authService.deleteRefreshToken(
-        req.user.id,
-        req.cookies.refreshToken
-      )
+      const deletedDevice = await devicesService.deleteDevice(req.deviceId)
+      // const deletedToken = await authService.deleteRefreshToken(
+      //   req.user.id,
+      //   req.cookies.refreshToken
+      // )
 
       return res.sendStatus(204)
     }

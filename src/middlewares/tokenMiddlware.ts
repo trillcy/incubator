@@ -15,17 +15,19 @@ export const tokenMiddleware = async (
     res.sendStatus(401)
     return
   }
-  // TODO: проверить наличие пользователя и валидность токена
+  // проверяет наличие пользователя и валидность токена
   const token = req.cookies.refreshToken
   console.log('20+++token', token)
 
-  const userId = await jwtService.getUserIdByToken(token, keys.refresh)
+  const payloadObject = await jwtService.getUserIdByToken(token, keys.refresh)
+  const userId = payloadObject.user.id
+  const deviceId = payloadObject.deviceId
   console.log('24+++token', userId)
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)
 
-    if (user) {
+    if (user && deviceId) {
       // проверить есть ли токен в blackList
       const isWrong = user.deletedTokens.includes(token)
       if (isWrong) {
@@ -37,6 +39,7 @@ export const tokenMiddleware = async (
         email: user.accountData.userName.email,
         createdAt: user.accountData.createdAt.toISOString(),
       }
+      req.deviceId = deviceId
       next()
       return
     }
