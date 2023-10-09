@@ -8,6 +8,7 @@ import { authRouter } from './routes/auth-router'
 import { commentsRouter } from './routes/comments-router'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { securityRouter } from './routes/security-router'
 // import { videoDb } from './db/db'
 
 export const RouterPaths = {
@@ -18,6 +19,7 @@ export const RouterPaths = {
   users: '/users',
   auth: '/auth',
   comments: '/comments',
+  security: '/security',
 }
 
 export const app = express()
@@ -34,3 +36,4 @@ app.use(RouterPaths.posts, postsRouter())
 app.use(RouterPaths.users, usersRouter())
 app.use(RouterPaths.auth, authRouter())
 app.use(RouterPaths.comments, commentsRouter())
+app.use(RouterPaths.security, securityRouter())

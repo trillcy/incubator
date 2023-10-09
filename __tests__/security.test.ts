@@ -12,86 +12,40 @@ describe(RouterPaths.posts, () => {
   afterAll((done) => {
     done()
   })
-  it('get all', async () => {
-    const blogObject = await request(app).get(RouterPaths.posts).expect(200)
-    console.log('84+++', blogObject.body)
+  /*
+  it('check get -> correct getAll', async () => {
+    await request(app).get(RouterPaths.posts).expect(200)
+  })
+*/
+  it('create user; create correctpost1,2 -> 1, correct get all', async () => {
+    // создаем корректный BLOG - 2 шт
+    const testObj = {
+      login: 'aer',
+      email: 'andreiincubator@gmail.com',
+      password: '12345678',
+    }
+    console.log('42+++posts') //, accessToken)
+
+    const expectObject = await request(app)
+      .post(RouterPaths.users)
+      .send(testObj)
+      .expect(201)
+    // auth/login
+    console.log('42+++posts') //, accessToken)
+
+    const loginObject = { loginOrEmail: 'aer', password: '12345678' }
+    const expectObject_2 = await request(app)
+      .post(`${RouterPaths.auth}/login`)
+      .set('User-Agent', '127:0:0:1')
+      .send(loginObject)
+      .expect(200)
+
+    // const accessToken = expectObject_2.body.accessToken
+    // const refreshToken = expectObject_2
+    console.log('44+++posts') //, refreshToken)
   })
 
   /*
-  it('create correct blog-1,2; create correctpost1,2 -> 1, correct get all', async () => {
-    // создаем корректный BLOG - 2 шт
-    const testObj = {
-      name: 'name-1',
-      description: 'description-1',
-      websiteUrl: `http://www.incubator.com`,
-    }
-
-    const expectObject = await request(app)
-      .post(RouterPaths.blogs)
-      .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
-      .send(testObj)
-      .expect(201)
-
-    const createdObject = expectObject.body
-    const testObj_2 = {
-      name: 'name-2',
-      description: 'description-2',
-      websiteUrl: `http://www.incubator-222.com`,
-    }
-
-    const expectObject_2 = await request(app)
-      .post(RouterPaths.blogs)
-      .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
-      .send(testObj_2)
-      .expect(201)
-
-    const createdObject_2 = expectObject_2.body
-    console.log('42+++posts', createdObject_2)
-
-    // создаем корректный POST - 2 шт
-    const testPostObj_1 = {
-      title: 'title-1',
-      shortDescription: 'description-1',
-      content: `http://www.incubator.com`,
-      blogId: createdObject_2.id,
-    }
-
-    const expectPostObject_1 = await request(app)
-      .post(RouterPaths.posts)
-      .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
-      .send(testPostObj_1)
-      .expect(201)
-
-    const createdPostObject_1 = expectPostObject_1.body
-
-    const testPostObj_2 = {
-      title: 'title-2',
-      shortDescription: 'description-2',
-      content: `--------------------`,
-      blogId: createdObject_2.id,
-    }
-
-    const expectPostObject_2 = await request(app)
-      .post(RouterPaths.posts)
-      .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
-
-      .send(testPostObj_2)
-      .expect(201)
-
-    const createdPostObject_2 = expectPostObject_2.body
-    console.log('74+++posts', createdPostObject_2)
-    // проверяем создание
-    const newDb = await request(app).get(RouterPaths.posts).expect(200)
-    console.log('77+++posts', newDb.body)
-
-    const postId = expectPostObject_2.body.id
-
-    const blogObject = await request(app)
-      .get(`${RouterPaths.posts}/${postId}`)
-      .expect(200)
-    console.log('84+++', blogObject.body)
-  })
-
   it('create authorisation post -> incorrect name', async () => {
     const testObj = {
       nam: '    ',
@@ -267,6 +221,7 @@ describe(RouterPaths.posts, () => {
     const newDb = await request(app).get(RouterPaths.blogs).expect(200)
   })
 */
+
   // ======
   /*
   it('add incorrect post -> title, author === wrong, availableResolutions: null', async () => {

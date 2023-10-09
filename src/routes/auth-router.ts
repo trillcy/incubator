@@ -10,7 +10,8 @@ import { jwtService } from '../applications/jwt-services'
 import { authMiidleware } from '../middlewares/authMiddlware'
 import { usersRepository } from '../repositories/users-db-repository'
 import { type ViewEmailUserType } from '../types/types'
-import { tokenMiidleware } from '../middlewares/tokenMiddlware'
+import { tokenMiddleware } from '../middlewares/tokenMiddlware'
+import { sessionsService } from '../domains/sessions-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -52,7 +53,7 @@ export const authRouter = () => {
   // возвращает JWT accessToken - в теле ответа, refreshToken - в куках только для чтения
   router.post(
     '/refresh-token',
-    tokenMiidleware,
+    tokenMiddleware,
     async (req: Request, res: Response) => {
       const user = req.user
       console.log('57---auth', user)
@@ -88,6 +89,7 @@ export const authRouter = () => {
     '/login',
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
+    validationMiidleware.deviceValidation,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
@@ -99,10 +101,12 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { loginOrEmail, password } = req.body
-
+      // проверяем что пользователь с таким login || email существует
+      // проверяем что пароль правильный
       const user = await authService.checkCredential(loginOrEmail, password)
 
       if (user) {
+        // выдаем access и refresh токены
         const accessToken = await jwtService.createJWT(
           user._id.toString(),
           keys.access,
@@ -114,12 +118,44 @@ export const authRouter = () => {
           '20000'
         )
         console.log('115----auth', accessToken, refreshToken)
+        // записываем session
+        // ??? надо ли проверять что сессия для данного девайс существует ???
+        // ??? и если да то удалять ее ???
+        const newDate = new Date()
+        // ExpireTime = newDate
+        const URL = req.baseUrl
+        const IP = req.headers['x-forwarded-for']?.toString() || null
+        const deviceId = `1-${req.headers['user-agent']?.toString()}` || null
+        const expireDate = newDate
+        console.log(
+          '130---',
+          req.headers,
+          URL,
+          req.headers['x-forwarded-for'],
+          req.headers['user-agent'],
+          IP,
+          deviceId,
+          expireDate
+        )
 
-        res.cookie('refreshToken', refreshToken, {
-          httpOnly: true,
-          secure: true,
-        })
-        return res.status(200).json({ accessToken: accessToken })
+        if (URL && IP && deviceId) {
+          console.log('133----auth')
+
+          const session = await sessionsService.createSession(
+            IP,
+            URL,
+            deviceId,
+            expireDate,
+            user._id.toString()
+          )
+          res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+          })
+          return res.status(200).json({ accessToken: accessToken })
+        } else {
+          res.sendStatus(444)
+        }
       }
       return res.sendStatus(401)
     }
@@ -128,7 +164,7 @@ export const authRouter = () => {
   // возвращает JWT accessToken - в теле ответа, refreshToken - в куках только для чтения
   router.post(
     '/logout',
-    tokenMiidleware,
+    tokenMiddleware,
     async (req: Request, res: Response) => {
       if (!req.user) {
         return res.sendStatus(444)

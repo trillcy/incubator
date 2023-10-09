@@ -1,5 +1,30 @@
 import { ObjectId } from 'mongodb'
 
+export type ResultSession = {
+  pagesCount: number
+  page: number
+  pageSize: number
+  totalCount: number
+  items: ViewSessionType[]
+}
+
+export type ViewSessionType = {
+  IP: string
+  URL: string
+  deviceId: string
+  expireDate: Date
+  userId: string
+}
+
+export type SessionDBType = {
+  _id: ObjectId
+  IP: string
+  URL: string
+  deviceId: string
+  expireDate: Date
+  userId: string
+}
+
 export type EmailBody = {
   email: string
   message: string

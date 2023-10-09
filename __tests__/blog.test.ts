@@ -26,6 +26,7 @@ describe(RouterPaths.blogs, () => {
       .send(testObj)
       .expect(400)
   })
+
   /*
     it('create incorrect post -> incorrect name', async () => {
     const testObj = {
@@ -231,6 +232,5 @@ describe(RouterPaths.blogs, () => {
     const newDb = await request(app).get(RouterPaths.blogs).expect(200)
   })
 */
-
   // ======
 })

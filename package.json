@@ -41,7 +41,7 @@
     "start": "node dist/index.js",
     "test": "jest",
     "sometest": "jest -u",
-    "runpost": "yarn sometest -t='/posts'",
+    "runsecurity": "yarn sometest -t='/security'",
     "serveo": "ssh -R 80:localhost:3004 serveo.net"
   },
   "engines": {

@@ -2,6 +2,7 @@ import {
   ValidationError,
   body,
   cookie,
+  header,
   param,
   query,
   validationResult,
@@ -9,6 +10,7 @@ import {
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
 import { jwtService } from '../applications/jwt-services'
+import { sessionsRepository } from '../repositories/sessions-db-repository'
 
 export const validationMiidleware = {
   titleValidation: body('title')
@@ -136,4 +138,13 @@ export const validationMiidleware = {
       if (user.emailConfirmation.isConfirmed) throw new Error('code exists')
       return true
     }),
+
+  deviceValidation: header('User-Agent').isString().trim().notEmpty(),
+  // .custom(async (value) => {
+  //   const session = await sessionsRepository.findByDevice(value)
+
+  //   if (!session) throw new Error('user doesnt exist')
+  //   // if (session.userId !== '1') return res.sendStatus(403)
+  //   return true
+  // }),
 }

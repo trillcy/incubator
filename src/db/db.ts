@@ -8,6 +8,7 @@ import {
   type CommentDBType,
   type PostDBType,
   type BlogDBType,
+  type SessionDBType,
 } from '../types/types'
 
 export type VideoType = {
@@ -54,6 +55,7 @@ export const blogsCollection = db.collection<BlogDBType>('blogs')
 export const postsCollection = db.collection<PostDBType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
+export const sessionCollection = db.collection<SessionDBType>('sessions')
 
 export const connectDb = async () => {
   try {

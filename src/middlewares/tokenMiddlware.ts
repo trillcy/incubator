@@ -5,7 +5,7 @@ import { type ViewUserType } from '../types/types'
 import { usersRepository } from '../repositories/users-db-repository'
 import { keys } from '../db/db'
 
-export const tokenMiidleware = async (
+export const tokenMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -17,6 +17,8 @@ export const tokenMiidleware = async (
   }
   // TODO: проверить наличие пользователя и валидность токена
   const token = req.cookies.refreshToken
+  console.log('20+++token', token)
+
   const userId = await jwtService.getUserIdByToken(token, keys.refresh)
   console.log('24+++token', userId)
   if (userId) {
