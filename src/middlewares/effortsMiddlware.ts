@@ -1,34 +1,28 @@
-import { Request, Response, NextFunction } from 'express'
-import { devicesRepository } from '../repositories/devices-db-repository'
-import { jwtService } from '../applications/jwt-services'
+// import { Request, Response, NextFunction } from 'express'
+// import { devicesRepository } from '../repositories/devices-db-repository'
+// import { jwtService } from '../applications/jwt-services'
 
-export const effortsMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // проверка наличия куков
-  if (!req.cookies.refreshToken) {
-    res.sendStatus(401)
-    return
-  }
-  // находим все сессии пользователя и проверяем по expireDate
-  const token = await jwtService.decodeJWT(req.cookies.refreshToken)
-  if (token.deviceId) {
-    // Получаем кол-во сессий этого device за последние 10 сек
-    const count = await devicesRepository.countEfforts(
-      token.deviceId,
-      new Date(Date.now() - 10000)
-    )
-    console.log('23++++', new Date(Date.now() - 10000), count)
+// const limitReq = 5
 
-    if (count > 4) {
-      return res.sendStatus(429)
-    }
-    // req.count = await devicesRepository.countEfforts(deviceId, nowDate)
+// export const effortsMiddleware = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const request = {
+//     URL: req.originalUrl,
+//     IP: req.ip,
+//     date: new Date(),
+//   }
 
-    next()
-    return
-  }
-  return res.sendStatus(401)
-}
+//   const countOfRequests = await reqCollection.countDocuments({
+//     IP: request.IP,
+//     URL: request.URL,
+//     date: { $gte: new Date(Date.now() - 10000) },
+//   })
+
+//   if (countOfRequests >= limitReq) return res.sendStatus(429)
+
+//   await reqCollection.insertOne({ ...request })
+//   return next()
+// }

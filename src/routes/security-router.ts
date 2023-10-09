@@ -12,7 +12,7 @@ import { usersRepository } from '../repositories/users-db-repository'
 import { type ViewEmailUserType } from '../types/types'
 import { tokenMiddleware } from '../middlewares/tokenMiddlware'
 import { devicesRepository } from '../repositories/devices-db-repository'
-import { effortsMiddleware } from '../middlewares/effortsMiddlware'
+// import { effortsMiddleware } from '../middlewares/effortsMiddlware'
 import { devicesService } from '../domains/devices-services'
 
 type ErrorObject = { message: string; field: string }

@@ -12,7 +12,8 @@ import { usersRepository } from '../repositories/users-db-repository'
 import { type ViewEmailUserType } from '../types/types'
 import { tokenMiddleware } from '../middlewares/tokenMiddlware'
 import { devicesService } from '../domains/devices-services'
-import { effortsMiddleware } from '../middlewares/effortsMiddlware'
+// import { effortsMiddleware } from '../middlewares/effortsMiddlware'
+import { randomUUID } from 'crypto'
 
 type ErrorObject = { message: string; field: string }
 
@@ -106,9 +107,9 @@ export const authRouter = () => {
 
       if (user) {
         // записываем devices
-        const title = req.baseUrl
-        const ip = req.headers['x-forwarded-for']?.toString() || null
-        const deviceId = req.headers['user-agent']?.toString() || null
+        const title = req.headers['user-agent']?.toString() ?? 'Anonymous'
+        const ip = req.ip
+        const deviceId = randomUUID()
         console.log('115-----', title, ip, deviceId)
 
         if (title && ip && deviceId) {
@@ -130,7 +131,7 @@ export const authRouter = () => {
           console.log('115----auth', accessToken, refreshToken)
 
           const payloadObject = await jwtService.decodeJWT(refreshToken)
-          const lastActiveDate = new Date(payloadObject.iat)
+          const lastActiveDate = new Date(payloadObject.iat + 10000)
           const expiredDate = payloadObject.exp
 
           const device = await devicesService.createDevice(
@@ -141,13 +142,15 @@ export const authRouter = () => {
             user._id.toString()
           )
 
-          res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-          })
-          return res.status(200).json({ accessToken: accessToken })
+          return res
+            .cookie('refreshToken', refreshToken, {
+              httpOnly: true,
+              secure: true,
+            })
+            .status(200)
+            .json({ accessToken: accessToken })
         } else {
-          res.sendStatus(444)
+          return res.sendStatus(444)
         }
       }
       return res.sendStatus(401)
