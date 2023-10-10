@@ -23,13 +23,11 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 
 export const testRouter = () => {
   const router = Router()
-  // пинимает токен в заголовке
-  // возвращает {userId, login, email}
   router.get('/', async (req: Request, res: Response) => {
     const effort = {
-      URL: '/auth/aegiinorrstt',
+      URL: '/auth/registration',
       IP: '35.156.186.92',
-      limitTime: Date.now() - 10000000000,
+      inMSeconds: 10000,
     }
     const result = await effortsRepository.countDocuments(effort)
     return res.status(200).json(result)

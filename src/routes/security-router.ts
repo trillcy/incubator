@@ -76,8 +76,6 @@ export const securityRouter = () => {
       const currentDeviceId = req.deviceId
       const userId = req.user?.id
       if (userId && currentDeviceId) {
-        const user = await devicesRepository.findById(userId)
-        if (!user) return res.sendStatus(404)
         const deletedDevices = await devicesService.deleteDevicesWithoutCurrent(
           userId,
           currentDeviceId

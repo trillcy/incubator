@@ -6,14 +6,14 @@ export const effortsRepository = {
   async countDocuments(effort: {
     IP: string
     URL: string
-    limitTime: number
+    inMSeconds: number
   }): Promise<number> {
-    console.log('11++repo.effort', effort.limitTime - Date.now())
+    console.log('11++repo.effort', Date.now() - effort.inMSeconds)
 
     const totalCount = await effortsCollection.countDocuments({
       IP: effort.IP,
       URL: effort.URL,
-      time: { $gte: effort.limitTime },
+      date: { $gte: Date.now() - effort.inMSeconds },
     })
 
     return totalCount
@@ -25,7 +25,7 @@ export const effortsRepository = {
       return {
         IP: newElement.IP,
         URL: newElement.URL,
-        time: newElement.time,
+        date: newElement.date,
       }
     } else {
       return null

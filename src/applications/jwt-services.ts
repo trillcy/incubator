@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 import { UserDBType } from '../types/types'
 import jwt from 'jsonwebtoken'
+import add from 'date-fns/add'
 
 export const jwtService = {
   async decodeJWT(token: string) {
@@ -13,7 +14,7 @@ export const jwtService = {
     const token: string = jwt.sign(payloadData, key, {
       expiresIn,
     })
-    console.log('10+++jwt', jwt.verify(token, key))
+    console.log('17+++jwt', jwt.verify(token, key))
 
     const payload = jwt.decode(token, key)
 

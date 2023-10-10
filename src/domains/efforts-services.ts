@@ -11,12 +11,12 @@ export const effortsService = {
   async createEffort(
     IP: string,
     URL: string,
-    limitDate: number
+    date: Date
   ): Promise<EffortDBType | null> {
     const newElement: EffortDBType = {
       IP,
       URL,
-      time: limitDate,
+      date,
     }
     return await effortsRepository.create({ ...newElement })
   },
