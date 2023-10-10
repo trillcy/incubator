@@ -32,6 +32,12 @@ export const effortsRepository = {
     }
   },
 
+  async deleteAll(): Promise<boolean> {
+    const result = await effortsCollection.deleteMany({})
+    const totalCount = await effortsCollection.countDocuments({})
+    return totalCount === 0
+  },
+
   /*
   async findAll(userId: string): Promise<ViewDeviceType[]> {
     // -----
@@ -65,12 +71,6 @@ export const effortsRepository = {
     } else {
       return null
     }
-  },
-
-  async deleteAll(): Promise<boolean> {
-    const result = await devicesCollection.deleteMany({})
-    const totalCount = await devicesCollection.countDocuments({})
-    return totalCount === 0
   },
 
   async deleteWithoutCurrent(

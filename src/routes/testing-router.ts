@@ -4,6 +4,7 @@ import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
 import { commentsRepository } from '../repositories/comments-db-repository'
 import { devicesRepository } from '../repositories/devices-db-repository'
+import { effortsRepository } from '../repositories/efforts-db-repository'
 
 export const testingRouter = () => {
   const router = Router()
@@ -13,7 +14,8 @@ export const testingRouter = () => {
     const resultBlogs = await blogsRepository.deleteAll()
     const resultUsers = await usersRepository.deleteAll()
     const resultComments = await commentsRepository.deleteAll()
-    const resultSession = await devicesRepository.deleteAll()
+    const resultDevices = await devicesRepository.deleteAll()
+    const resultEfforts = await effortsRepository.deleteAll()
     res.sendStatus(204)
   })
 
