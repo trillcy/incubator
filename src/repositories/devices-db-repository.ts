@@ -23,7 +23,6 @@ export const devicesRepository = {
         title: item.title,
         deviceId: item.deviceId,
         lastActiveDate: item.lastActiveDate.toISOString(),
-        // userId: item.userId,
       }
     })
   },

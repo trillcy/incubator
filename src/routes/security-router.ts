@@ -48,7 +48,7 @@ export const securityRouter = () => {
         return
       }
 
-      return res.sendStatus(444)
+      // return res.sendStatus(444)
     }
   )
   // удаляет все сессии пользователя кроме текущей
