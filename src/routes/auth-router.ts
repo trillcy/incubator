@@ -14,6 +14,7 @@ import { tokenMiddleware } from '../middlewares/tokenMiddlware'
 import { devicesService } from '../domains/devices-services'
 // import { effortsMiddleware } from '../middlewares/effortsMiddlware'
 import { randomUUID } from 'crypto'
+import { effortsMiddleware } from '../middlewares/effortsMiddlware'
 
 type ErrorObject = { message: string; field: string }
 
@@ -108,7 +109,7 @@ export const authRouter = () => {
     '/login',
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
-    // effortsMiddleware,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
@@ -203,6 +204,7 @@ export const authRouter = () => {
     validationMiidleware.newLoginValidation,
     validationMiidleware.newEmailValidation,
     validationMiidleware.passwordValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
@@ -236,6 +238,7 @@ export const authRouter = () => {
   router.post(
     '/registration-email-resending',
     validationMiidleware.emailValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 
@@ -264,6 +267,7 @@ export const authRouter = () => {
   router.post(
     '/registration-confirmation',
     validationMiidleware.codeValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 

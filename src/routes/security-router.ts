@@ -51,14 +51,10 @@ export const securityRouter = () => {
       // return res.sendStatus(444)
     }
   )
-  // удаляет все сессии пользователя кроме текущей
+  // удаляет все devices пользователя кроме текущей
   router.delete(
     '/devices',
     tokenMiddleware,
-    // уже должен быть req.user после tokenMiddleware
-    // sessionDateMiddleware,
-    // проверяем на наличие сессии с таким девайсом
-    // validationMiidleware.deviceValidation,
     async (req: Request, res: Response) => {
       const currentDeviceId = req.deviceId
       const userId = req.user?.id
