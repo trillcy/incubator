@@ -9,11 +9,12 @@ export const effortsRepository = {
     inMSeconds: number
   }): Promise<number> {
     console.log('11++repo.effort', Date.now() - effort.inMSeconds)
+    console.log('12++repo.effort', new Date(Date.now() - effort.inMSeconds))
 
     const totalCount = await effortsCollection.countDocuments({
       IP: effort.IP,
       URL: effort.URL,
-      date: { $gte: Date.now() - effort.inMSeconds },
+      date: { $gte: new Date(Date.now() - effort.inMSeconds) },
     })
 
     return totalCount

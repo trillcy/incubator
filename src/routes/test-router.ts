@@ -27,8 +27,11 @@ export const testRouter = () => {
     const effort = {
       URL: '/auth/registration',
       IP: '35.156.186.92',
-      inMSeconds: 10000,
+      inMSeconds: 10000000000,
     }
+    console.log('32---test', Date.now())
+    console.log('33---test', Date.now() - effort.inMSeconds)
+
     const result = await effortsRepository.countDocuments(effort)
     return res.status(200).json(result)
   })
