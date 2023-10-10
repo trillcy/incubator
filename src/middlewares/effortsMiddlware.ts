@@ -12,7 +12,7 @@ export const effortsMiddleware = async (
   const effort = {
     URL: req.originalUrl,
     IP: req.ip,
-    limitDate: Date.now() - 10000,
+    limitTime: Date.now() - 10000,
   }
 
   const countOfRequests = await effortsRepository.countDocuments(effort)
@@ -20,6 +20,6 @@ export const effortsMiddleware = async (
 
   if (countOfRequests >= limitReq) return res.sendStatus(429)
 
-  await effortsService.createEffort(effort.IP, effort.URL, effort.limitDate)
+  await effortsService.createEffort(effort.IP, effort.URL, effort.limitTime)
   return next()
 }

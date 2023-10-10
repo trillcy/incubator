@@ -91,7 +91,7 @@ export const authRouter = () => {
           ip,
           lastActiveDate
         )
-        if (!device) return res.sendStatus(444)
+        // if (!device) return res.sendStatus(444)
         return res
           .cookie('refreshToken', refreshToken, {
             httpOnly: true,
