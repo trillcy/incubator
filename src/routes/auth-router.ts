@@ -126,6 +126,9 @@ export const authRouter = () => {
       const user = await authService.checkCredential(loginOrEmail, password)
 
       if (user) {
+        // const checkUser = await usersRepository.findById(user._id)
+        // if (!checkUser) return res.sendStatus(401)
+        // ------
         // записываем devices
         const title = req.headers['user-agent']?.toString() ?? 'Anonymous'
         const ip = req.ip
