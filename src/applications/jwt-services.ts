@@ -19,16 +19,16 @@ export const jwtService = {
 
     return token
   },
-  async getUserIdByToken(token: string, key: any) {
+  async getPayloadByToken(token: string, key: any) {
     try {
-      console.log('16++++jwt', token, key)
+      console.log('24++++jwt', token, key)
 
       const result: any = jwt.verify(token, key)
-      console.log('17++++jwt', result)
+      console.log('27++++jwt', result)
 
       return result
     } catch (e) {
-      console.log('error in verify token:', e)
+      console.log('31+++error in verify token:', e)
       return null
     }
   },

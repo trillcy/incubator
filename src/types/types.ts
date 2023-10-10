@@ -1,5 +1,11 @@
 import { ObjectId } from 'mongodb'
 
+export type EffortDBType = {
+  IP: string
+  URL: string
+  date: Date
+}
+
 export type ViewDeviceType = {
   ip: string
   title: string

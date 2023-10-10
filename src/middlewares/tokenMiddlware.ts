@@ -4,6 +4,7 @@ import { usersService } from '../domains/users-services'
 import { type ViewUserType } from '../types/types'
 import { usersRepository } from '../repositories/users-db-repository'
 import { keys } from '../db/db'
+import { devicesRepository } from '../repositories/devices-db-repository'
 
 export const tokenMiddleware = async (
   req: Request,
@@ -19,14 +20,18 @@ export const tokenMiddleware = async (
   const token = req.cookies.refreshToken
   console.log('20+++token', token)
 
-  const payloadObject = await jwtService.getUserIdByToken(token, keys.refresh)
+  const payloadObject = await jwtService.getPayloadByToken(token, keys.refresh)
   if (!payloadObject) return res.sendStatus(401)
   const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
   console.log('24+++token', userId)
-  if (userId) {
-    // Если все норм, то получить user и вставить его в req
+  if (userId && deviceId) {
+    // Получить user, проверить, что device его и если норм, вставить его в req
     const user = await usersRepository.findById(userId)
+    const device = await devicesRepository.findByDevice(deviceId)
+    if (!device || device.userId !== userId) {
+      return res.sendStatus(403)
+    }
     console.log('32+++token', user)
     if (user && deviceId) {
       req.user = {

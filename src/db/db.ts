@@ -9,6 +9,7 @@ import {
   type PostDBType,
   type BlogDBType,
   type DeviceDBType,
+  type EffortDBType,
 } from '../types/types'
 
 export type VideoType = {
@@ -56,6 +57,7 @@ export const postsCollection = db.collection<PostDBType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
 export const devicesCollection = db.collection<DeviceDBType>('devices')
+export const effortsCollection = db.collection<EffortDBType>('efforts')
 
 export const connectDb = async () => {
   try {
