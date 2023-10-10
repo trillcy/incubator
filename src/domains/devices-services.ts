@@ -20,12 +20,12 @@ export const devicesService = {
     return await devicesRepository.deleteUserDevice(userId, deviceId)
   },
 
-  async deleteDevicesWithoutCurrent(
+  async deleteCurrentDevice(
     userId: string,
     deviceId: string
   ): Promise<boolean | null> {
     // const transformId = id.
-    return await devicesRepository.deleteWithoutCurrent(userId, deviceId)
+    return await devicesRepository.deleteCurrentDevice(userId, deviceId)
   },
 
   async updateDevice(

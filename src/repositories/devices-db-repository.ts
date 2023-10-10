@@ -52,13 +52,13 @@ export const devicesRepository = {
     return totalCount === 0
   },
 
-  async deleteWithoutCurrent(
+  async deleteCurrentDevice(
     userId: string,
     currentDeviceId: string
   ): Promise<boolean> {
     const result = await devicesCollection.deleteMany({
       userId,
-      deviceId: { $nin: [currentDeviceId] },
+      deviceId: currentDeviceId,
     })
     console.log('114----', result)
 

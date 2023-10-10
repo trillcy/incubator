@@ -59,6 +59,12 @@ export const securityRouter = () => {
       const currentDeviceId = req.deviceId
       const userId = req.user?.id
       if (userId && currentDeviceId) {
+        // проверили существует ли deviceId
+        const owner = await devicesRepository.findByDevice(currentDeviceId)
+        if (!owner) return res.sendStatus(404)
+        // проверили принадлежит ли deviceId данному user
+        if (owner.userId !== userId.toString()) return res.sendStatus(403)
+        // если все норм, то удаляем все, кроме текущего device
         const deletedDevices = await devicesService.deleteUserDevices(
           userId,
           currentDeviceId
@@ -73,11 +79,19 @@ export const securityRouter = () => {
     '/devices/:deviceId',
     tokenMiddleware,
     async (req: Request, res: Response) => {
-      const currentDeviceId = req.deviceId
+      // взяли deviceId из параметров (в токене не нужен)
+      const currentDeviceId = req.params.deviceId
+
       const userId = req.user?.id
       if (userId && currentDeviceId) {
-        const deletedDevices = await devicesService.deleteDevicesWithoutCurrent(
-          userId,
+        // проверили существует ли deviceId
+        const owner = await devicesRepository.findByDevice(currentDeviceId)
+
+        if (!owner) return res.sendStatus(404)
+        // проверили принадлежит ли deviceId данному user
+        if (owner.userId !== userId.toString()) return res.sendStatus(403)
+        // если все норм, то удаляем device
+        const deletedDevices = await devicesService.deleteDevice(
           currentDeviceId
         )
         return res.sendStatus(204)
