@@ -65,8 +65,14 @@ export const devicesRepository = {
     return result.acknowledged
   },
 
-  async deleteUserDevice(userId: string, deviceId: string): Promise<boolean> {
-    const result = await devicesCollection.deleteMany({ userId, deviceId })
+  async deleteUserDevicesWithoutCurrent(
+    userId: string,
+    deviceId: string
+  ): Promise<boolean> {
+    const result = await devicesCollection.deleteMany({
+      userId,
+      deviceId: { $nin: [deviceId] },
+    })
     return result.acknowledged
   },
   async deleteOneDevice(deviceId: string): Promise<boolean> {
@@ -79,7 +85,7 @@ export const devicesRepository = {
     ip: string,
     lastActiveDate: Date
   ): Promise<boolean> {
-    const result = await postsCollection.updateOne(
+    const result = await devicesCollection.updateOne(
       { deviceId },
       {
         $set: {

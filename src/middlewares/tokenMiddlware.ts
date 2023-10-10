@@ -34,7 +34,6 @@ export const tokenMiddleware = async (
       return res.sendStatus(403)
     }
     console.log('32+++token', user)
-    // if (user && deviceId) {
     req.user = {
       id: user.id,
       login: user.accountData.userName.login,
@@ -44,7 +43,6 @@ export const tokenMiddleware = async (
     req.deviceId = deviceId
     next()
     return
-    // }
   }
   return res.sendStatus(401)
 }

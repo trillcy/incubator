@@ -59,14 +59,14 @@ export const securityRouter = () => {
     async (req: Request, res: Response) => {
       const currentDeviceId = req.deviceId
       const userId = req.user?.id
-      if (userId && currentDeviceId) {
-        const deletedDevices = await devicesService.deleteUserDevices(
+      if (!userId || !currentDeviceId) return res.sendStatus(404)
+      const deletedDevices =
+        await devicesService.deleteUserDevicesWithoutCurrent(
           userId,
           currentDeviceId
         )
-        return res.sendStatus(204)
-      }
-      return res.sendStatus(444)
+      if (!deletedDevices) return res.sendStatus(444)
+      return res.sendStatus(204)
     }
   )
   // удаляет все сессии пользователя кроме текущей
