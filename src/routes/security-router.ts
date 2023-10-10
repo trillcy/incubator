@@ -37,7 +37,7 @@ export const securityRouter = () => {
   // пинимает refreshToken в cookie
   router.get(
     '/devices',
-    tokenMiddleware,
+    // tokenMiddleware,
     async (req: Request, res: Response) => {
       const user = req.user
       console.log('43----sec.route', user)
