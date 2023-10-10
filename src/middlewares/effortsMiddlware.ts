@@ -16,6 +16,7 @@ export const effortsMiddleware = async (
   }
 
   const countOfRequests = await effortsRepository.countDocuments(effort)
+  console.log('19+++efforts', countOfRequests, effort.URL, effort.IP)
 
   if (countOfRequests >= limitReq) return res.sendStatus(429)
 
