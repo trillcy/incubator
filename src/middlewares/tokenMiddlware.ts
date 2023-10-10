@@ -29,21 +29,22 @@ export const tokenMiddleware = async (
     // Получить user, проверить, что device его и если норм, вставить его в req
     const user = await usersRepository.findById(userId)
     const device = await devicesRepository.findByDevice(deviceId)
-    if (!device || device.userId !== userId.toString()) {
+    if (!user || !device) return res.sendStatus(404)
+    if (device.userId !== userId.toString()) {
       return res.sendStatus(403)
     }
     console.log('32+++token', user)
-    if (user && deviceId) {
-      req.user = {
-        id: user.id,
-        login: user.accountData.userName.login,
-        email: user.accountData.userName.email,
-        createdAt: user.accountData.createdAt.toISOString(),
-      }
-      req.deviceId = deviceId
-      next()
-      return
+    // if (user && deviceId) {
+    req.user = {
+      id: user.id,
+      login: user.accountData.userName.login,
+      email: user.accountData.userName.email,
+      createdAt: user.accountData.createdAt.toISOString(),
     }
+    req.deviceId = deviceId
+    next()
+    return
+    // }
   }
   return res.sendStatus(401)
 }
