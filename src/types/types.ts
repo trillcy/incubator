@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb'
 export type EffortDBType = {
   IP: string
   URL: string
-  date: Date
+  time: number
 }
 
 export type ViewDeviceType = {

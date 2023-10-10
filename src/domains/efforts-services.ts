@@ -16,7 +16,7 @@ export const effortsService = {
     const newElement: EffortDBType = {
       IP,
       URL,
-      date: new Date(limitDate),
+      time: limitDate,
     }
     return await effortsRepository.create({ ...newElement })
   },

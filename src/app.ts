@@ -9,6 +9,7 @@ import { commentsRouter } from './routes/comments-router'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { securityRouter } from './routes/security-router'
+import { testRouter } from './routes/test-router'
 // import { videoDb } from './db/db'
 
 export const RouterPaths = {
@@ -20,6 +21,7 @@ export const RouterPaths = {
   auth: '/auth',
   comments: '/comments',
   security: '/security',
+  test: '/test',
 }
 
 export const app = express()
@@ -37,6 +39,7 @@ app.use(RouterPaths.users, usersRouter())
 app.use(RouterPaths.auth, authRouter())
 app.use(RouterPaths.comments, commentsRouter())
 app.use(RouterPaths.security, securityRouter())
+app.use(RouterPaths.test, testRouter())
 
 // для того, чтобы работал корректный ip адрес в заголовках
 app.set('trust proxy', true)
