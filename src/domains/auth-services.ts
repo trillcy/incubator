@@ -132,7 +132,7 @@ export const authService = {
 
   async updatePassword(userId: string, password: string): Promise<boolean> {
     // находим пользователя по code
-    const user = await usersRepository.findByCode(password)
+    const user = await usersRepository.findByPwdCode(password)
     const passwordSalt = await bcrypt.genSalt(10)
     const passwordHash = await bcrypt.hash(password, passwordSalt)
 
