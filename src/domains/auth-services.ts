@@ -20,7 +20,7 @@ export const authService = {
   ): Promise<any | null> {
     const updatedObject = {
       passwordConfirmation: {
-        confirmationCode: uuidv4(),
+        confirmationCode: 'your_recovery_code', //uuidv4(),
         expirationDate: add(new Date(), { hours: 1, minutes: 30 }),
         isConfirmed: false,
       },
