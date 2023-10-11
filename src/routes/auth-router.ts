@@ -55,7 +55,11 @@ export const authRouter = () => {
       const { newPassword, recoveryCode } = req.body
       console.log('56-auth.route-recoveryCode', recoveryCode)
       console.log('57-auth.route-newPassword', newPassword)
+      if (!recoveryCode) {
+        console.log('59-auth-error with recoveryCode')
 
+        return res.sendStatus(477)
+      }
       const user = await authService.confirmationCode(recoveryCode)
       console.log('60-auth.serv-user', user)
 
