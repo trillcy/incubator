@@ -92,16 +92,6 @@ export const authRouter = () => {
         user.id,
         email
       )
-
-      // --------
-      // const { login, email, password } = req.body
-      // console.log('93----', login, email, password)
-
-      // const emailSuccess = await authService.registration(
-      //   login,
-      //   email,
-      //   password
-      // )
       console.log('100----', emailSuccess)
 
       if (emailSuccess) {

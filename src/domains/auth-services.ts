@@ -25,6 +25,8 @@ export const authService = {
         isConfirmed: false,
       },
     }
+    console.log('28===auth', userId)
+
     const updatedUser = await usersRepository.updateUserEmailConf(
       userId,
       updatedObject
@@ -34,7 +36,9 @@ export const authService = {
     if (!updatedUser) {
       return null
     }
-    const url = `https://somesite.com/confirm-registration?code=${updatedObject.emailConfirmation.confirmationCode}`
+    const userModel = await usersRepository.findById(userId)
+    if (!userModel) return null
+    const url = `https://somesite.com/confirm-registration?code=${userModel.emailConfirmation.confirmationCode}`
 
     const emailObject: EmailBody = {
       // const email: user.email,
