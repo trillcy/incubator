@@ -25,7 +25,10 @@ export const authService = {
         isConfirmed: false,
       },
     }
-    const updatedUser = await usersRepository.updateUser(userId, updatedObject)
+    const updatedUser = await usersRepository.updateUserEmailConf(
+      userId,
+      updatedObject
+    )
     console.log('48====auth', updatedUser)
 
     if (!updatedUser) {
@@ -111,7 +114,10 @@ export const authService = {
         isConfirmed: false,
       },
     }
-    const updatedUser = await usersRepository.updateUser(userId, updatedObject)
+    const updatedUser = await usersRepository.updateUserEmailConf(
+      userId,
+      updatedObject
+    )
 
     if (!updatedUser) {
       return null

@@ -1,55 +1,27 @@
 import { config } from 'dotenv'
 config()
 import { Request, Response, Router, query } from 'express'
-import { ValidationError, validationResult } from 'express-validator'
-import { effortsRepository } from '../repositories/efforts-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
 import { ObjectId } from 'mongodb'
-import { type UserDBType } from '../types/types'
-
-type ErrorObject = { message: string; field: string }
-
-const ErrorFormatter = (error: ValidationError): ErrorObject => {
-  switch (error.type) {
-    case 'field':
-      return {
-        message: error.msg,
-        field: error.path,
-      }
-    default:
-      return {
-        message: error.msg,
-        field: 'None',
-      }
-  }
-}
+import { v4 as uuidv4 } from 'uuid'
+import { add } from 'date-fns'
 
 export const testRouter = () => {
   const router = Router()
   router.get('/', async (req: Request, res: Response) => {
-    const result = await usersRepository.updateUserEmailConf(
-      '6526baea4378f66f1dc1041f',
-      {
-        // _id: new ObjectId('652676b707f4ebb22aa550dc'),
-        // accountData: {
-        //   userName: {
-        //     login: '000---sdgsgfaglfg',
-        //     email: '0-0-84353745792hfksjdbdsb@mail.ru',
-        //   },
-        //   createdAt: new Date(),
-        //   passwordSalt: '444shf;ussdfgsgak',
-        //   passwordHash: '555dhsf;kusdfsgashgf',
-        // },
-        emailConfirmation: {
-          confirmationCode: 'null---',
-          expirationDate: new Date(Date.now() + 10000),
-          isConfirmed: false,
-        },
-        deletedTokens: [],
-      }
+    const updatedObject = {
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
+        isConfirmed: false,
+      },
+    }
+    const result = await usersRepository.updateUser(
+      '6526c640de00dadb5388ff1f',
+      updatedObject
     )
+    console.log('23---test', result)
     return res.status(200).json(result)
   })
-
   return router
 }
