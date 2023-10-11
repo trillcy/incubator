@@ -21,11 +21,15 @@ export const authService = {
     const updatedObject = {
       passwordConfirmation: {
         confirmationCode: uuidv4(),
-        expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
+        expirationDate: add(new Date(), { hours: 1, minutes: 30 }),
         isConfirmed: false,
       },
     }
-    console.log('28===auth', userId)
+    console.log(
+      '28===auth',
+      userId,
+      updatedObject.passwordConfirmation.confirmationCode
+    )
 
     const updatedUser = await usersRepository.updateUserPwdConf(
       userId,

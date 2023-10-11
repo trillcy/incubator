@@ -6,7 +6,6 @@ import add from 'date-fns/add'
 export const jwtService = {
   async decodeJWT(token: string) {
     const payloadData: any = jwt.decode(token)
-    console.log('10+++jwt', payloadData)
 
     return payloadData
   },
@@ -14,7 +13,6 @@ export const jwtService = {
     const token: string = jwt.sign(payloadData, key, {
       expiresIn,
     })
-    console.log('17+++jwt', jwt.verify(token, key))
 
     const payload = jwt.decode(token, key)
 
@@ -22,14 +20,10 @@ export const jwtService = {
   },
   async getPayloadByToken(token: string, key: any) {
     try {
-      console.log('24++++jwt', token, key)
-
       const result: any = jwt.verify(token, key)
-      console.log('27++++jwt', result)
 
       return result
     } catch (e) {
-      console.log('31+++error in verify token:', e)
       return null
     }
   },

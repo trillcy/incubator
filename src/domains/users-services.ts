@@ -37,7 +37,6 @@ export const usersService = {
       },
       deletedTokens: [],
     }
-    console.log('37===users', newElement)
 
     const userId: string = await usersRepository.create({
       ...newElement,

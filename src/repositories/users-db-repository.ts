@@ -8,7 +8,6 @@ import {
   type ResultUser,
 } from '../types/types'
 import { UserModel } from '../db/db'
-import { log } from 'console'
 
 const usersFields = [
   'id',
@@ -59,12 +58,12 @@ export const usersRepository = {
   },
 
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
-    console.log('25+++user.repo-code', code)
+    console.log('62+++user.repo-code', code)
 
     const result = await UserModel.findOne({
       'emailConfirmation.confirmationCode': code,
     })
-    console.log('30+++users.result', result)
+    console.log('67+++users.result', result)
 
     if (result) {
       return {
@@ -95,10 +94,7 @@ export const usersRepository = {
   },
 
   async findById(id: string): Promise<ViewCompleteUserType | null> {
-    console.log('54+++user.repo', id)
-
     const result = await UserModel.findById(id) //.exec()
-    console.log('60+++user.repo', result)
 
     if (result) {
       return {
@@ -160,31 +156,26 @@ export const usersRepository = {
     const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10
     const skipElements = (numberOfPage - 1) * size
 
-    const items = await UserModel.find(
-      {
-        $or: [
-          {
-            'accountData.userName.login': {
-              $regex: searchLogin,
-              $options: 'i',
-            },
+    const items = await UserModel.find({
+      $or: [
+        {
+          'accountData.userName.login': {
+            $regex: searchLogin,
+            $options: 'i',
           },
-          {
-            'accountData.userName.email': {
-              $regex: searchEmail,
-              $options: 'i',
-            },
+        },
+        {
+          'accountData.userName.email': {
+            $regex: searchEmail,
+            $options: 'i',
           },
-        ],
-      }
-      // { projection: { _id: 0 } }
-    )
+        },
+      ],
+    })
       .sort(sortObject)
       .skip(skipElements)
       .limit(size)
       .lean()
-    console.log('127+++usrs', searchLogin, searchEmail)
-    console.log('128+++usrs', items)
 
     const totalCount = await UserModel.countDocuments({
       $or: [
@@ -244,18 +235,16 @@ export const usersRepository = {
       return null
     }
   },
+
   async findUserByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserDBType | null> {
-    console.log('200+++user', loginOrEmail)
-
     const result = await UserModel.findOne({
       $or: [
         { 'accountData.userName.login': loginOrEmail },
         { 'accountData.userName.email': loginOrEmail },
       ],
     })
-    console.log('206+++user', result)
 
     return result
   },
@@ -272,14 +261,14 @@ export const usersRepository = {
   async create(newElement: UserDBType): Promise<string> {
     const user = new UserModel({ ...newElement })
     const result = await user.save()
-    log(result)
+    console.log('264++users.repo', result)
     // console.log('user.repo--create===result', result.id, result.accountData)
     return result.id
   },
 
   async updateUser(id: string, newElement: any): Promise<boolean> {
     // const user = await UserModel.findById(id)
-    console.log('232+++users.repo', newElement)
+    console.log('274+++users.repo', newElement)
 
     const updated = await UserModel.updateOne(
       { _id: id },
@@ -287,7 +276,7 @@ export const usersRepository = {
         $set: newElement,
       }
     )
-    console.log('231++user.repo', updated)
+    console.log('282++user.repo', updated)
 
     return updated.matchedCount === 1
   },
