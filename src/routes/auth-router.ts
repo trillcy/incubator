@@ -15,6 +15,7 @@ import { devicesService } from '../domains/devices-services'
 // import { effortsMiddleware } from '../middlewares/effortsMiddlware'
 import { randomUUID } from 'crypto'
 import { effortsMiddleware } from '../middlewares/effortsMiddlware'
+import { usersService } from '../domains/users-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -39,8 +40,8 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/new-password',
-    validationMiidleware.passwordValidation,
-    validationMiidleware.recoveryTokenValidation,
+    validationMiidleware.newPasswordValidation,
+    validationMiidleware.recoveryCodeValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
@@ -51,13 +52,20 @@ export const authRouter = () => {
 
         return res.status(400).send({ errorsMessages })
       }
-      const { code } = req.body
-      const user = await authService.confirmationCode(code)
+      const { newPassword, recoveryCode } = req.body
+      const user = await authService.confirmationCode(recoveryCode)
 
-      if (user) {
+      if (!user) {
+        return res.sendStatus(401)
+      }
+      const newUserPassword = await authService.updatePassword(
+        user.id,
+        newPassword
+      )
+      if (newUserPassword) {
         return res.sendStatus(204)
       } else {
-        return res.sendStatus(400)
+        return res.sendStatus(444)
       }
     }
   )
@@ -65,7 +73,7 @@ export const authRouter = () => {
   // восстановление пароля при помощи отправки email с кодом
   router.post(
     '/password-recovery',
-    validationMiidleware.emailValidation,
+    validationMiidleware.recoveryEmailValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)

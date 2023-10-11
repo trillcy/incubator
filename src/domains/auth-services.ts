@@ -1,7 +1,7 @@
 import {
   EmailBody,
   type UserDBType,
-  type ViewUserType,
+  type ViewCompleteUserType,
   type ViewEmailUserType,
 } from '../types/types'
 import { blogsRepository } from '../repositories/blogs-db-repository'
@@ -63,7 +63,7 @@ export const authService = {
     return await usersRepository.updateUser(user.id, newElement)
   },
 
-  async confirmationCode(code: string): Promise<boolean> {
+  async confirmationCode(code: string): Promise<ViewCompleteUserType | null> {
     // находим пользователя по code
     const user = await usersRepository.findByCode(code)
 
@@ -75,9 +75,26 @@ export const authService = {
           isConfirmed: true,
         },
       }
-      return await usersRepository.updateUser(user.id, newElement)
+      const updated = await usersRepository.updateUser(user.id, newElement)
+      if (updated) {
+        return user
+      } else {
+        return null
+      }
     }
-    return false
+    return null
+  },
+
+  async updatePassword(userId: string, password: string): Promise<boolean> {
+    // находим пользователя по code
+    const user = await usersRepository.findByCode(password)
+    const passwordSalt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash(password, passwordSalt)
+
+    const newElement = {
+      accountData: { passwordHash, passwordSalt },
+    }
+    return await usersRepository.updateUser(userId, newElement)
   },
 
   async sendRegistraitonEmail(

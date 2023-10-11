@@ -88,6 +88,12 @@ export const validationMiidleware = {
     .notEmpty()
     .isLength({ min: 6, max: 20 }),
 
+  newPasswordValidation: body('newPassword')
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 6, max: 20 }),
+
   newEmailValidation: body('email')
     .isString()
     .trim()
@@ -109,6 +115,8 @@ export const validationMiidleware = {
       if (!user) throw new Error('user doesnt exist')
       if (user?.isConfirmed) throw new Error('email exists')
     }),
+
+  recoveryEmailValidation: body('email').isString().trim().notEmpty().isEmail(),
 
   loginOrEmailValidation: body('loginOrEmail').isString().trim().notEmpty(),
   /*
@@ -137,7 +145,7 @@ export const validationMiidleware = {
       return true
     }),
 
-  recoveryTokenValidation: body('recoveryToken').isString().trim().notEmpty(),
+  recoveryCodeValidation: body('recoveryCode').isString().trim().notEmpty(),
 
   // deviceValidation: header('User-Agent').isString().trim().notEmpty(),
   // .custom(async (value) => {
