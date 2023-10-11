@@ -25,7 +25,7 @@ export const usersRepository = {
     console.log('25+++user.repo-code', code)
 
     const result = await UserModel.findOne({
-      emailConfirmation: { confirmationCode: code },
+      'emailConfirmation.confirmationCode': code,
     })
     console.log('30+++users.result', result)
 

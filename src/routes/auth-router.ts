@@ -53,8 +53,11 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { newPassword, recoveryCode } = req.body
+      console.log('56-auth.route-recoveryCode', recoveryCode)
+      console.log('57-auth.route-newPassword', newPassword)
+
       const user = await authService.confirmationCode(recoveryCode)
-      console.log('57-auth.serv-user', user)
+      console.log('60-auth.serv-user', user)
 
       if (!user) {
         return res.sendStatus(499)
@@ -129,13 +132,11 @@ export const authRouter = () => {
     async (req: Request, res: Response) => {
       const user = req.user
       const deviceId = req.deviceId
-      console.log('57---auth', user)
 
       const title = req.headers['user-agent']?.toString() ?? 'Anonymous'
       const ip = req.ip
 
       if (user && title && ip && deviceId) {
-        console.log('133----auth')
         // выдаем access и refresh токены
         const accessData = { userId: user.id }
         const accessToken = await jwtService.createJWT(
@@ -185,7 +186,6 @@ export const authRouter = () => {
       if (!errors.isEmpty()) {
         const errorsArray = errors.array({ onlyFirstError: true })
         const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
-        console.log('97---auth', errorsMessages)
 
         return res.status(400).send({ errorsMessages })
       }

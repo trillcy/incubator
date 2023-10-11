@@ -21,7 +21,6 @@ export const effortsMiddleware = async (
     URL: effort.URL,
     inMSeconds: expirateInMSeconds,
   })
-  console.log('19+++efforts', countOfRequests, effort.URL, effort.IP)
 
   if (countOfRequests >= limitReq) return res.sendStatus(429)
 
