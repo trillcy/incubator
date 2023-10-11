@@ -7,7 +7,7 @@ import {
   type ViewCompleteUserType,
   type ResultUser,
 } from '../types/types'
-import { blogsCollection, usersCollection } from '../db/db'
+import { UserModel } from '../db/db'
 
 const usersFields = [
   'id',
@@ -22,7 +22,7 @@ const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
-    const result = await usersCollection.findOne({
+    const result = await UserModel.findOne({
       'emailConfirmation.confirmationCode': code,
     })
     console.log('28+++users', result)
@@ -50,13 +50,10 @@ export const usersRepository = {
     }
   },
 
-  async findById(id: ObjectId): Promise<ViewCompleteUserType | null> {
-    console.log('54+++user.repo', '6524116dddb2a93277071c27', id)
+  async findById(id: string): Promise<ViewCompleteUserType | null> {
+    console.log('54+++user.repo', id)
 
-    const result = await usersCollection.findOne(
-      { _id: new ObjectId(id) }
-      // { projection: { _id: 0 } }
-    )
+    const result = await UserModel.findById(id) //.exec()
     console.log('60+++user.repo', result)
 
     if (result) {
@@ -70,11 +67,13 @@ export const usersRepository = {
           passwordHash: result.accountData.passwordHash,
           createdAt: result.accountData.createdAt,
         },
-        emailConfirmation: {
-          confirmationCode: result.emailConfirmation.confirmationCode,
-          expirationDate: result.emailConfirmation.expirationDate,
-          isConfirmed: result.emailConfirmation.isConfirmed,
-        },
+        emailConfirmation:
+          // result.emailConfirmation,
+          {
+            confirmationCode: result.emailConfirmation.confirmationCode,
+            expirationDate: result.emailConfirmation.expirationDate,
+            isConfirmed: result.emailConfirmation.isConfirmed,
+          },
         deletedTokens: result.deletedTokens,
       }
     } else {
@@ -83,8 +82,8 @@ export const usersRepository = {
   },
 
   async deleteAll(): Promise<boolean> {
-    await usersCollection.deleteMany({})
-    const totalCount = await usersCollection.countDocuments({})
+    await UserModel.deleteMany({})
+    const totalCount = await UserModel.countDocuments({})
     return totalCount === 0
   },
   async findAllUsers(
@@ -112,34 +111,33 @@ export const usersRepository = {
     const size = pageSize && Number.isInteger(+pageSize) ? +pageSize : 10
     const skipElements = (numberOfPage - 1) * size
 
-    const items = await usersCollection
-      .find(
-        {
-          $or: [
-            {
-              'accountData.userName.login': {
-                $regex: searchLogin,
-                $options: 'i',
-              },
+    const items = await UserModel.find(
+      {
+        $or: [
+          {
+            'accountData.userName.login': {
+              $regex: searchLogin,
+              $options: 'i',
             },
-            {
-              'accountData.userName.email': {
-                $regex: searchEmail,
-                $options: 'i',
-              },
+          },
+          {
+            'accountData.userName.email': {
+              $regex: searchEmail,
+              $options: 'i',
             },
-          ],
-        }
-        // { projection: { _id: 0 } }
-      )
+          },
+        ],
+      }
+      // { projection: { _id: 0 } }
+    )
       .sort(sortObject)
       .skip(skipElements)
       .limit(size)
-      .toArray()
+      .lean()
     console.log('127+++usrs', searchLogin, searchEmail)
     console.log('128+++usrs', items)
 
-    const totalCount = await usersCollection.countDocuments({
+    const totalCount = await UserModel.countDocuments({
       $or: [
         {
           'accountData.userName.login': { $regex: searchLogin, $options: 'i' },
@@ -165,10 +163,9 @@ export const usersRepository = {
   },
 
   async findByLogin(login: string): Promise<ViewUserType | null> {
-    const result = await usersCollection.findOne(
-      { 'accountData.userName.login': login }
-      // { projection: { _id: 0 } }
-    )
+    const result = await UserModel.findOne({
+      'accountData.userName.login': login,
+    })
     if (result) {
       return {
         id: result._id.toString(),
@@ -181,7 +178,7 @@ export const usersRepository = {
     }
   },
   async findByEmail(email: string): Promise<ViewEmailUserType | null> {
-    const result = await usersCollection.findOne({
+    const result = await UserModel.findOne({
       'accountData.userName.email': email,
     })
     if (result) {
@@ -203,7 +200,7 @@ export const usersRepository = {
   ): Promise<UserDBType | null> {
     console.log('200+++user', loginOrEmail)
 
-    const result = await usersCollection.findOne({
+    const result = await UserModel.findOne({
       $or: [
         { 'accountData.userName.login': loginOrEmail },
         { 'accountData.userName.email': loginOrEmail },
@@ -215,7 +212,7 @@ export const usersRepository = {
   },
   async delete(id: string): Promise<boolean | null> {
     try {
-      const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
+      const result = await UserModel.deleteOne({ _id: new ObjectId(id) })
 
       return result.deletedCount === 1
     } catch (e) {
@@ -223,25 +220,24 @@ export const usersRepository = {
     }
   },
 
-  async create(newElement: UserDBType): Promise<ViewUserType | null> {
-    const created = await usersCollection.insertOne({ ...newElement })
-
-    if (created.acknowledged) {
-      return {
-        id: created.insertedId.toString(),
-        login: newElement.accountData.userName.login,
-        email: newElement.accountData.userName.email,
-        createdAt: newElement.accountData.createdAt.toISOString(),
-      }
-    } else {
-      return null
-    }
+  async create(newElement: UserDBType): Promise<string> {
+    const user = new UserModel({ ...newElement })
+    const result = await user.save()
+    // console.log('user.repo--create===result', result.id, result.accountData)
+    return result.id
   },
-  async updateUser(id: ObjectId, newElement: any): Promise<boolean> {
-    const updated = await usersCollection.updateOne(
+
+  async updateUser(id: string, newElement: any): Promise<boolean> {
+    // const user = await UserModel.findById(id)
+    console.log('232+++users.repo', newElement)
+    const updated = await UserModel.updateOne(
       { _id: id },
-      { $set: newElement }
+      {
+        $set: newElement,
+      }
     )
-    return updated.acknowledged
+    console.log('231++user.repo', updated)
+
+    return updated.matchedCount === 1
   },
 }

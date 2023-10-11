@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 
 export type EffortDBType = {
+  _id: ObjectId
   IP: string
   URL: string
   date: Date

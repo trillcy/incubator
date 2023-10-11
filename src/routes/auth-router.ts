@@ -35,6 +35,75 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 
 export const authRouter = () => {
   const router = Router()
+  // проверяем код с записанным
+  // возвращает только код 204
+  router.post(
+    '/new-password',
+    validationMiidleware.passwordValidation,
+    validationMiidleware.recoveryTokenValidation,
+    effortsMiddleware,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        return res.status(400).send({ errorsMessages })
+      }
+      const { code } = req.body
+      const user = await authService.confirmationCode(code)
+
+      if (user) {
+        return res.sendStatus(204)
+      } else {
+        return res.sendStatus(400)
+      }
+    }
+  )
+
+  // восстановление пароля при помощи отправки email с кодом
+  router.post(
+    '/password-recovery',
+    validationMiidleware.emailValidation,
+    effortsMiddleware,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        return res.status(400).send({ errorsMessages })
+      }
+      // надо создать коды
+      const email = req.body.email
+      const user = await usersRepository.findByEmail(email)
+      if (!user) return res.sendStatus(404)
+      const emailSuccess = await authService.sendPasswordRecoveryEmail(
+        user.id,
+        email
+      )
+
+      // --------
+      // const { login, email, password } = req.body
+      // console.log('93----', login, email, password)
+
+      // const emailSuccess = await authService.registration(
+      //   login,
+      //   email,
+      //   password
+      // )
+      console.log('100----', emailSuccess)
+
+      if (emailSuccess) {
+        return res.sendStatus(204)
+      } else {
+        return res.sendStatus(444)
+      }
+    }
+  )
+
   // пинимает токен в заголовке
   // возвращает {userId, login, email}
   router.get('/me', authMiidleware, async (req: Request, res: Response) => {
@@ -133,10 +202,8 @@ export const authRouter = () => {
         const title = req.headers['user-agent']?.toString() ?? 'Anonymous'
         const ip = req.ip
         const deviceId = randomUUID()
-        console.log('115-----', title, ip, deviceId)
 
         if (title && ip && deviceId) {
-          console.log('133----auth')
           // выдаем access и refresh токены
           const accessData = { userId: user._id }
           const accessToken = await jwtService.createJWT(

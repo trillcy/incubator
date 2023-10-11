@@ -5,9 +5,6 @@ import { ObjectId } from 'mongodb'
 import { usersRepository } from '../repositories/users-db-repository'
 
 export const usersService = {
-  async findUserById(id: ObjectId) {
-    return await usersRepository.findById(id)
-  },
   async deleteUser(id: string): Promise<boolean | null> {
     // const transformId = id.
     return await usersRepository.delete(id)
@@ -37,9 +34,17 @@ export const usersService = {
     }
     console.log('37===users', newElement)
 
-    const result = await usersRepository.create({ ...newElement })
-
-    return result
+    const userId: string = await usersRepository.create({
+      ...newElement,
+    })
+    const result = await usersRepository.findById(userId)
+    if (!result) return null
+    return {
+      id: result.id,
+      login: result.accountData.userName.login,
+      email: result.accountData.userName.email,
+      createdAt: result.accountData.createdAt.toISOString(),
+    }
   },
   async _generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt)

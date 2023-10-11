@@ -108,7 +108,6 @@ export const validationMiidleware = {
       const user = await usersRepository.findByEmail(value)
       if (!user) throw new Error('user doesnt exist')
       if (user?.isConfirmed) throw new Error('email exists')
-      return true
     }),
 
   loginOrEmailValidation: body('loginOrEmail').isString().trim().notEmpty(),
@@ -137,6 +136,8 @@ export const validationMiidleware = {
       if (user.emailConfirmation.isConfirmed) throw new Error('code exists')
       return true
     }),
+
+  recoveryTokenValidation: body('recoveryToken').isString().trim().notEmpty(),
 
   // deviceValidation: header('User-Agent').isString().trim().notEmpty(),
   // .custom(async (value) => {

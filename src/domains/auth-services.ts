@@ -14,11 +14,44 @@ import { add } from 'date-fns'
 import { emailManager } from '../managers/emails-managers'
 
 export const authService = {
+  async sendPasswordRecoveryEmail(
+    userId: string,
+    email: string
+  ): Promise<any | null> {
+    const updatedObject = {
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
+        isConfirmed: false,
+      },
+    }
+    const updatedUser = await usersRepository.updateUser(userId, updatedObject)
+    console.log('48====auth', updatedUser)
+
+    if (!updatedUser) {
+      return null
+    }
+    const url = `https://somesite.com/confirm-registration?code=${updatedObject.emailConfirmation.confirmationCode}`
+
+    const emailObject: EmailBody = {
+      // const email: user.email,
+      email: email, //`aermakov72@mail.ru`,
+      message: ` <h1>Password recovery</h1>
+      <p>To finish password recovery please follow the link below:
+         <a href='https://somesite.com/password-recovery?recoveryCode=your_recovery_code'>recovery password</a>
+     </p>
+   `,
+      subject: `Password recovery`,
+    }
+
+    return await emailManager.sendEmailConfirmationMessage(emailObject)
+  },
+
   async deleteRefreshToken(
     userId: string,
     refreshToken: string
   ): Promise<boolean> {
-    const user = await usersRepository.findById(new ObjectId(userId))
+    const user = await usersRepository.findById(userId)
     if (!user) {
       return false
     }
@@ -27,13 +60,12 @@ export const authService = {
     const newElement = {
       deletedTokens,
     }
-    return await usersRepository.updateUser(new ObjectId(user.id), newElement)
+    return await usersRepository.updateUser(user.id, newElement)
   },
 
   async confirmationCode(code: string): Promise<boolean> {
     // находим пользователя по code
     const user = await usersRepository.findByCode(code)
-    console.log('15===auth', user)
 
     if (user) {
       const newElement = {
@@ -43,7 +75,7 @@ export const authService = {
           isConfirmed: true,
         },
       }
-      return await usersRepository.updateUser(new ObjectId(user.id), newElement)
+      return await usersRepository.updateUser(user.id, newElement)
     }
     return false
   },
@@ -52,7 +84,6 @@ export const authService = {
     userId: string,
     email: string
   ): Promise<any | null> {
-    console.log('25====auth.serv', userId)
     const updatedObject = {
       emailConfirmation: {
         confirmationCode: uuidv4(),
@@ -60,11 +91,7 @@ export const authService = {
         isConfirmed: false,
       },
     }
-    const updatedUser = await usersRepository.updateUser(
-      new ObjectId(userId),
-      updatedObject
-    )
-    console.log('48====auth', updatedUser)
+    const updatedUser = await usersRepository.updateUser(userId, updatedObject)
 
     if (!updatedUser) {
       return null
@@ -80,7 +107,6 @@ export const authService = {
 </p>`,
       subject: `Confirmation of registration`,
     }
-    console.log('41=====auth', emailObject)
 
     return await emailManager.sendEmailConfirmationMessage(emailObject)
   },
@@ -89,8 +115,6 @@ export const authService = {
     loginOrEmail: string,
     password: string
   ): Promise<UserDBType | null> {
-    console.log('83---auth', loginOrEmail)
-
     const user: UserDBType | null =
       await usersRepository.findUserByLoginOrEmail(loginOrEmail)
 
@@ -111,7 +135,6 @@ export const authService = {
     if (!user) {
       return null
     }
-    console.log('96====auth', user.id, email)
 
     return await this.sendRegistraitonEmail(user.id, email)
   },
@@ -141,10 +164,15 @@ export const authService = {
       deletedTokens: [],
     }
 
-    const user: ViewUserType | null = await usersRepository.create(newElement)
-    if (!user) {
+    const userId: string | null = await usersRepository.create({
+      ...newElement,
+    })
+    if (!userId) {
       return null
     }
-    return await this.sendRegistraitonEmail(user.id, user.email)
+    return await this.sendRegistraitonEmail(
+      userId,
+      newElement.accountData.userName.email
+    )
   },
 }

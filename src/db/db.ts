@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 config()
 
 import { log } from 'console'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectId } from 'mongodb'
 import {
   type UserDBType,
   type CommentDBType,
@@ -11,6 +11,7 @@ import {
   type DeviceDBType,
   type EffortDBType,
 } from '../types/types'
+import mongoose from 'mongoose'
 
 export type VideoType = {
   id: number
@@ -51,21 +52,47 @@ const mongoURI = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017'
 const dbName = 'incubator'
 const client = new MongoClient(mongoURI)
 export const db = client.db(dbName)
+const { Schema } = mongoose
 
+const userSchema = new Schema<UserDBType>({
+  _id: ObjectId,
+  accountData: {
+    userName: { login: String, email: String },
+    passwordHash: String,
+    passwordSalt: String,
+    createdAt: Date,
+  },
+  emailConfirmation: {
+    confirmationCode: String,
+    expirationDate: Date,
+    isConfirmed: Boolean,
+  },
+  deletedTokens: Array,
+})
+const effortSchema = new Schema<EffortDBType>({
+  IP: String,
+  URL: String,
+  date: Date,
+})
+export const UserModel = mongoose.model('users', userSchema)
+export const EffortModel = mongoose.model('efforts', effortSchema)
+// ------
 export const blogsCollection = db.collection<BlogDBType>('blogs')
 export const postsCollection = db.collection<PostDBType>('posts')
-export const usersCollection = db.collection<UserDBType>('users')
+// export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
 export const devicesCollection = db.collection<DeviceDBType>('devices')
-export const effortsCollection = db.collection<EffortDBType>('efforts')
+// export const effortsCollection = db.collection<EffortDBType>('efforts')
 
 export const connectDb = async () => {
   try {
-    await client.connect()
+    await mongoose.connect(mongoURI)
+    // await client.connect()
 
-    await db.command({ ping: 1 })
+    // await db.command({ ping: 1 })
     log('Connected successfully to server')
   } catch (e) {
+    await mongoose.disconnect()
     log({ e })
     log('cant connect to db')
   }
@@ -74,4 +101,5 @@ export const connectDb = async () => {
 export const keys = {
   access: process.env.ACCESS_TOKEN_KEY,
   refresh: process.env.REFRESH_TOKEN_KEY,
+  recovery: process.env.RECOVERY_TOKEN_KEY,
 }
