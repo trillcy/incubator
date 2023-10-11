@@ -23,7 +23,7 @@ const usersDirections = ['asc', 'desc']
 export const usersRepository = {
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
     const result = await UserModel.findOne({
-      'emailConfirmation.confirmationCode': code,
+      emailConfirmation: { confirmationCode: code },
     })
     console.log('28+++users', result)
 

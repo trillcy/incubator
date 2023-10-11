@@ -8,9 +8,6 @@ export const effortsRepository = {
     URL: string
     inMSeconds: number
   }): Promise<number> {
-    console.log('11++repo.effort', Date.now() - effort.inMSeconds)
-    console.log('12++repo.effort', new Date(Date.now() - effort.inMSeconds))
-
     const totalCount = await EffortModel.countDocuments({
       IP: effort.IP,
       URL: effort.URL,
