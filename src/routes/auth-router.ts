@@ -56,7 +56,7 @@ export const authRouter = () => {
       const user = await authService.confirmationCode(recoveryCode)
 
       if (!user) {
-        return res.sendStatus(401)
+        return res.sendStatus(499)
       }
       const newUserPassword = await authService.updatePassword(
         user.id,
