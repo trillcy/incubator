@@ -67,6 +67,11 @@ const userSchema = new Schema<UserDBType>({
     expirationDate: Date,
     isConfirmed: Boolean,
   },
+  passwordConfirmation: {
+    confirmationCode: String,
+    expirationDate: Date,
+    isConfirmed: Boolean,
+  },
   deletedTokens: Array,
 })
 const effortSchema = new Schema<EffortDBType>({

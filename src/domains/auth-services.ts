@@ -19,7 +19,7 @@ export const authService = {
     email: string
   ): Promise<any | null> {
     const updatedObject = {
-      emailConfirmation: {
+      passwordConfirmation: {
         confirmationCode: uuidv4(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed: false,
@@ -27,7 +27,7 @@ export const authService = {
     }
     console.log('28===auth', userId)
 
-    const updatedUser = await usersRepository.updateUserEmailConf(
+    const updatedUser = await usersRepository.updateUserPwdConf(
       userId,
       updatedObject
     )
@@ -68,6 +68,37 @@ export const authService = {
       deletedTokens,
     }
     return await usersRepository.updateUser(user.id, newElement)
+  },
+
+  async confirmationPasswordCode(
+    code: string
+  ): Promise<ViewCompleteUserType | null> {
+    // находим пользователя по code
+    const user = await usersRepository.findByPwdCode(code)
+
+    if (user) {
+      const newElement = {
+        passwordConfirmation: {
+          confirmationCode: user.emailConfirmation.confirmationCode,
+          expirationDate: user.emailConfirmation.expirationDate,
+          isConfirmed: true,
+        },
+      }
+      console.log('85-auth.serv-user', user)
+
+      const updated = await usersRepository.updateUserPwdConf(
+        user.id,
+        newElement
+      )
+      console.log('89-auth.serv-updated', updated)
+
+      if (updated) {
+        return user
+      } else {
+        return null
+      }
+    }
+    return null
   },
 
   async confirmationCode(code: string): Promise<ViewCompleteUserType | null> {
@@ -193,6 +224,11 @@ export const authService = {
       emailConfirmation: {
         confirmationCode: uuidv4(),
         expirationDate: add(date, { hours: 1, minutes: 3 }),
+        isConfirmed: false,
+      },
+      passwordConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
         isConfirmed: false,
       },
       deletedTokens: [],

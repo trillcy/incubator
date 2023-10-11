@@ -60,7 +60,7 @@ export const authRouter = () => {
 
         return res.sendStatus(477)
       }
-      const user = await authService.confirmationCode(recoveryCode)
+      const user = await authService.confirmationPasswordCode(recoveryCode)
       console.log('60-auth.serv-user', user)
 
       if (!user) {
@@ -81,8 +81,8 @@ export const authRouter = () => {
   // восстановление пароля при помощи отправки email с кодом
   router.post(
     '/password-recovery',
-    validationMiidleware.recoveryEmailValidation,
     effortsMiddleware,
+    validationMiidleware.recoveryEmailValidation,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
 

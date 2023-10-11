@@ -104,6 +104,11 @@ export type ViewCompleteUserType = {
     expirationDate: Date | null
     isConfirmed: boolean
   }
+  passwordConfirmation: {
+    confirmationCode: string | null
+    expirationDate: Date | null
+    isConfirmed: boolean
+  }
   deletedTokens: string[]
 }
 export type UserDBType = {
@@ -115,6 +120,11 @@ export type UserDBType = {
     createdAt: Date
   }
   emailConfirmation: {
+    confirmationCode: string | null
+    expirationDate: Date | null
+    isConfirmed: boolean
+  }
+  passwordConfirmation: {
     confirmationCode: string | null
     expirationDate: Date | null
     isConfirmed: boolean

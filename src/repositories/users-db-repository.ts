@@ -8,6 +8,7 @@ import {
   type ResultUser,
 } from '../types/types'
 import { UserModel } from '../db/db'
+import { log } from 'console'
 
 const usersFields = [
   'id',
@@ -21,6 +22,42 @@ const usersFields = [
 const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
+  async findByPwdCode(code: string): Promise<ViewCompleteUserType | null> {
+    console.log('25+++user.repo-code', code)
+
+    const result = await UserModel.findOne({
+      'passwordConfirmation.confirmationCode': code,
+    })
+    console.log('30+++users.result', result)
+
+    if (result) {
+      return {
+        id: result._id.toString(),
+        accountData: {
+          userName: {
+            login: result.accountData.userName.login,
+            email: result.accountData.userName.email,
+          },
+          passwordHash: result.accountData.passwordHash,
+          createdAt: result.accountData.createdAt,
+        },
+        emailConfirmation: {
+          confirmationCode: result.emailConfirmation.confirmationCode,
+          expirationDate: result.emailConfirmation.expirationDate,
+          isConfirmed: result.emailConfirmation.isConfirmed,
+        },
+        passwordConfirmation: {
+          confirmationCode: result.passwordConfirmation.confirmationCode,
+          expirationDate: result.passwordConfirmation.expirationDate,
+          isConfirmed: result.passwordConfirmation.isConfirmed,
+        },
+        deletedTokens: result.deletedTokens,
+      }
+    } else {
+      return null
+    }
+  },
+
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
     console.log('25+++user.repo-code', code)
 
@@ -44,6 +81,11 @@ export const usersRepository = {
           confirmationCode: result.emailConfirmation.confirmationCode,
           expirationDate: result.emailConfirmation.expirationDate,
           isConfirmed: result.emailConfirmation.isConfirmed,
+        },
+        passwordConfirmation: {
+          confirmationCode: result.passwordConfirmation.confirmationCode,
+          expirationDate: result.passwordConfirmation.expirationDate,
+          isConfirmed: result.passwordConfirmation.isConfirmed,
         },
         deletedTokens: result.deletedTokens,
       }
@@ -76,6 +118,11 @@ export const usersRepository = {
             expirationDate: result.emailConfirmation.expirationDate,
             isConfirmed: result.emailConfirmation.isConfirmed,
           },
+        passwordConfirmation: {
+          confirmationCode: result.passwordConfirmation.confirmationCode,
+          expirationDate: result.passwordConfirmation.expirationDate,
+          isConfirmed: result.passwordConfirmation.isConfirmed,
+        },
         deletedTokens: result.deletedTokens,
       }
     } else {
@@ -225,6 +272,7 @@ export const usersRepository = {
   async create(newElement: UserDBType): Promise<string> {
     const user = new UserModel({ ...newElement })
     const result = await user.save()
+    log(result)
     // console.log('user.repo--create===result', result.id, result.accountData)
     return result.id
   },
@@ -254,7 +302,18 @@ export const usersRepository = {
         $set: { ...newElement },
       }
     )
-    console.log('231++user.repo', updated)
+
+    return updated.matchedCount === 1
+  },
+
+  async updateUserPwdConf(id: string, newElement: any): Promise<boolean> {
+    const updated = await UserModel.updateOne(
+      { _id: id },
+      {
+        $set: { ...newElement },
+      }
+    )
+    console.log('271++user.repo', updated)
 
     return updated.matchedCount === 1
   },

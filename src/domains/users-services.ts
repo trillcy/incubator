@@ -30,6 +30,11 @@ export const usersService = {
         expirationDate: null,
         isConfirmed: false,
       },
+      passwordConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
+        isConfirmed: false,
+      },
       deletedTokens: [],
     }
     console.log('37===users', newElement)
