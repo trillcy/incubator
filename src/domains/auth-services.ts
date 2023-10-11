@@ -42,14 +42,14 @@ export const authService = {
     }
     const userModel = await usersRepository.findById(userId)
     if (!userModel) return null
-    const url = `https://somesite.com/confirm-registration?code=${userModel.emailConfirmation.confirmationCode}`
+    const url = `https://somesite.com/password-recovery?recoveryCode=${userModel.passwordConfirmation.confirmationCode}`
 
     const emailObject: EmailBody = {
       // const email: user.email,
       email: email, //`aermakov72@mail.ru`,
       message: ` <h1>Password recovery</h1>
       <p>To finish password recovery please follow the link below:
-         <a href='https://somesite.com/password-recovery?recoveryCode=your_recovery_code'>recovery password</a>
+         <a href=${url}>recovery password</a>
      </p>
    `,
       subject: `Password recovery`,
