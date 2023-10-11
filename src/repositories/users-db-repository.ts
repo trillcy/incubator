@@ -22,10 +22,12 @@ const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
+    console.log('25+++user.repo-code', code)
+
     const result = await UserModel.findOne({
       emailConfirmation: { confirmationCode: code },
     })
-    console.log('28+++users', result)
+    console.log('30+++users.result', result)
 
     if (result) {
       return {
