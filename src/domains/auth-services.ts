@@ -82,10 +82,14 @@ export const authService = {
           isConfirmed: true,
         },
       }
+      console.log('85-auth.serv-user', user)
+
       const updated = await usersRepository.updateUserEmailConf(
         user.id,
         newElement
       )
+      console.log('89-auth.serv-updated', updated)
+
       if (updated) {
         return user
       } else {

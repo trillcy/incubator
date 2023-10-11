@@ -10,14 +10,9 @@ import { authService } from '../domains/auth-services'
 export const testRouter = () => {
   const router = Router()
   router.get('/', async (req: Request, res: Response) => {
-    const email = 'andreiincubator@gmail.com'
-    const user = await usersRepository.findByEmail(email)
-    console.log('15---', user)
-
-    if (!user) return res.sendStatus(404)
-    const result = await authService.sendPasswordRecoveryEmail(user.id, email)
-    console.log('22---', result)
-
+    const result = await usersRepository.findByCode(
+      '2c6e2fa1-2c0f-4fa5-8dec-2ceeeeb8ebfb'
+    )
     return res.status(200).json(result)
   })
   return router
