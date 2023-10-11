@@ -230,10 +230,26 @@ export const usersRepository = {
   async updateUser(id: string, newElement: any): Promise<boolean> {
     // const user = await UserModel.findById(id)
     console.log('232+++users.repo', newElement)
+
     const updated = await UserModel.updateOne(
       { _id: id },
       {
         $set: newElement,
+      }
+    )
+    console.log('231++user.repo', updated)
+
+    return updated.matchedCount === 1
+  },
+
+  async updateUserEmailConf(id: string, newElement: any): Promise<boolean> {
+    // const user = await UserModel.findById(id)
+    console.log('232+++users.repo', newElement)
+
+    const updated = await UserModel.updateOne(
+      { _id: id },
+      {
+        $set: { ...newElement },
       }
     )
     console.log('231++user.repo', updated)

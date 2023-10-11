@@ -75,7 +75,10 @@ export const authService = {
           isConfirmed: true,
         },
       }
-      const updated = await usersRepository.updateUser(user.id, newElement)
+      const updated = await usersRepository.updateUserEmailConf(
+        user.id,
+        newElement
+      )
       if (updated) {
         return user
       } else {

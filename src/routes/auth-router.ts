@@ -105,6 +105,7 @@ export const authRouter = () => {
       console.log('100----', emailSuccess)
 
       if (emailSuccess) {
+        // надо записать новый код
         return res.sendStatus(204)
       } else {
         return res.sendStatus(444)

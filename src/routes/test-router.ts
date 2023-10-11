@@ -27,8 +27,8 @@ const ErrorFormatter = (error: ValidationError): ErrorObject => {
 export const testRouter = () => {
   const router = Router()
   router.get('/', async (req: Request, res: Response) => {
-    const result = await usersRepository.updateUser(
-      '652676b707f4ebb22aa550dc',
+    const result = await usersRepository.updateUserEmailConf(
+      '6526baea4378f66f1dc1041f',
       {
         // _id: new ObjectId('652676b707f4ebb22aa550dc'),
         // accountData: {
