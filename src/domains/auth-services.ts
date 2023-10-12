@@ -85,8 +85,8 @@ export const authService = {
     if (user) {
       const newElement = {
         passwordConfirmation: {
-          confirmationCode: user.emailConfirmation.confirmationCode,
-          expirationDate: user.emailConfirmation.expirationDate,
+          confirmationCode: user.passwordConfirmation.confirmationCode,
+          expirationDate: user.passwordConfirmation.expirationDate,
           isConfirmed: true,
         },
       }
