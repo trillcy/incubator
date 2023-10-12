@@ -69,7 +69,7 @@ export const authRouter = () => {
       }
 
       const newUserPassword = await authService.updatePassword(
-        user.id,
+        user,
         newPassword
       )
       if (newUserPassword) {

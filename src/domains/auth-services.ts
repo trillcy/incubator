@@ -136,16 +136,22 @@ export const authService = {
     return null
   },
 
-  async updatePassword(userId: string, password: string): Promise<boolean> {
-    // находим пользователя по code
-    const user = await usersRepository.findByPwdCode(password)
+  async updatePassword(
+    user: ViewCompleteUserType,
+    password: string
+  ): Promise<boolean> {
     const passwordSalt = await bcrypt.genSalt(10)
     const passwordHash = await bcrypt.hash(password, passwordSalt)
 
     const newElement = {
-      accountData: { passwordHash, passwordSalt },
+      accountData: {
+        userName: user.accountData.userName,
+        passwordHash,
+        passwordSalt,
+        createdAt: user.accountData.createdAt,
+      },
     }
-    return await usersRepository.updateUser(userId, newElement)
+    return await usersRepository.updateUser(user.id, newElement)
   },
 
   async sendRegistraitonEmail(

@@ -273,7 +273,7 @@ export const usersRepository = {
     const updated = await UserModel.updateOne(
       { _id: id },
       {
-        $set: newElement,
+        $set: { ...newElement },
       }
     )
     console.log('282++user.repo', updated)
