@@ -146,15 +146,13 @@ export const validationMiidleware = {
       return true
     }),
 
-  recoveryCodeValidation: body('recoveryCode')
-    .isString()
-    .trim()
-    .notEmpty()
-    .custom(async (value) => {
-      const user = await authService.confirmationPasswordCode(value)
-      if (!user) throw new Error('recovery code is incorrect')
-      return true
-    }),
+  recoveryCodeValidation: body('recoveryCode').isString().trim().notEmpty(),
+  // .custom(async (value) => {
+  //   const user = await authService.confirmationPasswordCode(value)
+  //   if (!user) throw new Error('recovery code is incorrect')
+  //   return true
+  // }),
+
   // deviceValidation: header('User-Agent').isString().trim().notEmpty(),
   // .custom(async (value) => {
   //   const session = await sessionsRepository.findByDevice(value)
