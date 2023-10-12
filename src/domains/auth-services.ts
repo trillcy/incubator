@@ -18,6 +18,7 @@ export const authService = {
     userId: string,
     email: string
   ): Promise<any | null> {
+    let userModel
     const updatedObject = {
       passwordConfirmation: {
         confirmationCode: uuidv4(),
@@ -40,7 +41,8 @@ export const authService = {
     if (!updatedUser) {
       return null
     }
-    const userModel = await usersRepository.findById(userId)
+    userModel = await usersRepository.findById(userId)
+
     if (!userModel) return null
     const url = `https://somesite.com/password-recovery?recoveryCode=${userModel.passwordConfirmation.confirmationCode}`
 

@@ -64,7 +64,7 @@ export const authRouter = () => {
       console.log('60-auth.serv-user', user)
 
       if (!user) {
-        return res.sendStatus(499)
+        return res.sendStatus(400)
       }
       const newUserPassword = await authService.updatePassword(
         user.id,
@@ -95,7 +95,7 @@ export const authRouter = () => {
       // надо создать коды
       const email = req.body.email
       const user = await usersRepository.findByEmail(email)
-      if (!user) return res.sendStatus(404)
+      if (!user) return res.sendStatus(204)
       const emailSuccess = await authService.sendPasswordRecoveryEmail(
         user.id,
         email
