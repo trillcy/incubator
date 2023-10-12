@@ -11,6 +11,7 @@ import { blogsRepository } from '../repositories/blogs-db-repository'
 import { usersRepository } from '../repositories/users-db-repository'
 import { jwtService } from '../applications/jwt-services'
 import { devicesRepository } from '../repositories/devices-db-repository'
+import { authService } from '../domains/auth-services'
 
 export const validationMiidleware = {
   titleValidation: body('title')
@@ -145,8 +146,15 @@ export const validationMiidleware = {
       return true
     }),
 
-  recoveryCodeValidation: body('recoveryCode').isString().trim().notEmpty(),
-
+  recoveryCodeValidation: body('recoveryCode')
+    .isString()
+    .trim()
+    .notEmpty()
+    .custom(async (value) => {
+      const user = await authService.confirmationPasswordCode(value)
+      if (!user) throw new Error('recovery code is incorrect')
+      return true
+    }),
   // deviceValidation: header('User-Agent').isString().trim().notEmpty(),
   // .custom(async (value) => {
   //   const session = await sessionsRepository.findByDevice(value)

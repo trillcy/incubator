@@ -60,12 +60,14 @@ export const authRouter = () => {
 
         return res.sendStatus(477)
       }
+
       const user = await authService.confirmationPasswordCode(recoveryCode)
       console.log('60-auth.serv-user', user)
 
       if (!user) {
-        return res.sendStatus(400)
+        return res.sendStatus(499)
       }
+
       const newUserPassword = await authService.updatePassword(
         user.id,
         newPassword
