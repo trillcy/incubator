@@ -41,7 +41,7 @@ export const authRouter = () => {
   router.post(
     '/new-password',
     validationMiidleware.newPasswordValidation,
-    validationMiidleware.recoveryCodeValidation,
+    validationMiidleware.confirmRecoveryCodeValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
       const errors = validationResult(req)
