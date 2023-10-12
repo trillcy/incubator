@@ -41,7 +41,6 @@ export const securityRouter = () => {
     async (req: Request, res: Response) => {
       const userId = req.user?.id
       const deviceId = req.deviceId
-      console.log('43----sec.route', userId)
 
       if (userId) {
         const devices = await devicesRepository.findAll(userId)

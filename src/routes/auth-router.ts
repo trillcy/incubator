@@ -53,16 +53,11 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { newPassword, recoveryCode } = req.body
-      console.log('56-auth.route-recoveryCode', recoveryCode)
-      console.log('57-auth.route-newPassword', newPassword)
       if (!recoveryCode) {
-        console.log('59-auth-error with recoveryCode')
-
         return res.sendStatus(477)
       }
 
       const user = await authService.confirmationPasswordCode(recoveryCode)
-      console.log('60-auth.serv-user', user)
 
       if (!user) {
         return res.sendStatus(499)
@@ -102,7 +97,6 @@ export const authRouter = () => {
         user.id,
         email
       )
-      console.log('100----', emailSuccess)
 
       if (emailSuccess) {
         // надо записать новый код
@@ -224,12 +218,9 @@ export const authRouter = () => {
             keys.refresh,
             '20min'
           )
-          console.log('115----auth', accessToken, refreshToken)
 
           const payloadObject = await jwtService.decodeJWT(refreshToken)
           const lastActiveDate = new Date(payloadObject.iat * 1000)
-          console.log('iat:', payloadObject.iat)
-          console.log('lastActiveDate:', lastActiveDate)
           const expiredDate = payloadObject.exp
 
           const device = await devicesService.createDevice(
@@ -293,14 +284,12 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { login, email, password } = req.body
-      console.log('93----', login, email, password)
 
       const emailSuccess = await authService.registration(
         login,
         email,
         password
       )
-      console.log('100----', emailSuccess)
 
       if (emailSuccess) {
         return res.sendStatus(204)
@@ -327,10 +316,8 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { email } = req.body
-      console.log('128---auth', email)
 
       const emailSuccess = await authService.emailResending(email)
-      console.log('129---auth', emailSuccess)
       if (emailSuccess) {
         return res.sendStatus(204)
       } else {
@@ -356,7 +343,6 @@ export const authRouter = () => {
         return res.status(400).send({ errorsMessages })
       }
       const { code } = req.body
-      console.log('156----auth', code)
 
       const user = await authService.confirmationCode(code)
 

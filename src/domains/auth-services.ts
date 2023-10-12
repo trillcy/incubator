@@ -26,17 +26,11 @@ export const authService = {
         isConfirmed: false,
       },
     }
-    console.log(
-      '28===auth',
-      userId,
-      updatedObject.passwordConfirmation.confirmationCode
-    )
 
     const updatedUser = await usersRepository.updateUserPwdConf(
       userId,
       updatedObject
     )
-    console.log('48====auth', updatedUser)
 
     if (!updatedUser) {
       return null
@@ -90,13 +84,11 @@ export const authService = {
           isConfirmed: true,
         },
       }
-      console.log('85-auth.serv-user', user)
 
       const updated = await usersRepository.updateUserPwdConf(
         user.id,
         newElement
       )
-      console.log('89-auth.serv-updated', updated)
 
       if (updated) {
         return user
@@ -119,13 +111,11 @@ export const authService = {
           isConfirmed: true,
         },
       }
-      console.log('85-auth.serv-user', user)
 
       const updated = await usersRepository.updateUserEmailConf(
         user.id,
         newElement
       )
-      console.log('89-auth.serv-updated', updated)
 
       if (updated) {
         return user

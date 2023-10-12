@@ -60,7 +60,6 @@ export const devicesRepository = {
       userId,
       deviceId: currentDeviceId,
     })
-    console.log('114----', result)
 
     return result.acknowledged
   },
@@ -103,7 +102,6 @@ export const devicesRepository = {
 
   async createDevice(newElement: DeviceDBType): Promise<ViewDeviceType | null> {
     const result = await devicesCollection.insertOne({ ...newElement })
-    console.log('169++++sess', result)
 
     if (result.acknowledged) {
       return {

@@ -123,7 +123,6 @@ export const validationMiidleware = {
   /*
     .custom(async (value) => {
       const user = await usersRepository.findUserByLoginOrEmail(value)
-      console.log('118++++valid', user)
 
       if (!user) {
         // -------

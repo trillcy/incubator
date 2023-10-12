@@ -22,12 +22,9 @@ const usersDirections = ['asc', 'desc']
 
 export const usersRepository = {
   async findByPwdCode(code: string): Promise<ViewCompleteUserType | null> {
-    console.log('25+++user.repo-code', code)
-
     const result = await UserModel.findOne({
       'passwordConfirmation.confirmationCode': code,
     })
-    console.log('30+++users.result', result)
 
     if (result) {
       return {
@@ -58,12 +55,9 @@ export const usersRepository = {
   },
 
   async findByCode(code: string): Promise<ViewCompleteUserType | null> {
-    console.log('62+++user.repo-code', code)
-
     const result = await UserModel.findOne({
       'emailConfirmation.confirmationCode': code,
     })
-    console.log('67+++users.result', result)
 
     if (result) {
       return {
@@ -261,14 +255,11 @@ export const usersRepository = {
   async create(newElement: UserDBType): Promise<string> {
     const user = new UserModel({ ...newElement })
     const result = await user.save()
-    console.log('264++users.repo', result)
-    // console.log('user.repo--create===result', result.id, result.accountData)
     return result.id
   },
 
   async updateUser(id: string, newElement: any): Promise<boolean> {
     // const user = await UserModel.findById(id)
-    console.log('274+++users.repo', newElement)
 
     const updated = await UserModel.updateOne(
       { _id: id },
@@ -276,14 +267,12 @@ export const usersRepository = {
         $set: { ...newElement },
       }
     )
-    console.log('282++user.repo', updated)
 
     return updated.matchedCount === 1
   },
 
   async updateUserEmailConf(id: string, newElement: any): Promise<boolean> {
     // const user = await UserModel.findById(id)
-    console.log('232+++users.repo', newElement)
 
     const updated = await UserModel.updateOne(
       { _id: id },
@@ -302,7 +291,6 @@ export const usersRepository = {
         $set: { ...newElement },
       }
     )
-    console.log('271++user.repo', updated)
 
     return updated.matchedCount === 1
   },
