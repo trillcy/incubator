@@ -100,8 +100,6 @@ export const commentsRepository = {
     const result = await commentsCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
       let userStatus = 'None'
-      console.log('103++comm.repo-userId', userId)
-      console.log('104++comm.repo-userId', result)
 
       if (userId) {
         const array = result.likesInfo.statuses.filter(
@@ -137,8 +135,6 @@ export const commentsRepository = {
 
   async delete(id: string): Promise<boolean> {
     const result = await commentsCollection.deleteOne({ _id: new ObjectId(id) })
-    console.log('109++++comments.repo', id)
-    console.log('110++++comments.repo', result)
 
     return result.deletedCount === 1
   },
