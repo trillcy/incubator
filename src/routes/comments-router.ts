@@ -52,9 +52,11 @@ export const commentsRouter = () => {
 
         return res.status(400).send({ errorsMessages })
       } else {
-        const commentId = req.params.id
+        const commentId = req.params.commentId
         const userId = req.user ? req.user.id : null
         if (!userId) return res.sendStatus(401)
+        console.log('58---comm.route', commentId)
+
         const comment = await commentsService.findById(userId, commentId)
         console.log('58----comments.route', comment)
 

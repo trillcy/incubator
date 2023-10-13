@@ -1,17 +1,15 @@
 import request from 'supertest'
 
-import { RouterPaths } from '../src/app'
-import { startApp } from '../src/index'
+import { RouterPaths, app } from '../src/app'
 
 describe(RouterPaths.posts, () => {
-  const app = startApp()
-  beforeAll(async () => {
-    await request(app).delete(`${RouterPaths.testing}/all-data`).expect(204)
-  })
+  // beforeAll(async () => {
+  //   await request(app).delete(`${RouterPaths.testing}/all-data`).expect(204)
+  // })
 
-  afterAll((done) => {
-    done()
-  })
+  // afterAll((done) => {
+  //   done()
+  // })
 
   it('check get -> correct getAll', async () => {
     await request(app).get(RouterPaths.security).expect(200)

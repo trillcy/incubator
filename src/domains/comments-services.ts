@@ -38,6 +38,8 @@ export const commentsService = {
     id: string
   ): Promise<ViewCommentType | null> {
     console.log('37===comm.serv-userId', userId)
+    console.log('41===comm.serv-userId')
+    console.log('42===comm.serv-userId', id)
 
     return await commentsRepository.findById(userId, id)
   },
