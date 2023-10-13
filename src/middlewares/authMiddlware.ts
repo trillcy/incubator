@@ -22,7 +22,8 @@ export const authMiidleware = async (
   const payloadObject = await jwtService.getPayloadByToken(token, keys.access)
   console.log('23++authMW-payloadObject', payloadObject)
 
-  const userId = payloadObject.user.id
+  const userId = payloadObject.userId
+  // const userId = payloadObject.user.id
   if (userId) {
     // Если все норм, то получить user и вставить его в req
     const user = await usersRepository.findById(userId)
