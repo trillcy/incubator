@@ -20,6 +20,8 @@ export const authMiidleware = async (
   // TODO: проверить наличие пользователя и валидность токена
   const token = req.headers.authorization.split(' ')[1]
   const payloadObject = await jwtService.getPayloadByToken(token, keys.access)
+  console.log('23++authMW-payloadObject', payloadObject)
+
   const userId = payloadObject.user.id
   if (userId) {
     // Если все норм, то получить user и вставить его в req
