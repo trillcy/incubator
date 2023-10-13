@@ -87,8 +87,8 @@ export const commentsRouter = () => {
         const commentId = req.params.id
         const userId = req.user ? req.user.id : null
         const owner = await commentsService.findById(userId, commentId)
-        console.log('58----comments.route', owner)
-        console.log('59----comments.route', req.user!)
+        console.log('90----comments.route', owner)
+        console.log('91----comments.route', req.user!)
 
         if (owner) {
           if (owner.commentatorInfo.userId !== req.user!.id.toString()) {
