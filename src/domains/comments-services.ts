@@ -33,7 +33,12 @@ export const commentsService = {
     )
   },
 */
-  async findById(userId: string, id: string): Promise<ViewCommentType | null> {
+  async findById(
+    userId: string | null,
+    id: string
+  ): Promise<ViewCommentType | null> {
+    console.log('37===comm.serv-userId', userId)
+
     return await commentsRepository.findById(userId, id)
   },
 

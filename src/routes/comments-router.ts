@@ -53,7 +53,8 @@ export const commentsRouter = () => {
         return res.status(400).send({ errorsMessages })
       } else {
         const commentId = req.params.id
-        const comment = await commentsService.findById(req.user!.id, commentId)
+        const userId = req.user ? req.user.id : null
+        const comment = await commentsService.findById(userId, commentId)
         console.log('58----comments.route', comment)
 
         if (!comment) return res.sendStatus(404)
@@ -87,7 +88,8 @@ export const commentsRouter = () => {
         return res.status(400).send({ errorsMessages })
       } else {
         const commentId = req.params.id
-        const owner = await commentsService.findById(req.user!.id, commentId)
+        const userId = req.user ? req.user.id : null
+        const owner = await commentsService.findById(userId, commentId)
         console.log('58----comments.route', owner)
         console.log('59----comments.route', req.user!)
 
@@ -110,10 +112,10 @@ export const commentsRouter = () => {
 
   router.delete('/:id', authMiidleware, async (req: Request, res: Response) => {
     const commentId = req.params.id
-    const owner = await commentsService.findById(req.user!.id, commentId)
-    console.log('82----comments.route', owner)
-    console.log('83----comments.route', req.user!.id.toString())
-    console.log('84----comments.route', req.user!)
+    const userId = req.user ? req.user.id : null
+    const owner = await commentsService.findById(userId, commentId)
+    console.log('117----comments.route', userId)
+    console.log('118----comments.route', req.user!)
 
     if (owner) {
       if (owner.commentatorInfo.userId !== req.user!.id.toString()) {
@@ -142,6 +144,8 @@ export const commentsRouter = () => {
         req.headers.authorization
       )
     }
+    console.log('145--comm.route-userId', userId)
+
     const comment = await commentsRepository.findById(userId, commentId)
     // добавляем blogName
     if (comment) {

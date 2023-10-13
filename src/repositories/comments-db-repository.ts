@@ -99,12 +99,15 @@ export const commentsRepository = {
   ): Promise<ViewCommentType | null> {
     const result = await commentsCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
-      let userStatus = null
-      if (userId)
-        userStatus = result.likesInfo.statuses.filter(
+      let userStatus = 'None'
+      console.log('103++comm.repo-userId', userId)
+
+      if (userId) {
+        const array = result.likesInfo.statuses.filter(
           (el) => el.userId === userId
         )
-
+        userStatus = array.length ? array[0].status : 'None'
+      }
       return {
         id: result._id.toString(),
         content: result.content,
@@ -116,7 +119,7 @@ export const commentsRepository = {
         likesInfo: {
           likesCount: result.likesInfo.likesCount,
           dislikesCount: result.likesInfo.dislikesCount,
-          myStatus: userStatus ? userStatus[0].status : 'None',
+          myStatus: userStatus,
         },
       }
       // =====
