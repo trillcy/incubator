@@ -101,6 +101,7 @@ export const commentsRepository = {
     if (result) {
       let userStatus = 'None'
       console.log('103++comm.repo-userId', userId)
+      console.log('104++comm.repo-userId', result)
 
       if (userId) {
         const array = result.likesInfo.statuses.filter(
@@ -142,12 +143,32 @@ export const commentsRepository = {
     return result.deletedCount === 1
   },
 
-  async updateLikes(id: string, element: any): Promise<boolean> {
+  async updateLikes(
+    userId: string,
+    id: string,
+    newLikesCount: number,
+    newDislikesCount: number,
+    likeStatus: string
+  ): Promise<boolean> {
+    const comment = await commentsCollection.findOne({ _id: new ObjectId(id) })
+    if (!comment) return false
+    const foundStatus = comment.likesInfo.statuses.find(
+      (el) => el.userId === userId
+    )
+    let index = comment.likesInfo.statuses.length
+    if (foundStatus) {
+      index = comment.likesInfo.statuses.indexOf(foundStatus)
+    }
+    comment.likesInfo.statuses[index] = { userId, status: likeStatus }
     const result = await commentsCollection.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...element,
+          likesInfo: {
+            likesCount: newLikesCount,
+            dislikesCount: newDislikesCount,
+            statuses: comment.likesInfo.statuses,
+          },
         },
       }
     )

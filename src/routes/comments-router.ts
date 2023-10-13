@@ -54,22 +54,19 @@ export const commentsRouter = () => {
       } else {
         const commentId = req.params.id
         const userId = req.user ? req.user.id : null
+        if (!userId) return res.sendStatus(401)
         const comment = await commentsService.findById(userId, commentId)
         console.log('58----comments.route', comment)
 
         if (!comment) return res.sendStatus(404)
         const { likeStatus } = req.body
         const result = await commentsService.updateLikeStatus(
+          userId,
           comment,
           likeStatus
         )
-        if (result) {
-          return res.sendStatus(204)
-        } else {
-          return res.sendStatus(404)
-        }
-
-        return res.sendStatus(404)
+        if (!result) return res.sendStatus(404)
+        return res.sendStatus(204)
       }
     }
   )
@@ -147,6 +144,8 @@ export const commentsRouter = () => {
     console.log('145--comm.route-userId', userId)
 
     const comment = await commentsRepository.findById(userId, commentId)
+    console.log('150-comm.route-get', comment)
+
     // добавляем blogName
     if (comment) {
       res.status(200).json(comment)

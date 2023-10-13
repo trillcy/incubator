@@ -55,17 +55,53 @@ export const commentsService = {
   },
 
   async updateLikeStatus(
+    userId: string,
     comment: ViewCommentType,
     likeStatus: string
   ): Promise<boolean> {
+    let oldLikesCount: number = comment.likesInfo.likesCount || 0
+    let oldDislikesCount: number = comment.likesInfo.dislikesCount || 0
+    let oldStatus = comment.likesInfo.myStatus || 'None'
+    let newLikesCount: number = 0
+    let newDislikesCount: number = 0
+
+    switch (oldStatus) {
+      case 'None': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount + 1 : oldLikesCount
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount + 1 : oldDislikesCount
+        break
+      }
+      case 'Like': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount : oldLikesCount - 1
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount + 1 : oldDislikesCount
+        break
+      }
+      case 'Dislike': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount + 1 : oldLikesCount
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount : oldDislikesCount - 1
+        break
+      }
+    }
     const newElement = {
       likesInfo: {
-        likesCount: comment.likesInfo.likesCount,
-        dislikesCount: comment.likesInfo.dislikesCount,
+        likesCount: newLikesCount,
+        dislikesCount: newDislikesCount,
         myStatus: likeStatus,
       },
     }
-    return await commentsRepository.updateLikes(comment.id, newElement)
+    return await commentsRepository.updateLikes(
+      userId,
+      comment.id,
+      newLikesCount,
+      newDislikesCount,
+      likeStatus
+    )
   },
 
   async createComment(
