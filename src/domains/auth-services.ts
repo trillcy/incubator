@@ -20,7 +20,10 @@ export const authService = {
     // TODO: проверить наличие пользователя и валидность токена
     const token = accessToken.split(' ')[1]
     const payloadObject = await jwtService.getPayloadByToken(token, keys.access)
-    return payloadObject.user.id
+    console.log('23==auth.serv-payloadObject', payloadObject)
+
+    // return payloadObject.user.id
+    return payloadObject.userId
   },
 
   async sendPasswordRecoveryEmail(

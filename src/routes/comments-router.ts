@@ -58,7 +58,7 @@ export const commentsRouter = () => {
         console.log('58---comm.route', commentId)
 
         const comment = await commentsService.findById(userId, commentId)
-        console.log('58----comments.route', comment)
+        console.log('61----comments.route', comment)
 
         if (!comment) return res.sendStatus(404)
         const { likeStatus } = req.body
