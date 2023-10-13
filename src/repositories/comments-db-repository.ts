@@ -22,7 +22,7 @@ const directions = ['asc', 'desc']
 
 export const commentsRepository = {
   async findAllComments(
-    userId: string,
+    userId: string | null,
     sortBy: string | undefined,
     sortDirection: string | undefined,
     pageNumber: string | undefined,
@@ -60,9 +60,13 @@ export const commentsRepository = {
     const resultArray = []
 
     for (let item of items) {
-      const myStatus = item.likesInfo.statuses.filter(
-        (el) => el.userId === userId
-      )
+      let userStatus = 'None'
+      if (userId) {
+        const array = item.likesInfo.statuses.filter(
+          (el) => el.userId === userId
+        )
+        userStatus = array.length ? array[0].status : 'None'
+      }
       const object: ViewCommentType = {
         id: item._id.toString(),
         content: item.content,
@@ -74,7 +78,7 @@ export const commentsRepository = {
         likesInfo: {
           likesCount: item.likesInfo.likesCount,
           dislikesCount: item.likesInfo.dislikesCount,
-          myStatus: myStatus.length ? myStatus[0].status : 'None',
+          myStatus: userStatus,
         },
       }
       resultArray.push(object)
@@ -89,12 +93,17 @@ export const commentsRepository = {
     return result
   },
 
-  async findById(userId: string, id: string): Promise<ViewCommentType | null> {
+  async findById(
+    userId: string | null,
+    id: string
+  ): Promise<ViewCommentType | null> {
     const result = await commentsCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
-      const myStatus = result.likesInfo.statuses.filter(
-        (el) => el.userId === userId
-      )
+      let userStatus = null
+      if (userId)
+        userStatus = result.likesInfo.statuses.filter(
+          (el) => el.userId === userId
+        )
 
       return {
         id: result._id.toString(),
@@ -107,7 +116,7 @@ export const commentsRepository = {
         likesInfo: {
           likesCount: result.likesInfo.likesCount,
           dislikesCount: result.likesInfo.dislikesCount,
-          myStatus: myStatus.length ? myStatus[0].status : 'None',
+          myStatus: userStatus ? userStatus[0].status : 'None',
         },
       }
       // =====

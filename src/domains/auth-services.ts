@@ -12,8 +12,17 @@ import { usersService } from './users-services'
 import { v4 as uuidv4 } from 'uuid'
 import { add } from 'date-fns'
 import { emailManager } from '../managers/emails-managers'
+import { jwtService } from '../applications/jwt-services'
+import { keys } from '../db/db'
 
 export const authService = {
+  async getUserIdInAccessToken(accessToken: string): Promise<string | null> {
+    // TODO: проверить наличие пользователя и валидность токена
+    const token = accessToken.split(' ')[1]
+    const payloadObject = await jwtService.getPayloadByToken(token, keys.access)
+    return payloadObject.user.id
+  },
+
   async sendPasswordRecoveryEmail(
     userId: string,
     email: string

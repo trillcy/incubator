@@ -17,6 +17,7 @@ import { ResultUser, ViewUserType } from '../types/types'
 import { authMiidleware } from '../middlewares/authMiddlware'
 import { commentsService } from '../domains/comments-services'
 import { commentsRepository } from '../repositories/comments-db-repository'
+import { authService } from '../domains/auth-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -132,10 +133,16 @@ export const commentsRouter = () => {
 
     return res.sendStatus(404)
   })
-  router.get('/:id', authMiidleware, async (req: Request, res: Response) => {
+  router.get('/:id', async (req: Request, res: Response) => {
     const commentId = req.params.id
-
-    const comment = await commentsRepository.findById(req.user!.id, commentId)
+    // проверяем можем ли мы получить user из accessToken
+    let userId = null
+    if (req.headers.authorization) {
+      userId = await authService.getUserIdInAccessToken(
+        req.headers.authorization
+      )
+    }
+    const comment = await commentsRepository.findById(userId, commentId)
     // добавляем blogName
     if (comment) {
       res.status(200).json(comment)
@@ -144,20 +151,5 @@ export const commentsRouter = () => {
     }
   })
 
-  /*
-  router.get('/', async (req: Request, res: Response) => {
-    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
-      req.query
-    const result: any = await blogsRepository.findAll(
-      searchNameTerm?.toString(),
-      sortBy?.toString(),
-      sortDirection?.toString(),
-      pageNumber?.toString(),
-      pageSize?.toString()
-    )
-
-    res.status(200).json(result)
-  })
-*/
   return router
 }

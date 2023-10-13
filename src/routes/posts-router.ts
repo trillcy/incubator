@@ -19,6 +19,7 @@ import { postsService } from '../domains/posts-services'
 import { authMiidleware } from '../middlewares/authMiddlware'
 import { commentsService } from '../domains/comments-services'
 import { commentsRepository } from '../repositories/comments-db-repository'
+import { authService } from '../domains/auth-services'
 
 type ErrorObject = { message: string; field: string }
 
@@ -82,35 +83,37 @@ export const postsRouter = () => {
     }
   )
 
-  router.get(
-    '/:postId/comments',
-    authMiidleware,
-    async (req: Request, res: Response) => {
-      const { sortBy, sortDirection, pageNumber, pageSize } = req.query
-      const postId = req.params.postId
-      if (!postId) {
-        res.sendStatus(404)
-        return
-      }
-
-      const post = await postsRepository.findById(postId)
-      if (!post) {
-        res.sendStatus(404)
-        return
-      }
-      const user = req.user!
-
-      const result: ResultComment = await commentsRepository.findAllComments(
-        user.id,
-        sortBy?.toString(),
-        sortDirection?.toString(),
-        pageNumber?.toString(),
-        pageSize?.toString(),
-        postId?.toString()
-      )
-      res.status(200).json(result)
+  router.get('/:postId/comments', async (req: Request, res: Response) => {
+    const { sortBy, sortDirection, pageNumber, pageSize } = req.query
+    const postId = req.params.postId
+    if (!postId) {
+      res.sendStatus(404)
+      return
     }
-  )
+
+    const post = await postsRepository.findById(postId)
+    if (!post) {
+      res.sendStatus(404)
+      return
+    }
+    // проверяем можем ли мы получить user из accessToken
+    let userId = null
+    if (req.headers.authorization) {
+      userId = await authService.getUserIdInAccessToken(
+        req.headers.authorization
+      )
+    }
+
+    const result: ResultComment = await commentsRepository.findAllComments(
+      userId,
+      sortBy?.toString(),
+      sortDirection?.toString(),
+      pageNumber?.toString(),
+      pageSize?.toString(),
+      postId?.toString()
+    )
+    res.status(200).json(result)
+  })
 
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
