@@ -21,21 +21,22 @@ export const authMiidleware = async (
   const token = req.headers.authorization.split(' ')[1]
   const payloadObject = await jwtService.getPayloadByToken(token, keys.access)
   console.log('23++authMW-payloadObject', payloadObject)
-
-  const userId = payloadObject.userId
-  // const userId = payloadObject.user.id
-  if (userId) {
-    // Если все норм, то получить user и вставить его в req
-    const user = await usersRepository.findById(userId)
-    if (user) {
-      req.user = {
-        id: user.id,
-        login: user.accountData.userName.login,
-        email: user.accountData.userName.email,
-        createdAt: user.accountData.createdAt.toISOString(),
+  if (payloadObject) {
+    const userId = payloadObject.userId
+    // const userId = payloadObject.user.id
+    if (userId) {
+      // Если все норм, то получить user и вставить его в req
+      const user = await usersRepository.findById(userId)
+      if (user) {
+        req.user = {
+          id: user.id,
+          login: user.accountData.userName.login,
+          email: user.accountData.userName.email,
+          createdAt: user.accountData.createdAt.toISOString(),
+        }
+        next()
+        return
       }
-      next()
-      return
     }
   }
   res.sendStatus(401)
