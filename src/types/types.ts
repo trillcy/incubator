@@ -76,6 +76,7 @@ export type ViewCommentType = {
   content: string
   commentatorInfo: { userId: string; userLogin: string }
   createdAt: string
+  likesInfo: { likesCount: number; dislikesCount: number; myStatus: string }
 }
 export type CommentDBType = {
   _id: ObjectId
@@ -83,6 +84,11 @@ export type CommentDBType = {
   commentatorInfo: { userId: string; userLogin: string }
   createdAt: string
   postId: string
+  likesInfo: {
+    likesCount: number
+    dislikesCount: number
+    statuses: { userId: string; status: string }[]
+  }
 }
 export type ResultComment = {
   pagesCount: number

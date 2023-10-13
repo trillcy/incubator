@@ -39,6 +39,40 @@ export const commentsRouter = () => {
   const router = Router()
 
   router.put(
+    '/:commentId/like-status',
+    authMiidleware,
+    validationMiidleware.likeStatusValidation,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        return res.status(400).send({ errorsMessages })
+      } else {
+        const commentId = req.params.id
+        const comment = await commentsService.findById(req.user!.id, commentId)
+        console.log('58----comments.route', comment)
+
+        if (!comment) return res.sendStatus(404)
+        const { likeStatus } = req.body
+        const result = await commentsService.updateLikeStatus(
+          comment,
+          likeStatus
+        )
+        if (result) {
+          return res.sendStatus(204)
+        } else {
+          return res.sendStatus(404)
+        }
+
+        return res.sendStatus(404)
+      }
+    }
+  )
+
+  router.put(
     '/:id',
     authMiidleware,
     validationMiidleware.commentContentValidation,
@@ -52,7 +86,7 @@ export const commentsRouter = () => {
         return res.status(400).send({ errorsMessages })
       } else {
         const commentId = req.params.id
-        const owner = await commentsService.findById(commentId)
+        const owner = await commentsService.findById(req.user!.id, commentId)
         console.log('58----comments.route', owner)
         console.log('59----comments.route', req.user!)
 
@@ -75,7 +109,7 @@ export const commentsRouter = () => {
 
   router.delete('/:id', authMiidleware, async (req: Request, res: Response) => {
     const commentId = req.params.id
-    const owner = await commentsService.findById(commentId)
+    const owner = await commentsService.findById(req.user!.id, commentId)
     console.log('82----comments.route', owner)
     console.log('83----comments.route', req.user!.id.toString())
     console.log('84----comments.route', req.user!)
@@ -98,10 +132,10 @@ export const commentsRouter = () => {
 
     return res.sendStatus(404)
   })
-  router.get('/:id', async (req: Request, res: Response) => {
+  router.get('/:id', authMiidleware, async (req: Request, res: Response) => {
     const commentId = req.params.id
 
-    const comment = await commentsRepository.findById(commentId)
+    const comment = await commentsRepository.findById(req.user!.id, commentId)
     // добавляем blogName
     if (comment) {
       res.status(200).json(comment)

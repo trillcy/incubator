@@ -33,8 +33,8 @@ export const commentsService = {
     )
   },
 */
-  async findById(id: string): Promise<ViewCommentType | null> {
-    return await commentsRepository.findById(id)
+  async findById(userId: string, id: string): Promise<ViewCommentType | null> {
+    return await commentsRepository.findById(userId, id)
   },
 
   async deleteAll(): Promise<boolean> {
@@ -49,6 +49,20 @@ export const commentsService = {
     return await commentsRepository.update(id, content)
   },
 
+  async updateLikeStatus(
+    comment: ViewCommentType,
+    likeStatus: string
+  ): Promise<boolean> {
+    const newElement = {
+      likesInfo: {
+        likesCount: comment.likesInfo.likesCount,
+        dislikesCount: comment.likesInfo.dislikesCount,
+        myStatus: likeStatus,
+      },
+    }
+    return await commentsRepository.updateLikes(comment.id, newElement)
+  },
+
   async createComment(
     content: string,
     postId: string,
@@ -60,6 +74,11 @@ export const commentsService = {
       commentatorInfo: { userId: user.id, userLogin: user.login },
       createdAt: new Date().toISOString(),
       postId,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        statuses: [],
+      },
     }
 
     const result = await commentsRepository.createComment({ ...newElement })
@@ -69,6 +88,11 @@ export const commentsService = {
         content: result.content,
         commentatorInfo: result.commentatorInfo,
         createdAt: result.createdAt,
+        likesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+        },
       }
     } else {
       return null

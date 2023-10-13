@@ -82,28 +82,35 @@ export const postsRouter = () => {
     }
   )
 
-  router.get('/:postId/comments', async (req: Request, res: Response) => {
-    const { sortBy, sortDirection, pageNumber, pageSize } = req.query
-    const postId = req.params.postId
-    if (!postId) {
-      res.sendStatus(404)
-      return
-    }
-    const post = await postsRepository.findById(postId)
-    if (!post) {
-      res.sendStatus(404)
-      return
-    }
+  router.get(
+    '/:postId/comments',
+    authMiidleware,
+    async (req: Request, res: Response) => {
+      const { sortBy, sortDirection, pageNumber, pageSize } = req.query
+      const postId = req.params.postId
+      if (!postId) {
+        res.sendStatus(404)
+        return
+      }
 
-    const result: ResultComment = await commentsRepository.findAllComments(
-      sortBy?.toString(),
-      sortDirection?.toString(),
-      pageNumber?.toString(),
-      pageSize?.toString(),
-      postId?.toString()
-    )
-    res.status(200).json(result)
-  })
+      const post = await postsRepository.findById(postId)
+      if (!post) {
+        res.sendStatus(404)
+        return
+      }
+      const user = req.user!
+
+      const result: ResultComment = await commentsRepository.findAllComments(
+        user.id,
+        sortBy?.toString(),
+        sortDirection?.toString(),
+        pageNumber?.toString(),
+        pageSize?.toString(),
+        postId?.toString()
+      )
+      res.status(200).json(result)
+    }
+  )
 
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =

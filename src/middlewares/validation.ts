@@ -14,6 +14,16 @@ import { devicesRepository } from '../repositories/devices-db-repository'
 import { authService } from '../domains/auth-services'
 
 export const validationMiidleware = {
+  likeStatusValidation: body('likeStatus')
+    .isString()
+    .trim()
+    .notEmpty()
+    .custom(async (value) => {
+      const isCorrect = ['None', 'Like', 'Dislike'].includes(value)
+      if (!isCorrect) throw new Error('incorrect likeStatus')
+      return true
+    }),
+
   titleValidation: body('title')
     .isString()
     .trim()

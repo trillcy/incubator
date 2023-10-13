@@ -22,6 +22,7 @@ const directions = ['asc', 'desc']
 
 export const commentsRepository = {
   async findAllComments(
+    userId: string,
     sortBy: string | undefined,
     sortDirection: string | undefined,
     pageNumber: string | undefined,
@@ -57,8 +58,11 @@ export const commentsRepository = {
     const totalCount = await commentsCollection.countDocuments(searchObject)
     const pagesCount = Math.ceil(totalCount / size)
     const resultArray = []
-    // if (items.length) {
+
     for (let item of items) {
+      const myStatus = item.likesInfo.statuses.filter(
+        (el) => el.userId === userId
+      )
       const object: ViewCommentType = {
         id: item._id.toString(),
         content: item.content,
@@ -67,6 +71,11 @@ export const commentsRepository = {
           userLogin: item.commentatorInfo.userLogin,
         },
         createdAt: item.createdAt,
+        likesInfo: {
+          likesCount: item.likesInfo.likesCount,
+          dislikesCount: item.likesInfo.dislikesCount,
+          myStatus: myStatus.length ? myStatus[0].status : 'None',
+        },
       }
       resultArray.push(object)
     }
@@ -80,9 +89,13 @@ export const commentsRepository = {
     return result
   },
 
-  async findById(id: string): Promise<ViewCommentType | null> {
+  async findById(userId: string, id: string): Promise<ViewCommentType | null> {
     const result = await commentsCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
+      const myStatus = result.likesInfo.statuses.filter(
+        (el) => el.userId === userId
+      )
+
       return {
         id: result._id.toString(),
         content: result.content,
@@ -91,6 +104,11 @@ export const commentsRepository = {
           userId: result.commentatorInfo.userId,
         },
         createdAt: result.createdAt,
+        likesInfo: {
+          likesCount: result.likesInfo.likesCount,
+          dislikesCount: result.likesInfo.dislikesCount,
+          myStatus: myStatus.length ? myStatus[0].status : 'None',
+        },
       }
       // =====
     } else {
@@ -110,6 +128,23 @@ export const commentsRepository = {
     console.log('110++++comments.repo', result)
 
     return result.deletedCount === 1
+  },
+
+  async updateLikes(id: string, element: any): Promise<boolean> {
+    const result = await commentsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...element,
+        },
+      }
+    )
+
+    if (result.matchedCount === 1) {
+      return true
+    } else {
+      return false
+    }
   },
 
   async update(id: string, content: string): Promise<boolean> {
