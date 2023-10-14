@@ -1,33 +1,60 @@
-import {
-  postsDb,
-  type PostType,
-  type ViewPostType,
-  type ResultPost,
-} from '../db/postsDb'
+import { type ViewPostType } from '../types/types'
 import { blogsCollection, db, postsCollection } from '../db/db'
 import { postsRepository } from '../repositories/posts-db-repository'
 import { blogsRepository } from '../repositories/blogs-db-repository'
 import { ObjectId } from 'mongodb'
 
 export const postsService = {
-  async findAll(
-    // searchNameTerm: string | undefined,
-    sortBy: string | undefined,
-    sortDirection: string | undefined,
-    pageNumber: string | undefined,
-    pageSize: string | undefined
-  ): Promise<ResultPost | null> {
-    return await postsRepository.findAll(
-      // searchNameTerm,
-      sortBy,
-      sortDirection,
-      pageNumber,
-      pageSize
+  async updateLikeStatus(
+    userId: string,
+    login: string,
+    post: ViewPostType,
+    likeStatus: string
+  ): Promise<boolean> {
+    let oldLikesCount: number = post.extendedLikesInfo.likesCount || 0
+    let oldDislikesCount: number = post.extendedLikesInfo.dislikesCount || 0
+    let oldStatus = post.extendedLikesInfo.myStatus || 'None'
+    let newLikesCount: number = 0
+    let newDislikesCount: number = 0
+    switch (oldStatus) {
+      case 'None': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount + 1 : oldLikesCount
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount + 1 : oldDislikesCount
+        break
+      }
+      case 'Like': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount : oldLikesCount - 1
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount + 1 : oldDislikesCount
+        break
+      }
+      case 'Dislike': {
+        newLikesCount =
+          likeStatus === 'Like' ? oldLikesCount + 1 : oldLikesCount
+        newDislikesCount =
+          likeStatus === 'Dislike' ? oldDislikesCount : oldDislikesCount - 1
+        break
+      }
+    }
+    const newElement = {
+      likesInfo: {
+        likesCount: newLikesCount,
+        dislikesCount: newDislikesCount,
+        myStatus: likeStatus,
+      },
+    }
+    return await postsRepository.updateLikes(
+      userId,
+      login,
+      post.id,
+      newLikesCount,
+      newDislikesCount,
+      likeStatus,
+      new Date()
     )
-  },
-
-  async findById(id: string): Promise<PostType | null> {
-    return await postsRepository.findById(id)
   },
 
   async deleteAll(): Promise<boolean> {
@@ -78,6 +105,12 @@ export const postsService = {
       blogId,
       blogName,
       createdAt: date.toISOString(),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        statuses: [],
+        newestLikes: [],
+      },
     }
 
     const result = await postsRepository.create({ ...newElement })

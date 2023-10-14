@@ -209,8 +209,10 @@ export const blogsRouter = () => {
     }
 
     const { sortBy, sortDirection, pageNumber, pageSize } = req.query
+    const userId = req.user ? req.user.id : null
 
     const result = await postsRepository.findAll(
+      userId,
       sortBy?.toString(),
       sortDirection?.toString(),
       pageNumber?.toString(),

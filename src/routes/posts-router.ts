@@ -1,19 +1,13 @@
 import { Request, Response, Router } from 'express'
 import { postsRepository } from '../repositories/posts-db-repository'
-import {
-  ValidationError,
-  body,
-  param,
-  validationResult,
-} from 'express-validator'
+import { ValidationError, validationResult } from 'express-validator'
 import { blogsRepository } from '../repositories/blogs-db-repository'
+import { type PostType, type ResultPost } from '../db/postsDb'
 import {
-  type PostType,
-  type ViewPostType,
-  type ResultPost,
-} from '../db/postsDb'
-import { type ResultComment } from '../types/types'
-import { type ViewCommentType } from '../types/types'
+  type ResultComment,
+  ViewPostType,
+  ViewCommentType,
+} from '../types/types'
 import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { authMiidleware } from '../middlewares/authMiddlware'
@@ -43,6 +37,46 @@ export const postsRouter = () => {
   const auth = (basicString: string | undefined) => {
     return basicString === `Basic YWRtaW46cXdlcnR5` ? true : false
   }
+  router.put(
+    '/:postId/like-status',
+    authMiidleware,
+    validationMiidleware.likeStatusValidation,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        const errorsArray = errors.array({ onlyFirstError: true })
+        const errorsMessages = errorsArray.map((e) => ErrorFormatter(e))
+
+        return res.status(400).send({ errorsMessages })
+      } else {
+        const postId = req.params.postId
+        const userId = req.user ? req.user.id : null
+        const login = req.user ? req.user.login : null
+
+        if (!userId || !login) return res.sendStatus(401)
+        console.log('62---post.route', postId)
+
+        const post: ViewPostType | null = await postsRepository.findById(
+          userId,
+          postId
+        )
+        console.log('61----post.route', post)
+
+        if (!post) return res.sendStatus(404)
+        const { likeStatus } = req.body
+        const result = await postsService.updateLikeStatus(
+          userId,
+          login,
+          post,
+          likeStatus
+        )
+        if (!result) return res.sendStatus(404)
+        return res.sendStatus(204)
+      }
+    }
+  )
+
   router.post(
     '/:postId/comments',
     authMiidleware,
@@ -65,7 +99,8 @@ export const postsRouter = () => {
           res.sendStatus(404)
           return
         }
-        const post = await postsRepository.findById(postId)
+        const userId = req.user ? req.user.id : null
+        const post = await postsRepository.findById(userId, postId)
         if (!post) {
           res.sendStatus(404)
           return
@@ -91,7 +126,7 @@ export const postsRouter = () => {
       return
     }
 
-    const post = await postsRepository.findById(postId)
+    const post = await postsRepository.findById(null, postId)
     if (!post) {
       res.sendStatus(404)
       return
@@ -118,9 +153,9 @@ export const postsRouter = () => {
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
       req.query
-
+    const userId = req.user ? req.user.id : null
     const result: ResultPost | null = await postsRepository.findAll(
-      // searchNameTerm?.toString(),
+      userId,
       sortBy?.toString(),
       sortDirection?.toString(),
       pageNumber?.toString(),
@@ -138,8 +173,9 @@ export const postsRouter = () => {
     //validationMiidleware.idValidation,
     async (req: Request, res: Response) => {
       const postId = req.params.id
+      const userId = req.user ? req.user.id : null
 
-      const post = await postsRepository.findById(postId)
+      const post = await postsRepository.findById(userId, postId)
       // добавляем blogName
       if (post) {
         const blogId = post.blogId

@@ -37,6 +37,12 @@ export type PostDBType = {
   blogId: string
   blogName: string
   createdAt: string
+  extendedLikesInfo: {
+    likesCount: number
+    dislikesCount: number
+    statuses: { addedAt: Date; userId: string; status: string; login: string }[]
+    // newestLikes: { addedAt: string; userId: string; login: string }[]
+  }
 }
 export type ViewPostType = {
   id: string
@@ -46,6 +52,12 @@ export type ViewPostType = {
   blogId: string
   blogName: string
   createdAt: string
+  extendedLikesInfo: {
+    likesCount: number
+    dislikesCount: number
+    myStatus: string
+    newestLikes: { addedAt: string; userId: string; login: string }[]
+  }
 }
 
 export type BlogDBType = {

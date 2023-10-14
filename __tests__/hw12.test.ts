@@ -3,18 +3,14 @@ import request from 'supertest'
 import { RouterPaths, app } from '../src/app'
 
 describe(RouterPaths.posts, () => {
-  // beforeAll(async () => {
-  //   await request(app).delete(`${RouterPaths.testing}/all-data`).expect(204)
-  // })
-
-  // afterAll((done) => {
-  //   done()
-  // })
-
-  it('check get -> correct getAll', async () => {
-    await request(app).get(RouterPaths.security).expect(200)
+  beforeAll(async () => {
+    await request(app).delete(`${RouterPaths.testing}/all-data`).expect(204)
   })
-  /*
+
+  afterAll((done) => {
+    done()
+  })
+
   it('create user; create correctpost1,2 -> 1, correct get all', async () => {
     // создаем корректный BLOG - 2 шт
     const testObj = {
@@ -22,14 +18,14 @@ describe(RouterPaths.posts, () => {
       email: 'andreiincubator@gmail.com',
       password: '12345678',
     }
-    console.log('42+++posts') //, accessToken)
+    console.log('21+++test.posts') //, accessToken)
 
     const expectObject = await request(app)
       .post(RouterPaths.users)
       .send(testObj)
       .expect(201)
     // auth/login
-    console.log('42+++posts') //, accessToken)
+    console.log('28+++test.posts') //, accessToken)
 
     const loginObject = { loginOrEmail: 'aer', password: '12345678' }
     const expectObject_2 = await request(app)
@@ -42,7 +38,6 @@ describe(RouterPaths.posts, () => {
     // const refreshToken = expectObject_2
     console.log('44+++posts') //, refreshToken)
   })
-*/
 
   /*
   it('create authorisation post -> incorrect name', async () => {

@@ -16,7 +16,53 @@ const postsFields = [
 const postsDirections = ['asc', 'desc']
 
 export const postsRepository = {
+  async updateLikes(
+    userId: string,
+    login: string,
+    id: string,
+    newLikesCount: number,
+    newDislikesCount: number,
+    likeStatus: string,
+    addedAt: Date
+  ): Promise<boolean> {
+    const post = await postsCollection.findOne({ _id: new ObjectId(id) })
+    if (!post) return false
+    const foundStatus = post.extendedLikesInfo.statuses.find(
+      (el) => el.userId === userId
+    )
+    let index = post.extendedLikesInfo.statuses.length
+    if (foundStatus) {
+      index = post.extendedLikesInfo.statuses.indexOf(foundStatus)
+    }
+
+    post.extendedLikesInfo.statuses[index] = {
+      addedAt,
+      userId,
+      login,
+      status: likeStatus,
+    }
+    const result = await postsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          likesInfo: {
+            likesCount: newLikesCount,
+            dislikesCount: newDislikesCount,
+            statuses: post.extendedLikesInfo.statuses,
+          },
+        },
+      }
+    )
+
+    if (result.matchedCount === 1) {
+      return true
+    } else {
+      return false
+    }
+  },
+
   async findAll(
+    userId: string | null,
     sortBy: string | undefined,
     sortDirection: string | undefined,
     pageNumber: string | undefined,
@@ -51,14 +97,30 @@ export const postsRepository = {
 
     const totalCount = await postsCollection.countDocuments(searchObject)
     const pagesCount = Math.ceil(totalCount / size)
-    // const resultArray = []
-    // if (items.length) {
-    //   for (let item of items) {
-    // const blogModel: ViewBlogType | null = await blogsRepository.findById(
-    //   item.blogId
-    // )
-    // if (blogModel) {
-    const object: ViewPostType[] = items.map((item) => {
+    const array: ViewPostType[] = items.map((item) => {
+      // определяем статус для конкретного поста
+      let userStatus = 'None'
+
+      if (userId) {
+        const array = item.extendedLikesInfo.statuses.filter(
+          (el) => el.userId === userId
+        )
+        userStatus = array.length ? array[0].status : 'None'
+      }
+
+      // находим первые три элемента по дате
+      const sortedLikes = item.extendedLikesInfo.statuses.sort(
+        (a, b) => a.addedAt.getTime() - b.addedAt.getTime()
+      )
+
+      const newestLikes = sortedLikes.slice(0, 3).map((el) => {
+        return {
+          addedAt: el.addedAt.toISOString(),
+          userId: el.userId,
+          login: el.login,
+        }
+      })
+
       return {
         id: item._id.toString(),
         title: item.title,
@@ -67,6 +129,12 @@ export const postsRepository = {
         blogId: item.blogId,
         blogName: item.blogName,
         createdAt: item.createdAt,
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: userStatus,
+          newestLikes: newestLikes,
+        },
       }
     })
     // resultArray.push(object)
@@ -79,21 +147,37 @@ export const postsRepository = {
       page: numberOfPage,
       pageSize: size,
       totalCount,
-      items: object,
+      items: array,
     }
     return result
   },
 
-  async findById(id: string): Promise<PostType | null> {
-    // const result = await postsCollection.findOne(
-    //   { id: id },
-    //   { projection: { _id: 0 } }
-    // )
-    const result = await postsCollection.findOne(
-      { _id: new ObjectId(id) }
-      // { projection: { _id: 0 } }
-    )
+  async findById(
+    userId: string | null,
+    id: string
+  ): Promise<ViewPostType | null> {
+    const result = await postsCollection.findOne({ _id: new ObjectId(id) })
     if (result) {
+      let userStatus = 'None'
+
+      if (userId) {
+        const array = result.extendedLikesInfo.statuses.filter(
+          (el) => el.userId === userId
+        )
+        userStatus = array.length ? array[0].status : 'None'
+      }
+
+      // находим первые три элемента по дате
+      const sortedLikes = result.extendedLikesInfo.statuses.sort(
+        (a, b) => a.addedAt.getTime() - b.addedAt.getTime()
+      )
+      const newestLikes = sortedLikes.slice(0, 3).map((el) => {
+        return {
+          addedAt: el.addedAt.toISOString(),
+          userId: el.userId,
+          login: el.login,
+        }
+      })
       // return result
       // ====
       return {
@@ -102,7 +186,14 @@ export const postsRepository = {
         shortDescription: result.shortDescription,
         content: result.content,
         blogId: result.blogId,
+        blogName: result.blogName,
         createdAt: result.createdAt,
+        extendedLikesInfo: {
+          likesCount: result.extendedLikesInfo.likesCount,
+          dislikesCount: result.extendedLikesInfo.dislikesCount,
+          myStatus: userStatus,
+          newestLikes,
+        },
       }
       // =====
     } else {
@@ -157,6 +248,12 @@ export const postsRepository = {
         blogId: newElement.blogId,
         blogName: newElement.blogName,
         createdAt: newElement.createdAt,
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
       }
     } else {
       return null
