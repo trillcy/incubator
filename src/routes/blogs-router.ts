@@ -12,6 +12,7 @@ import { validationMiidleware } from '../middlewares/validation'
 import { postsService } from '../domains/posts-services'
 import { ResultPost, ViewPostType } from '../db/postsDb'
 import { ViewBlogType, type ResultBlog } from '../types/types'
+import { authService } from '../domains/auth-services'
 type ErrorObject = { message: string; field: string }
 
 const ErrorFormatter = (error: ValidationError): ErrorObject => {
@@ -209,7 +210,13 @@ export const blogsRouter = () => {
     }
 
     const { sortBy, sortDirection, pageNumber, pageSize } = req.query
-    const userId = req.user ? req.user.id : null
+    // проверяем можем ли мы получить user из accessToken
+    let userId = null
+    if (req.headers.authorization) {
+      userId = await authService.getUserIdInAccessToken(
+        req.headers.authorization
+      )
+    }
 
     const result = await postsRepository.findAll(
       userId,
