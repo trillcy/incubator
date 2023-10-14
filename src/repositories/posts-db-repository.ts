@@ -173,7 +173,11 @@ export const postsRepository = {
       }
 
       // находим первые три элемента по дате
-      const sortedLikes = result.extendedLikesInfo.statuses.sort(
+      const filteredLikes = result.extendedLikesInfo.statuses.filter(
+        (el) => el.status === 'Like'
+      )
+
+      const sortedLikes = filteredLikes.sort(
         (a, b) => b.addedAt.getTime() - a.addedAt.getTime()
       )
       const newestLikes = sortedLikes.slice(0, 3).map((el) => {
