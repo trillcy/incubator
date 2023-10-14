@@ -11,9 +11,10 @@ const postsFields = [
   'content',
   'blogId',
   'blogName',
-  'extendedLikesInfo.likesCount',
-  'extendedLikesInfo.dislikesCount',
-  'extendedLikesInfo.myStatus',
+  'likesCount',
+  'dislikesCount',
+  // 'extendedLikesInfo.likesCount',
+  // 'extendedLikesInfo.dislikesCount',
 ]
 
 const postsDirections = ['asc', 'desc']
@@ -71,8 +72,10 @@ export const postsRepository = {
     blogId?: string | undefined
   ): Promise<ResultPost> {
     // -----
-    const sortField =
+    let sortField =
       sortBy && postsFields.includes(sortBy) ? sortBy : 'createdAt'
+    if (sortField === 'likesCount' || sortField === 'dislikesCount')
+      sortField = `extendedLikesInfo.${sortField}`
     const sortString =
       sortDirection && postsDirections.includes(sortDirection)
         ? sortDirection
