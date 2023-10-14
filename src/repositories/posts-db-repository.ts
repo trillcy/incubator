@@ -41,14 +41,23 @@ export const postsRepository = {
       index = post.extendedLikesInfo.statuses.indexOf(foundStatus)
     }
     let newPost = { ...post }
-    newPost.extendedLikesInfo.statuses[index] = {
+    // newPost.extendedLikesInfo.statuses[index] = {
+    //   addedAt,
+    //   userId,
+    //   login,
+    //   status: likeStatus,
+    // }
+    const newInfo = { ...post.extendedLikesInfo }
+    newInfo.likesCount = newLikesCount
+    newInfo.dislikesCount = newDislikesCount
+    newInfo.statuses = [...post.extendedLikesInfo.statuses]
+    newInfo.statuses[index] = {
       addedAt,
       userId,
       login,
       status: likeStatus,
     }
-    newPost.extendedLikesInfo.likesCount = newLikesCount
-    newPost.extendedLikesInfo.dislikesCount = newDislikesCount
+    newPost.extendedLikesInfo = newInfo
     const result = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       {
