@@ -107,8 +107,12 @@ export const postsRepository = {
       }
 
       // находим первые три элемента по дате
-      const sortedLikes = item.extendedLikesInfo.statuses.sort(
-        (a, b) => a.addedAt.getTime() - b.addedAt.getTime()
+      const filteredLikes = item.extendedLikesInfo.statuses.filter(
+        (el) => el.status === 'Like'
+      )
+
+      const sortedLikes = filteredLikes.sort(
+        (a, b) => b.addedAt.getTime() - a.addedAt.getTime()
       )
 
       const newestLikes = sortedLikes.slice(0, 3).map((el) => {
@@ -170,7 +174,7 @@ export const postsRepository = {
 
       // находим первые три элемента по дате
       const sortedLikes = result.extendedLikesInfo.statuses.sort(
-        (a, b) => a.addedAt.getTime() - b.addedAt.getTime()
+        (a, b) => b.addedAt.getTime() - a.addedAt.getTime()
       )
       const newestLikes = sortedLikes.slice(0, 3).map((el) => {
         return {

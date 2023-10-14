@@ -124,6 +124,7 @@ export const postsRouter = () => {
       res.sendStatus(404)
       return
     }
+    console.log('127--posts.route-postId', postId)
 
     const post = await postsRepository.findById(null, postId)
     if (!post) {

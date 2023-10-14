@@ -16,6 +16,8 @@ export const postsService = {
     let oldStatus = post.extendedLikesInfo.myStatus || 'None'
     let newLikesCount: number = 0
     let newDislikesCount: number = 0
+    // let newNewestLikes = [...post.extendedLikesInfo.newestLikes]
+
     console.log('19--post.serv', userId, login, likeStatus)
 
     switch (oldStatus) {
@@ -40,13 +42,6 @@ export const postsService = {
           likeStatus === 'Dislike' ? oldDislikesCount : oldDislikesCount - 1
         break
       }
-    }
-    const newElement = {
-      likesInfo: {
-        likesCount: newLikesCount,
-        dislikesCount: newDislikesCount,
-        myStatus: likeStatus,
-      },
     }
     console.log(
       '51==posts.serv',

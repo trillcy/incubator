@@ -16,6 +16,8 @@ const commentsFields = [
   'commentatorInfo.userId',
   'content',
   'postId',
+  'likesInfo.likesCount',
+  'likesInfo.dislikesCount',
 ]
 
 const directions = ['asc', 'desc']
@@ -30,6 +32,7 @@ export const commentsRepository = {
     postId?: string | undefined
   ): Promise<ResultComment> {
     console.log('32++comm.repo-userId', userId)
+    console.log('35++comm.repo-postd', postId)
 
     // -----
     const sortField =
@@ -48,7 +51,7 @@ export const commentsRepository = {
     const skipElements = (numberOfPage - 1) * size
     // -----
 
-    const searchObject = postId ? { postId: postId } : {}
+    const searchObject = { postId: postId }
     // ---------
     const items = await commentsCollection
       .find(searchObject) //, { projection: { _id: 0 } }
@@ -56,6 +59,8 @@ export const commentsRepository = {
       .skip(skipElements)
       .limit(size)
       .toArray()
+
+    console.log('60++comments.repo-get all items', items)
 
     const totalCount = await commentsCollection.countDocuments(searchObject)
     const pagesCount = Math.ceil(totalCount / size)
