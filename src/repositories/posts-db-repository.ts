@@ -11,6 +11,9 @@ const postsFields = [
   'content',
   'blogId',
   'blogName',
+  'extendedLikesInfo.likesCount',
+  'extendedLikesInfo.dislikesCount',
+  'extendedLikesInfo.myStatus',
 ]
 
 const postsDirections = ['asc', 'desc']
