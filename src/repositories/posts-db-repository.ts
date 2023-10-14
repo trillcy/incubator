@@ -57,7 +57,10 @@ export const postsRepository = {
       login,
       status: likeStatus,
     }
+
     newPost.extendedLikesInfo = newInfo
+    console.log('62++post.repo-like-newPost', newPost)
+
     const result = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -107,29 +110,28 @@ export const postsRepository = {
       .skip(skipElements)
       .limit(size)
       .toArray()
+    console.log('113++repo-items', items)
 
     const totalCount = await postsCollection.countDocuments(searchObject)
     const pagesCount = Math.ceil(totalCount / size)
-    const array: ViewPostType[] = items.map((item) => {
+    const array: ViewPostType[] = items.map((el) => {
       // определяем статус для конкретного поста
       let userStatus = 'None'
 
       if (userId) {
-        const array = item.extendedLikesInfo.statuses.filter(
+        const hasUserStatus = el.extendedLikesInfo.statuses.filter(
           (el) => el.userId === userId
         )
-        userStatus = array.length ? array[0].status : 'None'
+        userStatus = hasUserStatus.length ? hasUserStatus[0].status : 'None'
       }
 
       // находим первые три элемента по дате
-      const filteredLikes = item.extendedLikesInfo.statuses.filter(
+      const filteredLikes = el.extendedLikesInfo.statuses.filter(
         (el) => el.status === 'Like'
       )
-
       const sortedLikes = filteredLikes.sort(
         (a, b) => b.addedAt.getTime() - a.addedAt.getTime()
       )
-
       const newestLikes = sortedLikes.slice(0, 3).map((el) => {
         return {
           addedAt: el.addedAt.toISOString(),
@@ -139,16 +141,16 @@ export const postsRepository = {
       })
 
       return {
-        id: item._id.toString(),
-        title: item.title,
-        shortDescription: item.shortDescription,
-        content: item.content,
-        blogId: item.blogId,
-        blogName: item.blogName,
-        createdAt: item.createdAt,
+        id: el._id.toString(),
+        title: el.title,
+        shortDescription: el.shortDescription,
+        content: el.content,
+        blogId: el.blogId,
+        blogName: el.blogName,
+        createdAt: el.createdAt,
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
+          likesCount: el.extendedLikesInfo.likesCount,
+          dislikesCount: el.extendedLikesInfo.dislikesCount,
           myStatus: userStatus,
           newestLikes: newestLikes,
         },
@@ -273,8 +275,8 @@ export const postsRepository = {
         blogName: newElement.blogName,
         createdAt: newElement.createdAt,
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
+          likesCount: newElement.extendedLikesInfo.likesCount,
+          dislikesCount: newElement.extendedLikesInfo.dislikesCount,
           myStatus: 'None',
           newestLikes: [],
         },

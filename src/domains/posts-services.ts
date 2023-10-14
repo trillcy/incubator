@@ -16,7 +16,7 @@ export const postsService = {
     let oldStatus = post.extendedLikesInfo.myStatus || 'None'
     let newLikesCount: number = 0
     let newDislikesCount: number = 0
-    // let newNewestLikes = [...post.extendedLikesInfo.newestLikes]
+    let newNewestLikes = [...post.extendedLikesInfo.newestLikes]
 
     console.log('19--post.serv', userId, login, likeStatus)
 
