@@ -29,6 +29,8 @@ export const commentsRepository = {
     pageSize: string | undefined,
     postId?: string | undefined
   ): Promise<ResultComment> {
+    console.log('32++comm.repo-userId', userId)
+
     // -----
     const sortField =
       sortBy && commentsFields.includes(sortBy) ? sortBy : 'createdAt'

@@ -26,6 +26,8 @@ export const postsRepository = {
     addedAt: Date
   ): Promise<boolean> {
     const post = await postsCollection.findOne({ _id: new ObjectId(id) })
+    console.log('29++post.repo-post', post)
+
     if (!post) return false
     const foundStatus = post.extendedLikesInfo.statuses.find(
       (el) => el.userId === userId
@@ -34,23 +36,19 @@ export const postsRepository = {
     if (foundStatus) {
       index = post.extendedLikesInfo.statuses.indexOf(foundStatus)
     }
-
-    post.extendedLikesInfo.statuses[index] = {
+    let newPost = { ...post }
+    newPost.extendedLikesInfo.statuses[index] = {
       addedAt,
       userId,
       login,
       status: likeStatus,
     }
+    newPost.extendedLikesInfo.likesCount = newLikesCount
+    newPost.extendedLikesInfo.dislikesCount = newDislikesCount
     const result = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       {
-        $set: {
-          likesInfo: {
-            likesCount: newLikesCount,
-            dislikesCount: newDislikesCount,
-            statuses: post.extendedLikesInfo.statuses,
-          },
-        },
+        $set: { ...newPost },
       }
     )
 
@@ -156,7 +154,10 @@ export const postsRepository = {
     userId: string | null,
     id: string
   ): Promise<ViewPostType | null> {
+    console.log('161++post.repo-userId,id', userId, id)
+
     const result = await postsCollection.findOne({ _id: new ObjectId(id) })
+    console.log('164++post.repo-result', result)
     if (result) {
       let userStatus = 'None'
 

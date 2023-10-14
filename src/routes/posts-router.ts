@@ -55,13 +55,12 @@ export const postsRouter = () => {
         const login = req.user ? req.user.login : null
 
         if (!userId || !login) return res.sendStatus(401)
-        console.log('62---post.route', postId)
 
         const post: ViewPostType | null = await postsRepository.findById(
           userId,
           postId
         )
-        console.log('61----post.route', post)
+        console.log('63----post.route', post)
 
         if (!post) return res.sendStatus(404)
         const { likeStatus } = req.body
@@ -138,6 +137,7 @@ export const postsRouter = () => {
         req.headers.authorization
       )
     }
+    console.log('140---post.route-userId', userId)
 
     const result: ResultComment = await commentsRepository.findAllComments(
       userId,
@@ -153,7 +153,13 @@ export const postsRouter = () => {
   router.get('/', async (req: Request, res: Response) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
       req.query
-    const userId = req.user ? req.user.id : null
+    // проверяем можем ли мы получить user из accessToken
+    let userId = null
+    if (req.headers.authorization) {
+      userId = await authService.getUserIdInAccessToken(
+        req.headers.authorization
+      )
+    }
     const result: ResultPost | null = await postsRepository.findAll(
       userId,
       sortBy?.toString(),
@@ -173,7 +179,13 @@ export const postsRouter = () => {
     //validationMiidleware.idValidation,
     async (req: Request, res: Response) => {
       const postId = req.params.id
-      const userId = req.user ? req.user.id : null
+      // проверяем можем ли мы получить user из accessToken
+      let userId = null
+      if (req.headers.authorization) {
+        userId = await authService.getUserIdInAccessToken(
+          req.headers.authorization
+        )
+      }
 
       const post = await postsRepository.findById(userId, postId)
       // добавляем blogName

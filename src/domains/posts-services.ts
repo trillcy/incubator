@@ -16,6 +16,8 @@ export const postsService = {
     let oldStatus = post.extendedLikesInfo.myStatus || 'None'
     let newLikesCount: number = 0
     let newDislikesCount: number = 0
+    console.log('19--post.serv', userId, login, likeStatus)
+
     switch (oldStatus) {
       case 'None': {
         newLikesCount =
@@ -46,6 +48,14 @@ export const postsService = {
         myStatus: likeStatus,
       },
     }
+    console.log(
+      '51==posts.serv',
+      post.id,
+      newLikesCount,
+      newDislikesCount,
+      likeStatus
+    )
+
     return await postsRepository.updateLikes(
       userId,
       login,
