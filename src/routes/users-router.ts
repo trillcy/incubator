@@ -102,11 +102,11 @@ export const usersRouter = () => {
     const isExist = await usersRepository.findById(id)
     console.log('103--users.route-isExist', isExist)
 
-    if (!isExist) res.sendStatus(404)
+    if (!isExist) return res.sendStatus(404)
     // return deletedCount === 1 - достаточно?
     const result = await usersService.deleteUser(id)
     if (result) {
-      res.sendStatus(204)
+      return res.sendStatus(204)
     }
     // else {
     //   res.sendStatus(404)
