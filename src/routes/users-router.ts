@@ -78,7 +78,6 @@ export const usersRouter = () => {
       pageNumber,
       pageSize,
     } = req.query
-    console.log('81---')
 
     const result: ResultUser = await usersRepository.findAllUsers(
       searchLoginTerm?.toString(),
@@ -88,7 +87,6 @@ export const usersRouter = () => {
       pageNumber?.toString(),
       pageSize?.toString()
     )
-    console.log('91--users.route', result)
 
     res.status(200).json(result)
   })
@@ -100,6 +98,7 @@ export const usersRouter = () => {
       return
     }
     const id = req.params.id
+    console.log('103--users.route-delete', id)
 
     // return deletedCount === 1 - достаточно?
     const result = await usersService.deleteUser(id)
