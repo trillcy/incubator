@@ -249,13 +249,21 @@ export const usersRepository = {
   },
   async delete(id: string): Promise<boolean | null> {
     try {
-      if (!Types.ObjectId.isValid(id)) return null
+      if (!Types.ObjectId.isValid(id)) {
+        const user = await UserModel.findById(id)
+        console.log('254++user.repo-ошибочный id', user)
+        if (!user) return null
+        const result = await UserModel.deleteOne(user.id)
+        console.log('257++user.repo-ошибочный id', result)
+
+        return result.deletedCount === 1
+      }
       const result = await UserModel.deleteOne({ _id: new ObjectId(id) })
-      console.log('258++users.repo--результат удвления юзера', result)
+      console.log('262++users.repo--результат удвления юзера', result)
 
       return result.deletedCount === 1
     } catch (e) {
-      console.log('257---catch', e)
+      console.log('266---catch', e)
 
       return null
     }
