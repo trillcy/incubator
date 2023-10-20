@@ -6,7 +6,7 @@ import { usersRepository } from '../repositories/users-db-repository'
 
 export const usersService = {
   async deleteUser(id: string): Promise<boolean | null> {
-    // const transformId = id.
+    console.log('9==users.serv-id', id)
     const result = await usersRepository.delete(id)
     console.log('11==users.serv-результат удаления юзера', result)
     return result
