@@ -254,7 +254,7 @@ export const usersRepository = {
 
       return result.deletedCount === 1
     } catch (e) {
-      return true
+      return null
     }
   },
 
