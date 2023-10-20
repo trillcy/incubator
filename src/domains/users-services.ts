@@ -14,9 +14,12 @@ export const usersService = {
 
       return null
     }
-    console.log('20==user.serv')
+    console.log('20==user.serv', user.accountData.userName.login)
 
-    const result = await usersRepository.delete(id)
+    // const result = await usersRepository.delete(id)
+    const result = await usersRepository.deleteByLogin(
+      user.accountData.userName.login
+    )
     console.log('11==users.serv-результат удаления юзера', result)
     return result
   },
