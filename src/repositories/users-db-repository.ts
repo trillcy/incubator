@@ -197,7 +197,7 @@ export const usersRepository = {
         id: i._id.toString(),
         login: i.accountData.userName.login,
         email: i.accountData.userName.email,
-        createdAt: i.accountData.createdAt,
+        createdAt: i.accountData.createdAt.toISOString(),
       })),
     }
   },
