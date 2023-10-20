@@ -247,6 +247,20 @@ export const usersRepository = {
 
     return result
   },
+  async deleteByLogin(login: string): Promise<boolean | null> {
+    try {
+      const result = await UserModel.deleteOne({
+        'accountData.userName.login': login,
+      })
+      console.log('262++users.repo--результат удвления юзера', result)
+
+      return result.deletedCount === 1
+    } catch (e) {
+      console.log('266---catch', e)
+
+      return null
+    }
+  },
   async delete(id: string): Promise<boolean | null> {
     try {
       const result = await UserModel.deleteOne({ _id: new ObjectId(id) })
