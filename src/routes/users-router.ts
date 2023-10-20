@@ -107,10 +107,9 @@ export const usersRouter = () => {
     const result = await usersService.deleteUser(id)
     if (result) {
       return res.sendStatus(204)
+    } else {
+      return res.sendStatus(444)
     }
-    // else {
-    //   res.sendStatus(404)
-    // }
   })
 
   return router
