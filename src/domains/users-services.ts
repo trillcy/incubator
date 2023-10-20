@@ -7,6 +7,15 @@ import { usersRepository } from '../repositories/users-db-repository'
 export const usersService = {
   async deleteUser(id: string): Promise<boolean | null> {
     console.log('9==users.serv-id', id)
+    const user = await usersRepository.findById(id)
+    console.log('11==user.serv-user', user)
+    if (!user) {
+      console.log('13===user.serv-не нашли юзера')
+
+      return null
+    }
+    console.log('20==user.serv')
+
     const result = await usersRepository.delete(id)
     console.log('11==users.serv-результат удаления юзера', result)
     return result
