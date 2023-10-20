@@ -248,14 +248,14 @@ export const usersRepository = {
     return result
   },
   async delete(id: string): Promise<boolean | null> {
-    // try {
-    const result = await UserModel.deleteOne({ _id: new ObjectId(id) })
-    console.log('258++users.repo--результат удвления юзера', result)
+    try {
+      const result = await UserModel.deleteOne({ _id: new ObjectId(id) })
+      console.log('258++users.repo--результат удвления юзера', result)
 
-    return true //result.deletedCount === 1
-    // } catch (e) {
-    //   return null
-    // }
+      return result.deletedCount === 1
+    } catch (e) {
+      return true
+    }
   },
 
   async create(newElement: UserDBType): Promise<string> {
