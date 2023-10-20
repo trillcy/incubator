@@ -139,8 +139,12 @@ export const usersRepository = {
     const searchLogin = searchLoginTerm ? searchLoginTerm : ''
     const searchEmail = searchEmailTerm ? searchEmailTerm : ''
     // -----
-    const sortField =
-      sortBy && usersFields.includes(sortBy) ? sortBy : 'createdAt'
+    let sortField = 'accountData.createdAt'
+    if (sortBy && usersFields.includes(sortBy)) {
+      if (sortBy === 'login') sortField = 'accountData.userName.login'
+      if (sortBy === 'email') sortField = 'accountData.userName.email'
+    }
+    // ------
     const sortString =
       sortDirection && usersDirections.includes(sortDirection)
         ? sortDirection
