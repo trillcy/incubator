@@ -80,7 +80,7 @@ const effortSchema = new Schema<EffortDBType>({
   date: Date,
 })
 export const UserModel = mongoose.model('users', userSchema)
-export const EffortModel = mongoose.model('efforts', effortSchema)
+export const EffortModel = mongoose.model('attemps', effortSchema)
 // ------
 export const blogsCollection = db.collection<BlogDBType>('blogs')
 export const postsCollection = db.collection<PostDBType>('posts')

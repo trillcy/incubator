@@ -156,11 +156,6 @@ export const postsRepository = {
         },
       }
     })
-    // resultArray.push(object)
-    // } else {
-    //   return null
-    // }
-    // }
     const result: ResultPost = {
       pagesCount,
       page: numberOfPage,
