@@ -8,6 +8,7 @@ import {
   type ResultUser,
 } from '../types/types'
 import { UserModel } from '../db/db'
+import { log } from 'console'
 
 const usersFields = [
   'id',
@@ -133,6 +134,8 @@ export const usersRepository = {
     pageNumber: string | undefined,
     pageSize: string | undefined
   ): Promise<ResultUser> {
+    console.log('136+++users')
+
     const searchLogin = searchLoginTerm ? searchLoginTerm : ''
     const searchEmail = searchEmailTerm ? searchEmailTerm : ''
     // -----
@@ -170,6 +173,7 @@ export const usersRepository = {
       .skip(skipElements)
       .limit(size)
       .lean()
+    console.log('176+++users', items)
 
     const totalCount = await UserModel.countDocuments({
       $or: [
@@ -182,6 +186,8 @@ export const usersRepository = {
       ],
     })
     const pagesCount = Math.ceil(totalCount / size)
+    console.log('189++users')
+
     return {
       pagesCount,
       page: numberOfPage,
@@ -191,7 +197,7 @@ export const usersRepository = {
         id: i._id.toString(),
         login: i.accountData.userName.login,
         email: i.accountData.userName.email,
-        createdAt: i.accountData.createdAt.toISOString(),
+        createdAt: i.accountData.createdAt,
       })),
     }
   },
