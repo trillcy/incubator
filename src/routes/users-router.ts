@@ -98,9 +98,7 @@ export const usersRouter = () => {
       return
     }
     const id = req.params.id
-    console.log('101--users.route-delete-id', id)
     const isExist = await usersRepository.findById(id)
-    console.log('103--users.route-isExist', isExist)
 
     if (!isExist) return res.sendStatus(404)
     // return deletedCount === 1 - достаточно?
