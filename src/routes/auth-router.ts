@@ -57,6 +57,8 @@ export const authRouter = () => {
         return res.sendStatus(477)
       }
 
+      console.log('60---')
+
       const user = await authService.confirmationPasswordCode(recoveryCode)
 
       if (!user) {
