@@ -102,6 +102,7 @@ export const devicesRepository = {
 
   async createDevice(newElement: DeviceDBType): Promise<ViewDeviceType | null> {
     const result = await devicesCollection.insertOne({ ...newElement })
+    console.log('105----')
 
     if (result.acknowledged) {
       return {
