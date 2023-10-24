@@ -79,12 +79,12 @@ export const devicesRepository = {
     const userDevice = await devicesCollection.findOne({
       _id: new ObjectId(deviceId),
     })
-    console.log('78++dev.repo', deviceId, userDevice)
+    console.log('82++dev.repo', deviceId, userDevice)
 
     const result = await devicesCollection.deleteOne({
       _id: new ObjectId(deviceId),
     })
-    console.log('81++dev.repo', result)
+    console.log('87++dev.repo', result)
 
     return result.acknowledged
   },
