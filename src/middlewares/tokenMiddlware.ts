@@ -33,7 +33,7 @@ export const tokenMiddleware = async (
   if (exp * 1000 < Date.now()) res.sendStatus(401)
   // console.log('30+++token', userId)
   // console.log('31+++token', exp * 1000)
-  const iat = payloadObject.iat
+  const iat = +payloadObject.iat
   // console.log('34+++token', iat)
   // ---
   if (userId && deviceId) {
@@ -44,10 +44,10 @@ export const tokenMiddleware = async (
     // ---24.10
     console.log('45+++token', device)
     console.log('46+++token', device.lastActiveDate)
-    console.log('47+++token', device.lastActiveDate.getTime())
-    console.log('48+++token', new Date(+iat)) //* 1000))
+    console.log('47+++token', device.lastActiveDate.getTime() !== +iat)
+    console.log('48+++token', +iat) //* 1000))
 
-    if (device.lastActiveDate !== new Date(+iat))
+    if (device.lastActiveDate.getTime() !== +iat)
       // * 1000))
       return res.sendStatus(401)
     console.log('52+++token', iat)
