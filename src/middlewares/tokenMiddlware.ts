@@ -27,37 +27,29 @@ export const tokenMiddleware = async (
   const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
   const exp = +payloadObject.exp
-  // ---24.10
-  console.log('31++', exp * 1000)
-
-  if (exp * 1000 < Date.now()) res.sendStatus(401)
-  // console.log('30+++token', userId)
-  // console.log('31+++token', exp * 1000)
   const iat = +payloadObject.iat
-  // console.log('34+++token', iat)
-  // ---
   if (userId && deviceId) {
+    // ---24.10
+
     // Получить user, проверить, что device его и если норм, вставить его в req
     const user = await usersRepository.findById(userId)
     const device = await devicesRepository.findByDevice(deviceId)
+
+    // console.log('55+++token', device.lastActiveDate === new Date(+iat * 1000))
+
     if (!user || !device) {
-      return res.sendStatus(404)
+      console.log('42+++tokenMW')
+
+      return res.sendStatus(401)
     }
+    if (device.lastActiveDate.getTime() !== +iat * 1000)
+      return res.sendStatus(401)
+    console.log('60+++token')
 
     if (device.userId !== userId.toString()) {
       return res.sendStatus(403)
     }
 
-    // ---24.10
-    console.log('51+++token', device)
-    console.log('52+++token', device.lastActiveDate.getTime())
-    console.log('53+++token', +iat * 1000)
-
-    // console.log('55+++token', device.lastActiveDate === new Date(+iat * 1000))
-
-    if (device.lastActiveDate.getTime() !== +iat * 1000)
-      return res.sendStatus(401)
-    console.log('60+++token')
     req.user = {
       id: user.id,
       login: user.accountData.userName.login,
