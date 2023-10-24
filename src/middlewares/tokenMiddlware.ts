@@ -21,17 +21,21 @@ export const tokenMiddleware = async (
   console.log('20+++token', token)
 
   const payloadObject = await jwtService.getPayloadByToken(token, keys.refresh)
+  console.log('24++', payloadObject)
+
   if (!payloadObject) return res.sendStatus(401)
   const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
   const exp = +payloadObject.exp
   // ---24.10
+  console.log('29++', exp * 1000 < Date.now())
+
   if (exp * 1000 < Date.now()) res.sendStatus(401)
-  console.log('30+++token', userId)
-  console.log('31+++token', exp)
+  // console.log('30+++token', userId)
+  // console.log('31+++token', exp * 1000)
   console.log('32+++token', Date.now())
-  const iat = payloadObject.iat
-  console.log('34+++token', iat)
+  // const iat = payloadObject.iat
+  // console.log('34+++token', iat)
   // ---
   if (userId && deviceId) {
     // Получить user, проверить, что device его и если норм, вставить его в req
