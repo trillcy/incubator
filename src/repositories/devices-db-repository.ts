@@ -75,7 +75,17 @@ export const devicesRepository = {
     return result.acknowledged
   },
   async deleteOneDevice(deviceId: string): Promise<boolean> {
-    const result = await devicesCollection.deleteOne({ id: deviceId })
+    console.log('78++dev.repo', deviceId)
+    const userDevice = await devicesCollection.findOne({
+      _id: new ObjectId(deviceId),
+    })
+    console.log('78++dev.repo', deviceId, userDevice)
+
+    const result = await devicesCollection.deleteOne({
+      _id: new ObjectId(deviceId),
+    })
+    console.log('81++dev.repo', result)
+
     return result.acknowledged
   },
 
