@@ -155,7 +155,7 @@ export const authRouter = () => {
           '20s'
         )
         const payloadObject = await jwtService.decodeJWT(refreshToken)
-        const lastActiveDate = new Date(payloadObject.iat * 1000)
+        const lastActiveDate = new Date(payloadObject.iat * 10000)
         const expiredDate = payloadObject.exp
 
         const device = await devicesService.updateDevice(
@@ -222,7 +222,7 @@ export const authRouter = () => {
           )
 
           const payloadObject = await jwtService.decodeJWT(refreshToken)
-          const lastActiveDate = new Date(payloadObject.iat * 1000)
+          const lastActiveDate = new Date(payloadObject.iat * 10000)
           const expiredDate = payloadObject.exp
 
           const device = await devicesService.createDevice(
