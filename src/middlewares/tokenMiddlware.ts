@@ -28,12 +28,13 @@ export const tokenMiddleware = async (
   const deviceId = payloadObject.deviceId
   const exp = +payloadObject.exp
   // ---24.10
-  console.log('29++', exp * 1000 < Date.now())
+  console.log('31++', exp * 1000)
+  console.log('32+++token', Date.now())
+  console.log('33++', exp * 1000 < Date.now())
 
   if (exp * 1000 < Date.now()) res.sendStatus(401)
   // console.log('30+++token', userId)
   // console.log('31+++token', exp * 1000)
-  console.log('32+++token', Date.now())
   // const iat = payloadObject.iat
   // console.log('34+++token', iat)
   // ---
