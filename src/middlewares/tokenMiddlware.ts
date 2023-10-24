@@ -50,9 +50,9 @@ export const tokenMiddleware = async (
     // ---24.10
     console.log('51+++token', device)
     console.log('52+++token', device.lastActiveDate)
-    console.log('53+++token', typeof device.lastActiveDate)
-    console.log('54+++token', device.lastActiveDate !== new Date(+iat))
-    console.log('55+++token', +iat * 1000)
+    console.log('53+++token', new Date(+iat * 1000))
+    console.log('54+++token', typeof device.lastActiveDate.getTime())
+    console.log('55+++token', device.lastActiveDate === new Date(+iat * 1000))
 
     if (device.lastActiveDate !== new Date(+iat * 1000))
       // * 1000))
