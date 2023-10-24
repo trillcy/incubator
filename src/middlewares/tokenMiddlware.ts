@@ -47,19 +47,17 @@ export const tokenMiddleware = async (
     if (device.userId !== userId.toString()) {
       return res.sendStatus(403)
     }
-    /*
+
     // ---24.10
     console.log('51+++token', device)
-    console.log('52+++token', device.lastActiveDate)
-    console.log('53+++token', new Date(+iat * 1000))
+    console.log('52+++token', device.lastActiveDate.getTime())
+    console.log('53+++token', +iat * 1000)
 
-    console.log('55+++token', device.lastActiveDate === new Date(+iat * 1000))
+    // console.log('55+++token', device.lastActiveDate === new Date(+iat * 1000))
 
-    if (device.lastActiveDate !== new Date(+iat * 1000))
-      // * 1000))
+    if (device.lastActiveDate.getTime() !== +iat * 1000)
       return res.sendStatus(401)
     console.log('60+++token')
-*/
     req.user = {
       id: user.id,
       login: user.accountData.userName.login,
