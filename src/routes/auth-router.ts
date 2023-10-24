@@ -154,7 +154,6 @@ export const authRouter = () => {
           keys.refresh,
           '20s'
         )
-
         const payloadObject = await jwtService.decodeJWT(refreshToken)
         const lastActiveDate = new Date(payloadObject.iat * 10000)
         const expiredDate = payloadObject.exp
