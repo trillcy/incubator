@@ -44,7 +44,7 @@ export const tokenMiddleware = async (
     const device = await devicesRepository.findByDevice(deviceId)
     if (!user || !device) return res.sendStatus(404)
     // ---24.10
-    if (device.lastActiveDate !== new Date(iat * 1000))
+    if (device.lastActiveDate !== new Date(+iat * 1000))
       return res.sendStatus(401)
     if (device.userId !== userId.toString()) {
       // ---
