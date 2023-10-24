@@ -24,7 +24,11 @@ export const tokenMiddleware = async (
   if (!payloadObject) return res.sendStatus(401)
   const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
-  console.log('24+++token', userId)
+  const exp = payloadObject.exp
+  // ---24.10
+  if (exp < Date.now()) res.sendStatus(401)
+  console.log('24+++token', userId, exp)
+  // ---
   if (userId && deviceId) {
     // Получить user, проверить, что device его и если норм, вставить его в req
     const user = await usersRepository.findById(userId)
