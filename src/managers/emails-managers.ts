@@ -3,7 +3,6 @@ import nodemailer from 'nodemailer'
 
 export const emailManager = {
   async sendEmailConfirmationMessage(emailObject: EmailBody): Promise<any> {
-    console.log('6+++++email', emailObject)
     // ==========
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -22,7 +21,6 @@ export const emailManager = {
         html: emailObject.message, // html body
       })
 
-      console.log('35+++++email', info)
       return info
     }
 

@@ -24,9 +24,9 @@ export const tokenMiddleware = async (
   if (!payloadObject) return res.sendStatus(401)
   const userId = payloadObject.userId
   const deviceId = payloadObject.deviceId
-  const exp = payloadObject.exp
+  const exp = +payloadObject.exp
   // ---24.10
-  if (exp > Date.now()) res.sendStatus(401)
+  if (exp * 1000 < Date.now()) res.sendStatus(401)
   console.log('30+++token', userId)
   console.log('31+++token', exp)
   console.log('32+++token', Date.now())
