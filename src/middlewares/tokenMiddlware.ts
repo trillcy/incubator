@@ -40,22 +40,25 @@ export const tokenMiddleware = async (
     // Получить user, проверить, что device его и если норм, вставить его в req
     const user = await usersRepository.findById(userId)
     const device = await devicesRepository.findByDevice(deviceId)
-    if (!user || !device) return res.sendStatus(404)
-    // ---24.10
-    console.log('45+++token', device)
-    console.log('46+++token', device.lastActiveDate)
-    console.log('47+++token', device.lastActiveDate.getTime() !== +iat)
-    console.log('48+++token', +iat) //* 1000))
-
-    if (device.lastActiveDate.getTime() !== +iat)
-      // * 1000))
-      return res.sendStatus(401)
-    console.log('52+++token', iat)
+    if (!user || !device) {
+      return res.sendStatus(404)
+    }
 
     if (device.userId !== userId.toString()) {
-      // ---
       return res.sendStatus(403)
     }
+    // ---24.10
+    console.log('51+++token', device)
+    console.log('52+++token', device.lastActiveDate)
+    console.log('53+++token', typeof device.lastActiveDate)
+    console.log('54+++token', device.lastActiveDate !== new Date(+iat))
+    console.log('55+++token', +iat * 1000)
+
+    if (device.lastActiveDate !== new Date(+iat * 1000))
+      // * 1000))
+      return res.sendStatus(401)
+    console.log('60+++token', iat)
+
     req.user = {
       id: user.id,
       login: user.accountData.userName.login,

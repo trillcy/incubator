@@ -82,8 +82,6 @@ const effortSchema = new Schema<EffortDBType>({
 export const UserModel = mongoose.model('users', userSchema)
 export const EffortModel = mongoose.model('attemps', effortSchema)
 // ------
-export const tokensCollection = db.collection<string[]>('test')
-// ------
 export const blogsCollection = db.collection<BlogDBType>('blogs')
 export const postsCollection = db.collection<PostDBType>('posts')
 // export const usersCollection = db.collection<UserDBType>('users')
