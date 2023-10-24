@@ -29,8 +29,6 @@ export const tokenMiddleware = async (
   const exp = +payloadObject.exp
   // ---24.10
   console.log('31++', exp * 1000)
-  console.log('32+++token', Date.now())
-  console.log('33++', exp * 1000 < Date.now())
 
   if (exp * 1000 < Date.now()) res.sendStatus(401)
   // console.log('30+++token', userId)
@@ -44,13 +42,16 @@ export const tokenMiddleware = async (
     const device = await devicesRepository.findByDevice(deviceId)
     if (!user || !device) return res.sendStatus(404)
     // ---24.10
+    console.log('45+++token', device)
     if (device.lastActiveDate !== new Date(+iat * 1000))
       return res.sendStatus(401)
+    console.log('48+++token', device.lastActiveDate)
+    console.log('48+++token', new Date(+iat * 1000))
+
     if (device.userId !== userId.toString()) {
       // ---
       return res.sendStatus(403)
     }
-    console.log('32+++token', user)
     req.user = {
       id: user.id,
       login: user.accountData.userName.login,
