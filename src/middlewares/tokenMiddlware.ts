@@ -43,10 +43,12 @@ export const tokenMiddleware = async (
     if (!user || !device) return res.sendStatus(404)
     // ---24.10
     console.log('45+++token', device)
+    console.log('46+++token', device.lastActiveDate)
+    console.log('47+++token', iat)
+    console.log('48+++token', new Date(+iat * 1000))
+
     if (device.lastActiveDate !== new Date(+iat * 1000))
       return res.sendStatus(401)
-    console.log('48+++token', device.lastActiveDate)
-    console.log('48+++token', new Date(+iat * 1000))
 
     if (device.userId !== userId.toString()) {
       // ---
