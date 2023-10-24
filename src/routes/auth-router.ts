@@ -113,6 +113,7 @@ export const authRouter = () => {
   // возвращает {userId, login, email}
   router.get('/me', authMiidleware, async (req: Request, res: Response) => {
     const { user } = req
+    console.log('116---auth/me')
 
     if (user) {
       const userOut = {
