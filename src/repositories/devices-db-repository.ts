@@ -75,7 +75,7 @@ export const devicesRepository = {
     return result.acknowledged
   },
   async deleteOneDevice(deviceId: string): Promise<boolean> {
-    const result = await devicesCollection.deleteMany({ deviceId })
+    const result = await devicesCollection.deleteOne({ id: deviceId })
     return result.acknowledged
   },
 
