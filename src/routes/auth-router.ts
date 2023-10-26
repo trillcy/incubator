@@ -145,14 +145,14 @@ export const authRouter = () => {
         const accessToken = await jwtService.createJWT(
           accessData,
           keys.access,
-          '10s'
+          '10min'
         )
         const refreshData = { userId: user.id, deviceId }
 
         const refreshToken = await jwtService.createJWT(
           refreshData,
           keys.refresh,
-          '20s'
+          '20min'
         )
         const payloadObject = await jwtService.decodeJWT(refreshToken)
         const lastActiveDate = new Date(payloadObject.iat * 10000)
@@ -211,14 +211,14 @@ export const authRouter = () => {
           const accessToken = await jwtService.createJWT(
             accessData,
             keys.access,
-            '10s'
+            '10min'
           )
           const refreshData = { userId: user._id, deviceId }
 
           const refreshToken = await jwtService.createJWT(
             refreshData,
             keys.refresh,
-            '20s'
+            '20min'
           )
 
           const payloadObject = await jwtService.decodeJWT(refreshToken)
