@@ -79,7 +79,7 @@ const effortSchema = new Schema<EffortDBType>({
   URL: String,
   date: Date,
 })
-export const UserModel = mongoose.model('users', userSchema)
+export const UserModel = mongoose.model('sa/users', userSchema)
 export const EffortModel = mongoose.model('attemps', effortSchema)
 // ------
 export const blogsCollection = db.collection<BlogDBType>('blogs')
