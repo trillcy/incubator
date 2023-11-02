@@ -44,6 +44,8 @@ export const authRouter = () => {
     validationMiidleware.confirmRecoveryCodeValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
+      console.log('47-auth.route-new-password')
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -56,9 +58,6 @@ export const authRouter = () => {
       if (!recoveryCode) {
         return res.sendStatus(477)
       }
-
-      console.log('60---')
-
       const user = await authService.confirmationPasswordCode(recoveryCode)
 
       if (!user) {
@@ -83,6 +82,8 @@ export const authRouter = () => {
     effortsMiddleware,
     validationMiidleware.recoveryEmailValidation,
     async (req: Request, res: Response) => {
+      console.log('85-auth.route-password-recovery')
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -113,7 +114,7 @@ export const authRouter = () => {
   // возвращает {userId, login, email}
   router.get('/me', authMiidleware, async (req: Request, res: Response) => {
     const { user } = req
-    console.log('116---auth/me')
+    console.log('117-auth.route-me')
 
     if (user) {
       const userOut = {
@@ -133,6 +134,8 @@ export const authRouter = () => {
     '/refresh-token',
     tokenMiddleware,
     async (req: Request, res: Response) => {
+      console.log('137-auth.route-prefresh-token')
+
       const user = req.user
       const deviceId = req.deviceId
 
@@ -183,6 +186,7 @@ export const authRouter = () => {
     validationMiidleware.passwordValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
+      console.log('189-auth.route-login')
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -253,6 +257,8 @@ export const authRouter = () => {
     '/logout',
     tokenMiddleware,
     async (req: Request, res: Response) => {
+      console.log('260-auth.route-logiut')
+
       if (!req.deviceId) {
         return res.sendStatus(444)
       }
@@ -277,6 +283,8 @@ export const authRouter = () => {
     validationMiidleware.passwordValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
+      console.log('286-auth.route-registration')
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -309,6 +317,8 @@ export const authRouter = () => {
     validationMiidleware.emailValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
+      console.log('320-auth.route-egistration-email-resending')
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -336,6 +346,8 @@ export const authRouter = () => {
     validationMiidleware.codeValidation,
     effortsMiddleware,
     async (req: Request, res: Response) => {
+      console.log('349-auth.route-registration-confirmation')
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
