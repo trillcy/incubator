@@ -40,9 +40,9 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/new-password',
+    effortsMiddleware,
     validationMiidleware.newPasswordValidation,
     validationMiidleware.confirmRecoveryCodeValidation,
-    effortsMiddleware,
     async (req: Request, res: Response) => {
       console.log('47-auth.route-new-password')
 
@@ -182,9 +182,9 @@ export const authRouter = () => {
   // возвращает JWT accessToken - в теле ответа, refreshToken - в куках только для чтения
   router.post(
     '/login',
+    effortsMiddleware,
     validationMiidleware.loginOrEmailValidation,
     validationMiidleware.passwordValidation,
-    effortsMiddleware,
     async (req: Request, res: Response) => {
       console.log('189-auth.route-login')
       const errors = validationResult(req)
@@ -278,10 +278,10 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/registration',
+    effortsMiddleware,
     validationMiidleware.newLoginValidation,
     validationMiidleware.newEmailValidation,
     validationMiidleware.passwordValidation,
-    effortsMiddleware,
     async (req: Request, res: Response) => {
       console.log('286-auth.route-registration')
 
@@ -314,8 +314,8 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/registration-email-resending',
-    validationMiidleware.emailValidation,
     effortsMiddleware,
+    validationMiidleware.emailValidation,
     async (req: Request, res: Response) => {
       console.log('320-auth.route-egistration-email-resending')
 
@@ -343,8 +343,8 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/registration-confirmation',
-    validationMiidleware.codeValidation,
     effortsMiddleware,
+    validationMiidleware.codeValidation,
     async (req: Request, res: Response) => {
       console.log('349-auth.route-registration-confirmation')
 
