@@ -278,10 +278,10 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/registration',
-    effortsMiddleware,
     validationMiidleware.newLoginValidation,
     validationMiidleware.newEmailValidation,
     validationMiidleware.passwordValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       console.log('286-auth.route-registration')
 
@@ -314,8 +314,8 @@ export const authRouter = () => {
   // возвращает только код 204
   router.post(
     '/registration-email-resending',
-    effortsMiddleware,
     validationMiidleware.emailValidation,
+    effortsMiddleware,
     async (req: Request, res: Response) => {
       console.log('320-auth.route-egistration-email-resending')
 
