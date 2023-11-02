@@ -3,7 +3,7 @@ import { effortsRepository } from '../repositories/efforts-db-repository'
 import { effortsService } from '../domains/efforts-services'
 
 const limitReq = 5
-const expirateInMSeconds = 1000
+const expirateInMSeconds = 10000
 
 export const effortsMiddleware = async (
   req: Request,
